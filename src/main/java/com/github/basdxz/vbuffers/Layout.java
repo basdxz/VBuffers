@@ -6,6 +6,10 @@ public @interface Layout {
     @interface Attribute {
         String value();
 
+        String[] aliases() default {};
+
+        Class<?> type();
+
         int sizeBytes() default -1;
 
         int offsetBytes() default -1;
