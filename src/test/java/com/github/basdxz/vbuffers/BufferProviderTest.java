@@ -18,9 +18,9 @@ public final class BufferProviderTest {
         val buffer = BufferProvider.newBuffer(LayoutA.class, backing);
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
-            val normal = value + 55;
-            val color = value + 55;
-            val texture = value + 55;
+            val normal = value - 73;
+            val color = value + 81;
+            val texture = value + 120;
 
             buffer.position(position)
                   .normal(normal)
@@ -41,14 +41,20 @@ public final class BufferProviderTest {
 
         val intBacking = backing.asIntBuffer();
         for (val value : SAMPLE_VALUES) {
-            buffer.position(value)
-                  .normal(value)
-                  .color(value)
-                  .texture(value);
-            assertEquals(value, intBacking.get(0));
-            assertEquals(value, intBacking.get(1));
-            assertEquals(value, intBacking.get(2));
-            assertEquals(value, intBacking.get(3));
+            val position = value + 55;
+            val normal = value - 73;
+            val color = value + 81;
+            val texture = value + 120;
+
+            buffer.position(position)
+                  .normal(normal)
+                  .color(color)
+                  .texture(texture);
+
+            assertEquals(position, intBacking.get(0));
+            assertEquals(normal, intBacking.get(1));
+            assertEquals(color, intBacking.get(2));
+            assertEquals(texture, intBacking.get(3));
         }
     }
 }
