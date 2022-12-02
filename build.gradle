@@ -29,6 +29,9 @@ dependencies {
     // JetBrains Static Analysis
     implementation 'org.jetbrains:annotations:23.0.0'
 
+    // Supported Types
+    implementation 'org.joml:joml:1.10.5'
+
     // JUnit
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
