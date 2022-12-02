@@ -71,12 +71,10 @@ public final class BufferProviderTest {
         //Only worked with allocate direct
         val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
-        val position = new Vector3f();
-        val normal = new Vector3f();
-        val color = new Vector4f();
-        val texture = new Vector2f();
-
-        buffer.position(position);
+        val position = new Vector3f(55F, 994F, -1515F);
+        val normal = new Vector3f(35F, 300F, -105F);
+        val color = new Vector4f(7777F, 0F, -1F, 1000F);
+        val texture = new Vector2f(-642F, 0.66F);
 
         buffer.position(position)
               .normal(normal)
