@@ -13,33 +13,41 @@ import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 import static java.util.Objects.requireNonNull;
 
 public final class BufferProvider {
-    @SuppressWarnings("unchecked")
     public static <LAYOUT extends VBuffer> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
                                                             BackingProvider backingProvider) {
-        val classLoader = BufferProvider.class.getClassLoader();
-        val interfaces = new Class[]{layout};
-        val invocationHandler = new BufferInvocationHandler(layout, backingProvider);
-        return (LAYOUT) Proxy.newProxyInstance(classLoader, interfaces, invocationHandler);
+        return newBuffer(layout, backingProvider, 1);
     }
 
-    public static class BufferInvocationHandler implements InvocationHandler {
+    @SuppressWarnings("unchecked")
+    public static <LAYOUT extends VBuffer> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
+                                                            BackingProvider backingProvider,
+                                                            int sizeStrides) {
+        val classLoader = BufferProvider.class.getClassLoader();
+        val interfaces = new Class[]{layout};
+        val handler = new BufferHandler(layout, backingProvider, sizeStrides);
+        return (LAYOUT) Proxy.newProxyInstance(classLoader, interfaces, handler);
+    }
+
+    public static class BufferHandler implements InvocationHandler {
         protected final Map<String, Integer> attributeOffsets = new HashMap<>();
         protected final Map<String, AttributeType> attributeTypes = new HashMap<>();
+        protected final int sizeStrides;
         protected final ByteBuffer backing;
 
-        public BufferInvocationHandler(Class<?> layout, BackingProvider backingProvider) {
+        public BufferHandler(Class<?> layout, BackingProvider backingProvider, int sizeStrides) {
+            this.sizeStrides = sizeStrides;
             val layoutAnnotation = layout.getAnnotation(Layout.class);
             var offset = 0;
             for (Layout.Attribute attribute : layoutAnnotation.value()) {
                 val name = requireNonNull(attribute.value());
-                attributeOffsets.put(attribute.value(), offset);
+                this.attributeOffsets.put(attribute.value(), offset);
                 val typeClass = requireNonNull(attribute.type());
                 val type = requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attribute.type()));
 
                 offset += type.sizeBytes();
-                attributeTypes.put(attribute.value(), type);
+                this.attributeTypes.put(attribute.value(), type);
             }
-            this.backing = backingProvider.newBacking(offset);
+            this.backing = backingProvider.newBacking(offset * sizeStrides);
         }
 
         @Override
