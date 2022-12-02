@@ -7,17 +7,19 @@ import org.joml.Vector4f;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// New buffer of size bigger than 0
+// Iterator for read/writing
 @NoArgsConstructor
 public final class BufferProviderTest {
     private static final int[] SAMPLE_VALUES = new int[]{12, 100, 340, 4300};
 
     @Test
     public void test0() {
-        val backing = ByteBuffer.allocate(4 * 4);
-        val buffer = BufferProvider.newBuffer(LayoutA.class, backing);
+        val buffer = BufferProvider.newBuffer(LayoutA.class, ByteBuffer::allocate);
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
             val normal = value - 73;
@@ -38,10 +40,14 @@ public final class BufferProviderTest {
 
     @Test
     public void test1() {
-        val backing = ByteBuffer.allocate(4 * 4);
-        val buffer = BufferProvider.newBuffer(LayoutA.class, backing);
+        val intBackingBox = new IntBuffer[1];
+        val buffer = BufferProvider.newBuffer(LayoutA.class, capacity -> {
+            val backing = ByteBuffer.allocate(capacity);
+            intBackingBox[0] = backing.asIntBuffer();
+            return backing;
+        });
+        val intBacking = intBackingBox[0];
 
-        val intBacking = backing.asIntBuffer();
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
             val normal = value - 73;
@@ -63,8 +69,7 @@ public final class BufferProviderTest {
     @Test
     public void test2() {
         //Only worked with allocate direct
-        val backing = ByteBuffer.allocateDirect((3 + 3 + 4 + 2) * 4);
-        val buffer = BufferProvider.newBuffer(LayoutB.class, backing);
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
         val position = new Vector3f();
         val normal = new Vector3f();

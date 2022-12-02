@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 public @interface Layout {
     Attribute[] value();
 
+    int sizeBytes() default -1;
+
     @Target({})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Attribute {
