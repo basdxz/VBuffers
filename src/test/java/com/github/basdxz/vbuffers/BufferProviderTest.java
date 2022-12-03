@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -89,10 +90,84 @@ public final class BufferProviderTest {
         assertEquals(texture, buffer.texture());
     }
 
+    // Buffer treated as an array for reads and writes
+    // https://www.baeldung.com/java-bytebuffer
     @Test
     public void test3() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 1000);
+        val positions = IntStream.range(0, 1000)
+                                 .mapToObj(Vector3f::new)
+                                 .toList();
+        val normals = IntStream.range(0, 1000)
+                               .mapToObj(Vector3f::new)
+                               .toList();
+        val colors = IntStream.range(0, 1000)
+                              .mapToObj(Vector4f::new)
+                              .toList();
+        val textures = IntStream.range(0, 1000)
+                                .mapToObj(Vector2f::new)
+                                .toList();
 
-        //
+        while (buffer.hasRemaining()) {
+            val index = buffer.position();
+            buffer.positionFixOverlap(positions.get(index))
+                  .normal(normals.get(index))
+                  .color(colors.get(index))
+                  .texture(textures.get(index));
+            buffer.position(index + 1);
+        }
+        buffer.clear();
+
+        while (buffer.hasRemaining()) {
+            val index = buffer.position();
+            assertEquals(positions.get(index), buffer.positionFixOverlap());
+            assertEquals(normals.get(index), buffer.normal());
+            assertEquals(colors.get(index), buffer.color());
+            assertEquals(textures.get(index), buffer.texture());
+            buffer.position(index + 1);
+        }
+    }
+
+    // Flip/Compact demonstration
+    // https://www.happycoders.eu/java/bytebuffer-flip-compact
+    @Test
+    public void test4() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Duplicate
+    @Test
+    public void test5() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Slice
+    @Test
+    public void test6() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Read-Only
+    @Test
+    public void test7() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Iterate
+    @Test
+    public void test8() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Stream
+    @Test
+    public void test9() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    // Buffer to Buffer transfers
+    @Test
+    public void test10() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 }

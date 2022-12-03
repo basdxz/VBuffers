@@ -29,11 +29,12 @@ public final class BufferProvider {
     public static class BufferHandler implements InvocationHandler {
         protected final Map<String, Integer> attributeOffsets;
         protected final Map<String, AttributeType> attributeTypes;
+        protected final int strideBytes;
         protected final ByteBuffer backing;
         protected final int capacity;
-        protected int position = 0;
-        protected int limit = 0;
-        protected int mark = 0;
+        protected int position;
+        protected int limit;
+        protected int mark;
 
         public BufferHandler(Class<?> layout, Allocator allocator, int capacity) {
             val layoutAnnotation = layout.getAnnotation(Layout.class);
@@ -51,19 +52,23 @@ public final class BufferProvider {
             }
             this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
             this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
+            this.strideBytes = offset;
             this.backing = allocator.newBacking(offset * capacity);
             this.capacity = capacity;
+            this.position = 0;
+            this.limit = capacity;
+            this.mark = -1;
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
             return handleInternal(proxy, method, args)
-                    .orElse(handleAttribute(proxy, method, args));
+                    .orElseGet(() -> handleAttribute(proxy, method, args));
         }
 
         protected Optional<Object> handleInternal(Object proxy, Method method, Object[] args) {
             try {
-                val arg = args.length > 0 ? args[0] : null;
+                val arg = args != null && args.length > 0 ? args[0] : null;
                 switch (method.getName()) {
                     case "capacity" -> {
                         return Optional.of(capacity());
@@ -164,6 +169,7 @@ public final class BufferProvider {
             mark = -1;
         }
 
+        //TODO: Make compact actually compact stuff
         protected void compact() {
             limit = capacity;
             position = remaining();
@@ -204,7 +210,7 @@ public final class BufferProvider {
         }
 
         protected int keyOffset(String key) {
-            return attributeOffsets.get(key);
+            return attributeOffsets.get(key) + (strideBytes * position);
         }
     }
 }
