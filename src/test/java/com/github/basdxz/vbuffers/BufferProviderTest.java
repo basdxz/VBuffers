@@ -26,12 +26,13 @@ public final class BufferProviderTest {
             val color = value + 81;
             val texture = value + 120;
 
-            buffer.position(position)
+            //TODO: dumb issue, rename once overlap is solved
+            buffer.positionFixOverlap(position)
                   .normal(normal)
                   .color(color)
                   .texture(texture);
 
-            assertEquals(position, buffer.position());
+            assertEquals(position, buffer.positionFixOverlap());
             assertEquals(normal, buffer.normal());
             assertEquals(color, buffer.color());
             assertEquals(texture, buffer.texture());
@@ -54,7 +55,8 @@ public final class BufferProviderTest {
             val color = value + 81;
             val texture = value + 120;
 
-            buffer.position(position)
+            //TODO: dumb issue, rename once overlap is solved
+            buffer.positionFixOverlap(position)
                   .normal(normal)
                   .color(color)
                   .texture(texture);
@@ -76,14 +78,21 @@ public final class BufferProviderTest {
         val color = new Vector4f(7777F, 0F, -1F, 1000F);
         val texture = new Vector2f(-642F, 0.66F);
 
-        buffer.position(position)
+        buffer.positionFixOverlap(position)
               .normal(normal)
               .color(color)
               .texture(texture);
 
-        assertEquals(position, buffer.position());
+        assertEquals(position, buffer.positionFixOverlap());
         assertEquals(normal, buffer.normal());
         assertEquals(color, buffer.color());
         assertEquals(texture, buffer.texture());
+    }
+
+    @Test
+    public void test3() {
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+
+        //
     }
 }

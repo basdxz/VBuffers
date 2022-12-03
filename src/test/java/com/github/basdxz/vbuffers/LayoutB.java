@@ -5,14 +5,14 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-@Layout({@Attribute(value = "position", type = Vector3f.class),
+@Layout({@Attribute(value = "positionFixOverlap", type = Vector3f.class),
          @Attribute(value = "normal", type = Vector3f.class),
          @Attribute(value = "color", type = Vector4f.class),
          @Attribute(value = "texture", type = Vector2f.class)})
 public interface LayoutB extends VBuffer {
-    LayoutB position(Vector3f value);
+    LayoutB positionFixOverlap(Vector3f value);
 
-    Vector3f position();
+    Vector3f positionFixOverlap();
 
     LayoutB normal(Vector3f value);
 

@@ -6,58 +6,189 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
-import static java.util.Objects.requireNonNull;
 
 public final class BufferProvider {
     public static <LAYOUT extends VBuffer> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
-                                                            BackingProvider backingProvider) {
-        return newBuffer(layout, backingProvider, 1);
+                                                            Allocator allocator) {
+        return newBuffer(layout, allocator, 1);
     }
 
     @SuppressWarnings("unchecked")
     public static <LAYOUT extends VBuffer> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
-                                                            BackingProvider backingProvider,
-                                                            int sizeStrides) {
+                                                            Allocator allocator,
+                                                            int capacity) {
         val classLoader = BufferProvider.class.getClassLoader();
         val interfaces = new Class[]{layout};
-        val handler = new BufferHandler(layout, backingProvider, sizeStrides);
+        val handler = new BufferHandler(layout, allocator, capacity);
         return (LAYOUT) Proxy.newProxyInstance(classLoader, interfaces, handler);
     }
 
     public static class BufferHandler implements InvocationHandler {
-        protected final Map<String, Integer> attributeOffsets = new HashMap<>();
-        protected final Map<String, AttributeType> attributeTypes = new HashMap<>();
-        protected final int sizeStrides;
+        protected final Map<String, Integer> attributeOffsets;
+        protected final Map<String, AttributeType> attributeTypes;
         protected final ByteBuffer backing;
+        protected final int capacity;
+        protected int position = 0;
+        protected int limit = 0;
+        protected int mark = 0;
 
-        public BufferHandler(Class<?> layout, BackingProvider backingProvider, int sizeStrides) {
-            this.sizeStrides = sizeStrides;
+        public BufferHandler(Class<?> layout, Allocator allocator, int capacity) {
             val layoutAnnotation = layout.getAnnotation(Layout.class);
+            var attributeOffsets = new HashMap<String, Integer>();
+            var attributeTypes = new HashMap<String, AttributeType>();
             var offset = 0;
             for (Layout.Attribute attribute : layoutAnnotation.value()) {
-                val name = requireNonNull(attribute.value());
-                this.attributeOffsets.put(attribute.value(), offset);
-                val typeClass = requireNonNull(attribute.type());
-                val type = requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attribute.type()));
+                val name = Objects.requireNonNull(attribute.value());
+                attributeOffsets.put(attribute.value(), offset);
+                val typeClass = Objects.requireNonNull(attribute.type());
+                val type = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attribute.type()));
 
                 offset += type.sizeBytes();
-                this.attributeTypes.put(attribute.value(), type);
+                attributeTypes.put(attribute.value(), type);
             }
-            this.backing = backingProvider.newBacking(offset * sizeStrides);
+            this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
+            this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
+            this.backing = allocator.newBacking(offset * capacity);
+            this.capacity = capacity;
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) {
-            val key = method.getName();
-            if (args != null) {
-                set(key, args[0]);
-                return proxy;
+            return handleInternal(proxy, method, args)
+                    .orElse(handleAttribute(proxy, method, args));
+        }
+
+        protected Optional<Object> handleInternal(Object proxy, Method method, Object[] args) {
+            try {
+                val arg = args.length > 0 ? args[0] : null;
+                switch (method.getName()) {
+                    case "capacity" -> {
+                        return Optional.of(capacity());
+                    }
+                    case "position" -> {
+                        if (arg == null)
+                            return Optional.of(position());
+                        position((Integer) arg);
+                        return Optional.of(0);
+                    }
+                    case "limit" -> {
+                        if (arg == null)
+                            return Optional.of(limit());
+                        limit((Integer) arg);
+                        return Optional.of(0);
+                    }
+                    case "mark" -> {
+                        mark();
+                        return Optional.of(0);
+                    }
+                    case "reset" -> {
+                        reset();
+                        return Optional.of(0);
+                    }
+                    case "clear" -> {
+                        clear();
+                        return Optional.of(0);
+                    }
+                    case "flip" -> {
+                        flip();
+                        return Optional.of(0);
+                    }
+                    case "rewind" -> {
+                        rewind();
+                        return Optional.of(0);
+                    }
+                    case "compact" -> {
+                        compact();
+                        return Optional.of(0);
+                    }
+                    case "hasRemaining" -> {
+                        return Optional.of(hasRemaining());
+                    }
+                    case "remaining" -> {
+                        return Optional.of(remaining());
+                    }
+                    default -> {
+                        return Optional.empty();
+                    }
+                }
+            } catch (Throwable e) {
+                return Optional.empty();
             }
-            return get(key);
+        }
+
+        protected int capacity() {
+            return capacity;
+        }
+
+        protected int position() {
+            return position;
+        }
+
+        protected void position(int position) {
+            this.position = position;
+        }
+
+        protected int limit() {
+            return 0;
+        }
+
+        protected void limit(int limit) {
+            this.limit = limit;
+        }
+
+        protected void mark() {
+            mark = position;
+        }
+
+        protected void reset() {
+            position = mark;
+        }
+
+        protected void clear() {
+            limit = capacity;
+            position = 0;
+            mark = -1;
+        }
+
+        protected void flip() {
+            limit = position;
+            position = 0;
+            mark = -1;
+        }
+
+        protected void rewind() {
+            position = 0;
+            mark = -1;
+        }
+
+        protected void compact() {
+            limit = capacity;
+            position = remaining();
+            mark = -1;
+        }
+
+        protected boolean hasRemaining() {
+            return position < limit;
+        }
+
+        protected int remaining() {
+            return limit - position;
+        }
+
+        protected Object handleAttribute(Object proxy, Method method, Object[] args) {
+            val key = method.getName();
+            try {
+                if (args != null) {
+                    set(key, args[0]);
+                    return proxy;
+                }
+                return get(key);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to handle key " + key, e);
+            }
         }
 
         protected void set(String key, Object value) {

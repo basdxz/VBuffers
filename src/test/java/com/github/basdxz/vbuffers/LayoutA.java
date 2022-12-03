@@ -2,14 +2,14 @@ package com.github.basdxz.vbuffers;
 
 import com.github.basdxz.vbuffers.Layout.Attribute;
 
-@Layout({@Attribute(value = "position", type = Integer.class),
+@Layout({@Attribute(value = "positionFixOverlap", type = Integer.class),
          @Attribute(value = "normal", type = Integer.class),
          @Attribute(value = "color", type = Integer.class),
          @Attribute(value = "texture", type = Integer.class)})
 public interface LayoutA extends VBuffer {
-    LayoutA position(int value);
+    LayoutA positionFixOverlap(int value);
 
-    int position();
+    int positionFixOverlap();
 
     LayoutA normal(int value);
 
