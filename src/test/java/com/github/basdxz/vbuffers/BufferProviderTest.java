@@ -45,9 +45,9 @@ public final class BufferProviderTest {
     public void test1() {
         val intBackingBox = new IntBuffer[1];
         val buffer = BufferProvider.newBuffer(LayoutA.class, capacity -> {
-            val backing = ByteBuffer.allocate(capacity);
-            intBackingBox[0] = backing.asIntBuffer();
-            return backing;
+            val allocation = ByteBuffer.allocate(capacity);
+            intBackingBox[0] = allocation.asIntBuffer();
+            return allocation;
         });
         val intBacking = intBackingBox[0];
 
@@ -133,7 +133,37 @@ public final class BufferProviderTest {
     // https://www.happycoders.eu/java/bytebuffer-flip-compact
     @Test
     public void test4() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
+        val positions = IntStream.range(0, BUFFER_SIZE)
+                                 .mapToObj(Vector3f::new)
+                                 .toList();
+        val normals = IntStream.range(0, BUFFER_SIZE)
+                               .mapToObj(Vector3f::new)
+                               .toList();
+        val colors = IntStream.range(0, BUFFER_SIZE)
+                              .mapToObj(Vector4f::new)
+                              .toList();
+        val textures = IntStream.range(0, BUFFER_SIZE)
+                                .mapToObj(Vector2f::new)
+                                .toList();
+        while (buffer.hasRemaining()) {
+            val index = buffer.position();
+            buffer.positionFixOverlap(positions.get(index))
+                  .normal(normals.get(index))
+                  .color(colors.get(index))
+                  .texture(textures.get(index));
+            buffer.position(index + 1);
+        }
+
+        buffer.flip();
+        while (buffer.hasRemaining()) {
+            val index = buffer.position();
+            assertEquals(positions.get(index), buffer.positionFixOverlap());
+            assertEquals(normals.get(index), buffer.normal());
+            assertEquals(colors.get(index), buffer.color());
+            assertEquals(textures.get(index), buffer.texture());
+            buffer.position(index + 1);
+        }
     }
 
     // Duplicate
