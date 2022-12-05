@@ -27,7 +27,7 @@ public interface VBuffer {
 
     void copy(int sourceIndex, int targetIndex);
 
-    void next();
+    boolean next();
 
     boolean hasRemaining();
 
