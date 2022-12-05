@@ -30,7 +30,7 @@ public final class BufferProvider {
         protected final Map<String, Integer> attributeOffsets;
         protected final Map<String, AttributeType> attributeTypes;
         protected final int strideBytes;
-        protected final ByteBuffer backing;
+        protected final ByteBuffer buffer;
         protected final int capacity;
         protected int position;
         protected int limit;
@@ -53,7 +53,7 @@ public final class BufferProvider {
             this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
             this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
             this.strideBytes = offset;
-            this.backing = allocator.newBacking(offset * capacity);
+            this.buffer = allocator.allocate(offset * capacity);
             this.capacity = capacity;
             this.position = 0;
             this.limit = capacity;
@@ -198,11 +198,11 @@ public final class BufferProvider {
         }
 
         protected void set(String key, Object value) {
-            attributeType(key).set(backing, keyOffset(key), value);
+            attributeType(key).set(buffer, keyOffset(key), value);
         }
 
         protected Object get(String key) {
-            return attributeType(key).get(backing, keyOffset(key));
+            return attributeType(key).get(buffer, keyOffset(key));
         }
 
         protected AttributeType attributeType(String key) {

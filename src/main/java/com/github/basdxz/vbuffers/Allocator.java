@@ -4,5 +4,5 @@ import java.nio.ByteBuffer;
 
 @FunctionalInterface
 public interface Allocator {
-    ByteBuffer newBacking(int sizeBytes);
+    ByteBuffer allocate(int sizeBytes);
 }
