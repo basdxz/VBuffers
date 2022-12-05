@@ -6,23 +6,20 @@ import com.github.basdxz.vbuffers.Layout.Attribute;
          @Attribute(value = "normal", type = Integer.class),
          @Attribute(value = "color", type = Integer.class),
          @Attribute(value = "texture", type = Integer.class)})
-public interface LayoutA<LAYOUT extends LayoutA<LAYOUT>> extends VBuffer<LAYOUT> {
-    LayoutA<?> position(int value);
+public interface LayoutA extends VBuffer<LayoutA> {
+    LayoutA position(int value);
 
     int position();
 
-    LayoutA<?> normal(int value);
+    LayoutA normal(int value);
 
     int normal();
 
-    LayoutA<?> color(int value);
+    LayoutA color(int value);
 
     int color();
 
-    LayoutA<?> texture(int value);
+    LayoutA texture(int value);
 
     int texture();
-
-    @Override
-    LAYOUT v$duplicate();
 }
