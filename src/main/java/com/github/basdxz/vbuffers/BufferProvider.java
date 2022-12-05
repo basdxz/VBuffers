@@ -190,16 +190,15 @@ public final class BufferProvider {
             mark = -1;
         }
 
-        protected void copy(int sourceIndex, int targetIndex, int length) {
-            for (var i = 0; i < length; i++)
-                copy(sourceIndex + i, targetIndex + i);
+        protected void copy(int sourceIndex, int targetIndex) {
+            copy(sourceIndex, targetIndex, 1);
         }
 
-        protected void copy(int sourceIndex, int targetIndex) {
+        protected void copy(int sourceIndex, int targetIndex, int length) {
             val sourceOffsetBytes = sourceIndex * strideBytes;
             val targetOffsetBytes = targetIndex * strideBytes;
-            for (var i = 0; i < strideBytes; i++)
-                buffer.put(targetOffsetBytes + i, buffer.get(sourceOffsetBytes + i));
+            val lengthBytes = length * strideBytes;
+            buffer.put(targetOffsetBytes, buffer, sourceOffsetBytes, lengthBytes);
         }
 
         protected boolean next() {
