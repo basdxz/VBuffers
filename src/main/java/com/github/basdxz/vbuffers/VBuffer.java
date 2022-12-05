@@ -23,6 +23,10 @@ public interface VBuffer {
 
     void compact();
 
+    void copy(int sourceIndex, int targetIndex, int length);
+
+    void copy(int sourceIndex, int targetIndex);
+
     void next();
 
     boolean hasRemaining();

@@ -68,21 +68,21 @@ public final class BufferProvider {
 
         protected Optional<Object> handleInternal(Object proxy, Method method, Object[] args) {
             try {
-                val arg = args != null && args.length > 0 ? args[0] : null;
+                val firstArg = args != null && args.length > 0 ? args[0] : null;
                 switch (method.getName()) {
                     case "capacity" -> {
                         return Optional.of(capacity());
                     }
                     case "position" -> {
-                        if (arg == null)
+                        if (firstArg == null)
                             return Optional.of(position());
-                        position((Integer) arg);
+                        position((Integer) firstArg);
                         return Optional.of(0);
                     }
                     case "limit" -> {
-                        if (arg == null)
+                        if (firstArg == null)
                             return Optional.of(limit());
-                        limit((Integer) arg);
+                        limit((Integer) firstArg);
                         return Optional.of(0);
                     }
                     case "mark" -> {
@@ -107,6 +107,16 @@ public final class BufferProvider {
                     }
                     case "compact" -> {
                         compact();
+                        return Optional.of(0);
+                    }
+                    case "copy" -> {
+                        if (firstArg == null)
+                            return Optional.empty();
+                        if (args.length == 2) {
+                            copy((Integer) args[0], (Integer) args[1]);
+                        } else {
+                            copy((Integer) args[0], (Integer) args[1], (Integer) args[2]);
+                        }
                         return Optional.of(0);
                     }
                     case "next" -> {
@@ -174,18 +184,18 @@ public final class BufferProvider {
 
         protected void compact() {
             val size = limit - position;
-            move(position, 0, size);
+            copy(position, 0, size);
             position = size;
             limit = capacity;
             mark = -1;
         }
 
-        protected void move(int sourceIndex, int targetIndex, int length) {
+        protected void copy(int sourceIndex, int targetIndex, int length) {
             for (var i = 0; i < length; i++)
-                move(sourceIndex + i, targetIndex + i);
+                copy(sourceIndex + i, targetIndex + i);
         }
 
-        protected void move(int sourceIndex, int targetIndex) {
+        protected void copy(int sourceIndex, int targetIndex) {
             val sourceOffsetBytes = sourceIndex * strideBytes;
             val targetOffsetBytes = targetIndex * strideBytes;
             for (var i = 0; i < strideBytes; i++)

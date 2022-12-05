@@ -212,6 +212,35 @@ public final class BufferProviderTest {
         }
     }
 
+    @Test
+    public void testCopy() {
+        // Create the test buffer
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+
+        //  Create the test data
+        val position = new Vector3f(55F, 994F, -1515F);
+        val normal = new Vector3f(35F, 300F, -105F);
+        val color = new Vector4f(7777F, 0F, -1F, 1000F);
+        val texture = new Vector2f(-642F, 0.66F);
+
+        // Write the test data at position 3 in the buffer
+        buffer.position(3);
+        buffer.positionFixOverlap(position)
+              .normal(normal)
+              .color(color)
+              .texture(texture);
+
+        // Copy the test data to position 9 in the buffer
+        buffer.copy(3, 9);
+
+        // Read the test data from position 9 in the buffer
+        buffer.position(9);
+        assertEquals(position, buffer.positionFixOverlap());
+        assertEquals(normal, buffer.normal());
+        assertEquals(color, buffer.color());
+        assertEquals(texture, buffer.texture());
+    }
+
     // Duplicate
     @Test
     public void test5() {
