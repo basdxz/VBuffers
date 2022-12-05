@@ -202,11 +202,10 @@ public final class BufferProvider {
         }
 
         protected boolean next() {
-            if (position < limit) {
-                position++;
-                return true;
-            }
-            return false;
+            if (position >= limit)
+                return false;
+            position++;
+            return true;
         }
 
         protected boolean hasRemaining() {
