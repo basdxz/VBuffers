@@ -33,7 +33,7 @@ public final class BufferProviderTest {
 
     @Test
     public void test0() {
-        val buffer = BufferProvider.newBuffer(LayoutA.class, ByteBuffer::allocate);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocate);
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
             val normal = value - 73;
@@ -56,7 +56,7 @@ public final class BufferProviderTest {
     @Test
     public void test1() {
         val intBackingBox = new IntBuffer[1];
-        val buffer = BufferProvider.newBuffer(LayoutA.class, capacity -> {
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, capacity -> {
             val allocation = ByteBuffer.allocate(capacity);
             intBackingBox[0] = allocation.asIntBuffer();
             return allocation;
@@ -85,7 +85,7 @@ public final class BufferProviderTest {
     @Test
     public void test2() {
         //Only worked with allocate direct
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
         val position = new Vector3f(55F, 994F, -1515F);
         val normal = new Vector3f(35F, 300F, -105F);
@@ -107,7 +107,7 @@ public final class BufferProviderTest {
     // https://www.baeldung.com/java-bytebuffer
     @Test
     public void test3() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
         val positions = newRangeList(BUFFER_SIZE, Vector3f::new);
         val normals = newRangeList(BUFFER_SIZE, Vector3f::new);
         val colors = IntStream.range(0, BUFFER_SIZE)
@@ -144,7 +144,7 @@ public final class BufferProviderTest {
         val middleOfB = SIZE_B / 2;
 
         // Create the test buffer
-        val buffer = BufferProvider.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
 
         // Write constant A to the buffer SIZE_A times
         for (var i = 0; i < SIZE_A; i++) {
@@ -215,7 +215,7 @@ public final class BufferProviderTest {
     @Test
     public void testCopy() {
         // Create the test buffer
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
 
         //  Create the test data
         val position = new Vector3f(55F, 994F, -1515F);
@@ -244,37 +244,37 @@ public final class BufferProviderTest {
     // Duplicate
     @Test
     public void test5() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Slice
     @Test
     public void test6() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Read-Only
     @Test
     public void test7() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Iterate
     @Test
     public void test8() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Stream
     @Test
     public void test9() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Buffer to Buffer transfers
     @Test
     public void test10() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     @NotNull

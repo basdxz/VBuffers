@@ -4,22 +4,28 @@ import lombok.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
-public class VBufferProxyHandler implements VBuffer, InvocationHandler {
+public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, InvocationHandler {
+    protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
+
+    protected final Class<BUFFER> layout;
+    protected final BUFFER buffer;
     protected final Map<String, Integer> attributeOffsets;
     protected final Map<String, AttributeType> attributeTypes;
     protected final int strideBytes;
-    protected final ByteBuffer buffer;
+    protected final ByteBuffer backing;
     protected final int capacity;
     protected int position;
     protected int limit;
     protected int mark;
 
-    public VBufferProxyHandler(Class<?> layout, Allocator allocator, int capacity) {
+    @SuppressWarnings("unchecked")
+    public VBufferHandler(Class<BUFFER> layout, Allocator allocator, int capacity) {
         val layoutAnnotation = layout.getAnnotation(Layout.class);
         var attributeOffsets = new HashMap<String, Integer>();
         var attributeTypes = new HashMap<String, AttributeType>();
@@ -33,14 +39,27 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
             offset += type.sizeBytes();
             attributeTypes.put(attribute.value(), type);
         }
+        this.layout = layout;
+        this.buffer = (BUFFER) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
         this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
         this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
         this.strideBytes = offset;
-        this.buffer = allocator.allocate(offset * capacity);
+        this.backing = allocator.allocate(offset * capacity);
         this.capacity = capacity;
         this.position = 0;
         this.limit = capacity;
         this.mark = -1;
+    }
+
+    public static <BUFFER extends VBuffer> BUFFER newBuffer(@NonNull Class<BUFFER> layout,
+                                                            Allocator allocator) {
+        return newBuffer(layout, allocator, 1);
+    }
+
+    public static <BUFFER extends VBuffer> BUFFER newBuffer(@NonNull Class<BUFFER> layout,
+                                                            Allocator allocator,
+                                                            int capacity) {
+        return new VBufferHandler<>(layout, allocator, capacity).buffer;
     }
 
     @Override
@@ -117,7 +136,7 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
         val sourceOffsetBytes = sourceIndex * strideBytes;
         val targetOffsetBytes = targetIndex * strideBytes;
         val lengthBytes = length * strideBytes;
-        buffer.put(targetOffsetBytes, buffer, sourceOffsetBytes, lengthBytes);
+        backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
     }
 
     @Override
@@ -177,11 +196,11 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
     }
 
     protected void set(String key, Object value) {
-        attributeType(key).set(buffer, keyOffset(key), value);
+        attributeType(key).set(backing, keyOffset(key), value);
     }
 
     protected Object get(String key) {
-        return attributeType(key).get(buffer, keyOffset(key));
+        return attributeType(key).get(backing, keyOffset(key));
     }
 
     protected AttributeType attributeType(String key) {
