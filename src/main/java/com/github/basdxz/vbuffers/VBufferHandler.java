@@ -23,6 +23,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected int position;
     protected int limit;
     protected int mark;
+    protected boolean readOnly;
 
     public VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
         val layoutAnnotation = layout.getAnnotation(Layout.class);
@@ -48,6 +49,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.position = 0;
         this.limit = capacity;
         this.mark = -1;
+        this.readOnly = false;
     }
 
     // Copy constructor
@@ -62,6 +64,22 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.position = other.position;
         this.limit = other.limit;
         this.mark = other.mark;
+        this.readOnly = other.readOnly;
+    }
+
+    // Slice constructor
+    public VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
+        this.layout = other.layout;
+        this.proxy = initProxy();
+        this.attributeOffsets = other.attributeOffsets;
+        this.attributeTypes = other.attributeTypes;
+        this.strideBytes = other.strideBytes;
+        this.backing = other.backing.slice(stridesToBytes(startIndex), stridesToBytes(size));
+        this.capacity = size;
+        this.position = 0;
+        this.limit = size;
+        this.mark = -1;
+        this.readOnly = other.readOnly;
     }
 
     @SuppressWarnings("unchecked")
@@ -149,7 +167,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     @Override
     public LAYOUT v$compact() {
         val size = limit - position;
-        v$copy(position, 0, size);
+        v$copyStride(position, 0, size);
         position = size;
         limit = capacity;
         mark = -1;
@@ -157,17 +175,14 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    public LAYOUT v$copy(int sourceIndex, int targetIndex) {
-        v$copy(sourceIndex, targetIndex, 1);
+    public LAYOUT v$copyStride(int sourceIndex, int targetIndex) {
+        v$copyStride(sourceIndex, targetIndex, 1);
         return proxy;
     }
 
     @Override
-    public LAYOUT v$copy(int sourceIndex, int targetIndex, int length) {
-        val sourceOffsetBytes = sourceIndex * strideBytes;
-        val targetOffsetBytes = targetIndex * strideBytes;
-        val lengthBytes = length * strideBytes;
-        backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
+    public LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length) {
+        backing.put(stridesToBytes(targetIndex), backing, stridesToBytes(sourceIndex), stridesToBytes(length));
         return proxy;
     }
 
@@ -194,14 +209,29 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
+    public LAYOUT v$single() {
+        return v$single(position);
+    }
+
+    @Override
+    public LAYOUT v$single(int index) {
+        return new VBufferHandler<>(this, index, 1).proxy;
+    }
+
+    @Override
     public LAYOUT v$slice() {
-        val copy = copy();
-        return copy.proxy;
+        return v$slice(position, limit - position);
+    }
+
+    @Override
+    public LAYOUT v$slice(int startIndex, int length) {
+        return new VBufferHandler<>(this, startIndex, length).proxy;
     }
 
     @Override
     public LAYOUT v$asReadOnly() {
         val copy = copy();
+        copy.readOnly = true;
         return copy.proxy;
     }
 
@@ -233,6 +263,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         try {
             // If the method is a setter, set the value and return the proxy
             if (args != null) {
+                if (readOnly)
+                    throw new UnsupportedOperationException("Buffer is read-only");
                 set(key, args[0]);
                 return proxy;
             }
@@ -256,6 +288,10 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected int keyOffset(String key) {
-        return attributeOffsets.get(key) + (strideBytes * position);
+        return attributeOffsets.get(key) + stridesToBytes(position);
+    }
+
+    protected int stridesToBytes(int index) {
+        return index * strideBytes;
     }
 }

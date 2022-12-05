@@ -27,9 +27,9 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
 
     LAYOUT v$compact();
 
-    LAYOUT v$copy(int sourceIndex, int targetIndex, int length);
+    LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length);
 
-    LAYOUT v$copy(int sourceIndex, int targetIndex);
+    LAYOUT v$copyStride(int sourceIndex, int targetIndex);
 
     //TODO: make throw
     LAYOUT v$next();
@@ -40,7 +40,13 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
 
     LAYOUT v$duplicate();
 
+    LAYOUT v$single();
+
+    LAYOUT v$single(int index);
+
     LAYOUT v$slice();
+
+    LAYOUT v$slice(int startIndex, int length);
 
     LAYOUT v$asReadOnly();
 }

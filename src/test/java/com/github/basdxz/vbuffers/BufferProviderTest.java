@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.ReadOnlyBufferException;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // Iterator for read/writing
 @NoArgsConstructor
@@ -227,7 +229,7 @@ public final class BufferProviderTest {
               .texture(texture);
 
         // Copy the test data to position 9 in the buffer
-        buffer.v$copy(3, 9);
+        buffer.v$copyStride(3, 9);
 
         // Read the test data from position 9 in the buffer
         buffer.v$position(9);
@@ -237,7 +239,6 @@ public final class BufferProviderTest {
         assertEquals(texture, buffer.texture());
     }
 
-    // Duplicate
     @Test
     public void duplicate() {
         // Create the test buffer
@@ -267,21 +268,75 @@ public final class BufferProviderTest {
         }
     }
 
-    // Slice
     @Test
     public void slice() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        // Create the test buffer
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+
+        // Fill buffer with numbers 0 to 9
+        for (var i = 0; i < 10; i++) {
+            buffer.position(i)
+                  .normal(i)
+                  .color(i)
+                  .texture(i);
+            buffer.v$next();
+        }
+
+        // Slice the buffer from index 3 with a length of 7
+        val sliceBuffer = buffer.v$slice(3, 7);
+
+        // Read the slice buffer
+        for (var i = 0; i < 7; i++) {
+            assertEquals(i + 3, sliceBuffer.position());
+            assertEquals(i + 3, sliceBuffer.normal());
+            assertEquals(i + 3, sliceBuffer.color());
+            assertEquals(i + 3, sliceBuffer.texture());
+            sliceBuffer.v$next();
+        }
     }
 
     // Read-Only
-    @Test
     public void readOnly() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        // Create the test buffer
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+
+        // Fill buffer with numbers 0 to 9
+        for (var i = 0; i < 10; i++) {
+            buffer.position(i)
+                  .normal(i)
+                  .color(i)
+                  .texture(i);
+            buffer.v$next();
+        }
+
+        // Flip the buffer
+        buffer.v$flip();
+
+        // Create a read-only buffer
+        val readOnlyBuffer = buffer.v$asReadOnly();
+
+        // Read the read-only buffer
+        for (var i = 0; i < 10; i++) {
+            assertEquals(i, readOnlyBuffer.position());
+            assertEquals(i, readOnlyBuffer.normal());
+            assertEquals(i, readOnlyBuffer.color());
+            assertEquals(i, readOnlyBuffer.texture());
+            readOnlyBuffer.v$next();
+        }
+
+        // Try to write to the read-only buffer
+        assertThrows(ReadOnlyBufferException.class, () -> {
+            readOnlyBuffer.position(0)
+                          .normal(0)
+                          .color(0)
+                          .texture(0);
+        });
     }
 
     // Iterate
     @Test
     public void iterate() {
+        // Create the test buffer
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
