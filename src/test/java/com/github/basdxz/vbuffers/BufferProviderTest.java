@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @NoArgsConstructor
 public final class BufferProviderTest {
     private static final int[] SAMPLE_VALUES = new int[]{12, 100, 340, 4300};
+    private static final int BUFFER_SIZE = 1000;
 
     @Test
     public void test0() {
@@ -94,17 +95,17 @@ public final class BufferProviderTest {
     // https://www.baeldung.com/java-bytebuffer
     @Test
     public void test3() {
-        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 1000);
-        val positions = IntStream.range(0, 1000)
+        val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
+        val positions = IntStream.range(0, BUFFER_SIZE)
                                  .mapToObj(Vector3f::new)
                                  .toList();
-        val normals = IntStream.range(0, 1000)
+        val normals = IntStream.range(0, BUFFER_SIZE)
                                .mapToObj(Vector3f::new)
                                .toList();
-        val colors = IntStream.range(0, 1000)
+        val colors = IntStream.range(0, BUFFER_SIZE)
                               .mapToObj(Vector4f::new)
                               .toList();
-        val textures = IntStream.range(0, 1000)
+        val textures = IntStream.range(0, BUFFER_SIZE)
                                 .mapToObj(Vector2f::new)
                                 .toList();
 
