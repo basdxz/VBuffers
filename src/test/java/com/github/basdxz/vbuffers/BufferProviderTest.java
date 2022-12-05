@@ -41,12 +41,12 @@ public final class BufferProviderTest {
             val texture = value + 120;
 
             //TODO: dumb issue, rename once overlap is solved
-            buffer.positionFixOverlap(position)
+            buffer.position(position)
                   .normal(normal)
                   .color(color)
                   .texture(texture);
 
-            assertEquals(position, buffer.positionFixOverlap());
+            assertEquals(position, buffer.position());
             assertEquals(normal, buffer.normal());
             assertEquals(color, buffer.color());
             assertEquals(texture, buffer.texture());
@@ -70,7 +70,7 @@ public final class BufferProviderTest {
             val texture = value + 120;
 
             //TODO: dumb issue, rename once overlap is solved
-            buffer.positionFixOverlap(position)
+            buffer.position(position)
                   .normal(normal)
                   .color(color)
                   .texture(texture);
@@ -92,12 +92,12 @@ public final class BufferProviderTest {
         val color = new Vector4f(7777F, 0F, -1F, 1000F);
         val texture = new Vector2f(-642F, 0.66F);
 
-        buffer.positionFixOverlap(position)
+        buffer.position(position)
               .normal(normal)
               .color(color)
               .texture(texture);
 
-        assertEquals(position, buffer.positionFixOverlap());
+        assertEquals(position, buffer.position());
         assertEquals(normal, buffer.normal());
         assertEquals(color, buffer.color());
         assertEquals(texture, buffer.texture());
@@ -117,23 +117,23 @@ public final class BufferProviderTest {
                                 .mapToObj(Vector2f::new)
                                 .toList();
 
-        while (buffer.hasRemaining()) {
-            val index = buffer.position();
-            buffer.positionFixOverlap(positions.get(index))
+        while (buffer.v$hasRemaining()) {
+            val index = buffer.v$position();
+            buffer.position(positions.get(index))
                   .normal(normals.get(index))
                   .color(colors.get(index))
                   .texture(textures.get(index));
-            buffer.position(index + 1);
+            buffer.v$position(index + 1);
         }
-        buffer.clear();
+        buffer.v$clear();
 
-        while (buffer.hasRemaining()) {
-            val index = buffer.position();
-            assertEquals(positions.get(index), buffer.positionFixOverlap());
+        while (buffer.v$hasRemaining()) {
+            val index = buffer.v$position();
+            assertEquals(positions.get(index), buffer.position());
             assertEquals(normals.get(index), buffer.normal());
             assertEquals(colors.get(index), buffer.color());
             assertEquals(textures.get(index), buffer.texture());
-            buffer.position(index + 1);
+            buffer.v$position(index + 1);
         }
     }
 
@@ -148,67 +148,67 @@ public final class BufferProviderTest {
 
         // Write constant A to the buffer SIZE_A times
         for (var i = 0; i < SIZE_A; i++) {
-            buffer.positionFixOverlap(CONSTANT_A)
+            buffer.position(CONSTANT_A)
                   .normal(CONSTANT_A)
                   .color(CONSTANT_A)
                   .texture(CONSTANT_A);
-            buffer.next();
+            buffer.v$next();
         }
         // Write constant B to the buffer SIZE_B times
         for (var i = 0; i < SIZE_B; i++) {
-            buffer.positionFixOverlap(2)
+            buffer.position(2)
                   .normal(2)
                   .color(2)
                   .texture(2);
-            buffer.next();
+            buffer.v$next();
         }
         // Flip the buffer
-        buffer.flip();
+        buffer.v$flip();
 
         // Read the CONSTANT_A values from the buffer
         for (var i = 0; i < SIZE_A; i++) {
-            assertEquals(CONSTANT_A, buffer.positionFixOverlap());
+            assertEquals(CONSTANT_A, buffer.position());
             assertEquals(CONSTANT_A, buffer.normal());
             assertEquals(CONSTANT_A, buffer.color());
             assertEquals(CONSTANT_A, buffer.texture());
-            buffer.next();
+            buffer.v$next();
         }
         // Read half of the CONSTANT_B values from the buffer
         for (var i = 0; i < middleOfB; i++) {
-            assertEquals(CONSTANT_B, buffer.positionFixOverlap());
+            assertEquals(CONSTANT_B, buffer.position());
             assertEquals(CONSTANT_B, buffer.normal());
             assertEquals(CONSTANT_B, buffer.color());
             assertEquals(CONSTANT_B, buffer.texture());
-            buffer.next();
+            buffer.v$next();
         }
         // Compact the buffer
-        buffer.compact();
+        buffer.v$compact();
 
         // Write constant C to the buffer SIZE_C times
         for (var i = 0; i < SIZE_C; i++) {
-            buffer.positionFixOverlap(CONSTANT_C)
+            buffer.position(CONSTANT_C)
                   .normal(CONSTANT_C)
                   .color(CONSTANT_C)
                   .texture(CONSTANT_C);
-            buffer.next();
+            buffer.v$next();
         }
-        buffer.flip();
+        buffer.v$flip();
 
         // Read the rest of the CONSTANT_B values from the buffer
         for (var i = 0; i < middleOfB; i++) {
-            assertEquals(CONSTANT_B, buffer.positionFixOverlap());
+            assertEquals(CONSTANT_B, buffer.position());
             assertEquals(CONSTANT_B, buffer.normal());
             assertEquals(CONSTANT_B, buffer.color());
             assertEquals(CONSTANT_B, buffer.texture());
-            buffer.next();
+            buffer.v$next();
         }
         // Read the CONSTANT_C values from the buffer
         for (var i = 0; i < SIZE_C; i++) {
-            assertEquals(CONSTANT_C, buffer.positionFixOverlap());
+            assertEquals(CONSTANT_C, buffer.position());
             assertEquals(CONSTANT_C, buffer.normal());
             assertEquals(CONSTANT_C, buffer.color());
             assertEquals(CONSTANT_C, buffer.texture());
-            buffer.next();
+            buffer.v$next();
         }
     }
 
@@ -224,18 +224,18 @@ public final class BufferProviderTest {
         val texture = new Vector2f(-642F, 0.66F);
 
         // Write the test data at position 3 in the buffer
-        buffer.position(3);
-        buffer.positionFixOverlap(position)
+        buffer.v$position(3);
+        buffer.position(position)
               .normal(normal)
               .color(color)
               .texture(texture);
 
         // Copy the test data to position 9 in the buffer
-        buffer.copy(3, 9);
+        buffer.v$copy(3, 9);
 
         // Read the test data from position 9 in the buffer
-        buffer.position(9);
-        assertEquals(position, buffer.positionFixOverlap());
+        buffer.v$position(9);
+        assertEquals(position, buffer.position());
         assertEquals(normal, buffer.normal());
         assertEquals(color, buffer.color());
         assertEquals(texture, buffer.texture());

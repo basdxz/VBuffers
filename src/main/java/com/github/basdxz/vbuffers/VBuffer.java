@@ -1,35 +1,37 @@
 package com.github.basdxz.vbuffers;
 
 public interface VBuffer {
-    int capacity();
+    String BUFFER_METHOD_PREFIX = "v$";
 
-    int position();
+    int v$capacity();
 
-    void position(int position);
+    int v$position();
 
-    int limit();
+    void v$position(int position);
 
-    void limit(int limit);
+    int v$limit();
 
-    void mark();
+    void v$limit(int limit);
 
-    void reset();
+    void v$mark();
 
-    void clear();
+    void v$reset();
 
-    void flip();
+    void v$clear();
 
-    void rewind();
+    void v$flip();
 
-    void compact();
+    void v$rewind();
 
-    void copy(int sourceIndex, int targetIndex, int length);
+    void v$compact();
 
-    void copy(int sourceIndex, int targetIndex);
+    void v$copy(int sourceIndex, int targetIndex, int length);
 
-    boolean next();
+    void v$copy(int sourceIndex, int targetIndex);
 
-    boolean hasRemaining();
+    boolean v$next();
 
-    int remaining();
+    boolean v$hasRemaining();
+
+    int v$remaining();
 }

@@ -1,7 +1,6 @@
 package com.github.basdxz.vbuffers;
 
 import lombok.*;
-import lombok.experimental.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -10,19 +9,13 @@ import java.util.*;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
-@Accessors(chain = false)
 public class VBufferProxyHandler implements VBuffer, InvocationHandler {
     protected final Map<String, Integer> attributeOffsets;
     protected final Map<String, AttributeType> attributeTypes;
     protected final int strideBytes;
     protected final ByteBuffer buffer;
-    @Getter
     protected final int capacity;
-    @Setter
-    @Getter
     protected int position;
-    @Setter
-    @Getter
     protected int limit;
     protected int mark;
 
@@ -51,51 +44,76 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
     }
 
     @Override
-    public void mark() {
+    public int v$capacity() {
+        return capacity;
+    }
+
+    @Override
+    public int v$position() {
+        return position;
+    }
+
+    @Override
+    public void v$position(int position) {
+        this.position = position;
+    }
+
+    @Override
+    public int v$limit() {
+        return limit;
+    }
+
+    @Override
+    public void v$limit(int limit) {
+        this.limit = limit;
+    }
+
+    @Override
+    public void v$mark() {
         mark = position;
     }
 
     @Override
-    public void reset() {
+    public void v$reset() {
         position = mark;
     }
 
     @Override
-    public void clear() {
+    public void v$clear() {
         limit = capacity;
         position = 0;
         mark = -1;
     }
 
     @Override
-    public void flip() {
+    public void v$flip() {
         limit = position;
         position = 0;
         mark = -1;
     }
 
     @Override
-    public void rewind() {
+    public void v$rewind() {
         position = 0;
         mark = -1;
     }
 
     @Override
-    public void compact() {
+    public void v$compact() {
         val size = limit - position;
-        copy(position, 0, size);
+        v$copy(position, 0, size);
         position = size;
         limit = capacity;
         mark = -1;
     }
 
     @Override
-    public void copy(int sourceIndex, int targetIndex) {
-        copy(sourceIndex, targetIndex, 1);
+    public void v$copy(int sourceIndex, int targetIndex) {
+        v$copy(sourceIndex, targetIndex, 1);
     }
 
     @Override
-    public void copy(int sourceIndex, int targetIndex, int length) {
+    public void v$copy(int sourceIndex, int targetIndex, int length) {
         val sourceOffsetBytes = sourceIndex * strideBytes;
         val targetOffsetBytes = targetIndex * strideBytes;
         val lengthBytes = length * strideBytes;
@@ -103,7 +121,7 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
     }
 
     @Override
-    public boolean next() {
+    public boolean v$next() {
         if (position >= limit)
             return false;
         position++;
@@ -111,93 +129,41 @@ public class VBufferProxyHandler implements VBuffer, InvocationHandler {
     }
 
     @Override
-    public boolean hasRemaining() {
+    public boolean v$hasRemaining() {
         return position < limit;
     }
 
     @Override
-    public int remaining() {
+    public int v$remaining() {
         return limit - position;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        return handleInternal(proxy, method, args)
-                .orElseGet(() -> handleAttribute(proxy, method, args));
+        return invokeInternal(proxy, method, args)
+                .orElseGet(() -> invokeMutator(proxy, method, args));
     }
 
-    protected Optional<Object> handleInternal(Object proxy, Method method, Object[] args) {
-        try {
-            val firstArg = args != null && args.length > 0 ? args[0] : null;
-            switch (method.getName()) {
-                case "capacity" -> {
-                    return Optional.of(capacity());
-                }
-                case "position" -> {
-                    if (firstArg == null)
-                        return Optional.of(position());
-                    position((Integer) firstArg);
-                    return Optional.of(0);
-                }
-                case "limit" -> {
-                    if (firstArg == null)
-                        return Optional.of(limit());
-                    limit((Integer) firstArg);
-                    return Optional.of(0);
-                }
-                case "mark" -> {
-                    mark();
-                    return Optional.of(0);
-                }
-                case "reset" -> {
-                    reset();
-                    return Optional.of(0);
-                }
-                case "clear" -> {
-                    clear();
-                    return Optional.of(0);
-                }
-                case "flip" -> {
-                    flip();
-                    return Optional.of(0);
-                }
-                case "rewind" -> {
-                    rewind();
-                    return Optional.of(0);
-                }
-                case "compact" -> {
-                    compact();
-                    return Optional.of(0);
-                }
-                case "copy" -> {
-                    if (firstArg == null)
-                        return Optional.empty();
-                    if (args.length == 2) {
-                        copy((Integer) args[0], (Integer) args[1]);
-                    } else {
-                        copy((Integer) args[0], (Integer) args[1], (Integer) args[2]);
-                    }
-                    return Optional.of(0);
-                }
-                case "next" -> {
-                    return Optional.of(next());
-                }
-                case "hasRemaining" -> {
-                    return Optional.of(hasRemaining());
-                }
-                case "remaining" -> {
-                    return Optional.of(remaining());
-                }
-                default -> {
-                    return Optional.empty();
-                }
-            }
-        } catch (Throwable e) {
+    protected Optional<Object> invokeInternal(Object proxy, Method method, Object[] args) {
+        val methodName = method.getName();
+        // Return empty optional if method is not a VBuffer method
+        if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX))
             return Optional.empty();
+        // If args is null, set it to an empty array
+        if (args == null)
+            args = new Object[0];
+        // Call the method from this class
+        try {
+            var result = method.invoke(this, args);
+            if (result == null)
+                result = 0;
+            return Optional.of(result);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    protected Object handleAttribute(Object proxy, Method method, Object[] args) {
+    protected Object invokeMutator(Object proxy, Method method, Object[] args) {
         val key = method.getName();
         try {
             if (args != null) {
