@@ -212,18 +212,6 @@ public final class BufferProviderTest {
         }
     }
 
-    @NotNull
-    private static <T> List<T> newRangeList(int size, IntFunction<T> mapper) {
-        return newRangeList(0, size, mapper);
-    }
-
-    @NotNull
-    private static <T> List<T> newRangeList(int start, int size, IntFunction<T> mapper) {
-        return IntStream.range(start, start + size)
-                        .mapToObj(mapper)
-                        .toList();
-    }
-
     // Duplicate
     @Test
     public void test5() {
@@ -258,5 +246,17 @@ public final class BufferProviderTest {
     @Test
     public void test10() {
         val buffer = BufferProvider.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    }
+
+    @NotNull
+    private static <T> List<T> newRangeList(int size, IntFunction<T> mapper) {
+        return newRangeList(0, size, mapper);
+    }
+
+    @NotNull
+    private static <T> List<T> newRangeList(int start, int size, IntFunction<T> mapper) {
+        return IntStream.range(start, start + size)
+                        .mapToObj(mapper)
+                        .toList();
     }
 }
