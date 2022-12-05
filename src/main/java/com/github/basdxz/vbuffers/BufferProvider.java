@@ -109,6 +109,9 @@ public final class BufferProvider {
                         compact();
                         return Optional.of(0);
                     }
+                    case "next" -> {
+                        return Optional.of(next());
+                    }
                     case "hasRemaining" -> {
                         return Optional.of(hasRemaining());
                     }
@@ -137,7 +140,7 @@ public final class BufferProvider {
         }
 
         protected int limit() {
-            return 0;
+            return limit;
         }
 
         protected void limit(int limit) {
@@ -169,11 +172,32 @@ public final class BufferProvider {
             mark = -1;
         }
 
-        //TODO: Make compact actually compact stuff
         protected void compact() {
+            val size = limit - position;
+            move(position, 0, size);
+            position = size;
             limit = capacity;
-            position = remaining();
             mark = -1;
+        }
+
+        protected void move(int sourceIndex, int targetIndex, int length) {
+            for (var i = 0; i < length; i++)
+                move(sourceIndex + i, targetIndex + i);
+        }
+
+        protected void move(int sourceIndex, int targetIndex) {
+            val sourceOffsetBytes = sourceIndex * strideBytes;
+            val targetOffsetBytes = targetIndex * strideBytes;
+            for (var i = 0; i < strideBytes; i++)
+                buffer.put(targetOffsetBytes + i, buffer.get(sourceOffsetBytes + i));
+        }
+
+        protected boolean next() {
+            if (position < limit) {
+                position++;
+                return true;
+            }
+            return false;
         }
 
         protected boolean hasRemaining() {

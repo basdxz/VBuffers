@@ -23,6 +23,8 @@ public interface VBuffer {
 
     void compact();
 
+    void next();
+
     boolean hasRemaining();
 
     int remaining();
