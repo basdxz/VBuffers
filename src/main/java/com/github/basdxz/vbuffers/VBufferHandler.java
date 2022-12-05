@@ -10,11 +10,11 @@ import java.util.*;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
-public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, InvocationHandler {
+public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
 
-    protected final Class<BUFFER> layout;
-    protected final BUFFER buffer;
+    protected final Class<LAYOUT> layout;
+    protected final LAYOUT proxy;
     protected final Map<String, Integer> attributeOffsets;
     protected final Map<String, AttributeType> attributeTypes;
     protected final int strideBytes;
@@ -24,8 +24,7 @@ public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, Invocati
     protected int limit;
     protected int mark;
 
-    @SuppressWarnings("unchecked")
-    public VBufferHandler(Class<BUFFER> layout, Allocator allocator, int capacity) {
+    public VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
         val layoutAnnotation = layout.getAnnotation(Layout.class);
         var attributeOffsets = new HashMap<String, Integer>();
         var attributeTypes = new HashMap<String, AttributeType>();
@@ -40,7 +39,7 @@ public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, Invocati
             attributeTypes.put(attribute.value(), type);
         }
         this.layout = layout;
-        this.buffer = (BUFFER) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
+        this.proxy = initProxy();
         this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
         this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
         this.strideBytes = offset;
@@ -51,15 +50,34 @@ public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, Invocati
         this.mark = -1;
     }
 
-    public static <BUFFER extends VBuffer> BUFFER newBuffer(@NonNull Class<BUFFER> layout,
-                                                            Allocator allocator) {
+    // Copy constructor
+    public VBufferHandler(VBufferHandler<LAYOUT> other) {
+        this.layout = other.layout;
+        this.proxy = initProxy();
+        this.attributeOffsets = other.attributeOffsets;
+        this.attributeTypes = other.attributeTypes;
+        this.strideBytes = other.strideBytes;
+        this.backing = other.backing;
+        this.capacity = other.capacity;
+        this.position = other.position;
+        this.limit = other.limit;
+        this.mark = other.mark;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected LAYOUT initProxy() {
+        return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
+    }
+
+    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
+                                                                    Allocator allocator) {
         return newBuffer(layout, allocator, 1);
     }
 
-    public static <BUFFER extends VBuffer> BUFFER newBuffer(@NonNull Class<BUFFER> layout,
-                                                            Allocator allocator,
-                                                            int capacity) {
-        return new VBufferHandler<>(layout, allocator, capacity).buffer;
+    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
+                                                                    Allocator allocator,
+                                                                    int capacity) {
+        return new VBufferHandler<>(layout, allocator, capacity).proxy;
     }
 
     @Override
@@ -158,6 +176,11 @@ public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, Invocati
     }
 
     @Override
+    public LAYOUT v$duplicate() {
+        return new VBufferHandler<>(this).proxy;
+    }
+
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
         return invokeInternal(proxy, method, args)
                 .orElseGet(() -> invokeMutator(proxy, method, args));
@@ -168,11 +191,9 @@ public class VBufferHandler<BUFFER extends VBuffer> implements VBuffer, Invocati
         // Return empty optional if method is not a VBuffer method
         if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX))
             return Optional.empty();
-        // If args is null, set it to an empty array
-        if (args == null)
-            args = new Object[0];
         // Call the method from this class
         try {
+            method = getClass().getMethod(methodName, method.getParameterTypes());
             var result = method.invoke(this, args);
             if (result == null)
                 result = 0;

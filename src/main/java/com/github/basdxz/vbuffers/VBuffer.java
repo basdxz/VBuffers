@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers;
 
-public interface VBuffer {
+public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
     String BUFFER_METHOD_PREFIX = "v$";
 
     int v$capacity();
@@ -34,4 +34,6 @@ public interface VBuffer {
     boolean v$hasRemaining();
 
     int v$remaining();
+
+    LAYOUT v$duplicate();
 }

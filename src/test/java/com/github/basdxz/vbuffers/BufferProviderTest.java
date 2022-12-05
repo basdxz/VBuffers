@@ -15,7 +15,6 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// New buffer of size bigger than 0
 // Iterator for read/writing
 @NoArgsConstructor
 public final class BufferProviderTest {
@@ -23,9 +22,9 @@ public final class BufferProviderTest {
 
     private static final int BUFFER_SIZE = 1000;
 
-    private static final int CONSTANT_A = 1;
-    private static final int CONSTANT_B = 2;
-    private static final int CONSTANT_C = 3;//make these more interesting numbers
+    private static final int CONSTANT_1 = 1;
+    private static final int CONSTANT_2 = 2;
+    private static final int CONSTANT_3 = 3;//make these more interesting numbers
 
     private static final int SIZE_A = 10;
     private static final int SIZE_B = 20;
@@ -40,7 +39,6 @@ public final class BufferProviderTest {
             val color = value + 81;
             val texture = value + 120;
 
-            //TODO: dumb issue, rename once overlap is solved
             buffer.position(position)
                   .normal(normal)
                   .color(color)
@@ -69,7 +67,6 @@ public final class BufferProviderTest {
             val color = value + 81;
             val texture = value + 120;
 
-            //TODO: dumb issue, rename once overlap is solved
             buffer.position(position)
                   .normal(normal)
                   .color(color)
@@ -84,7 +81,6 @@ public final class BufferProviderTest {
 
     @Test
     public void test2() {
-        //Only worked with allocate direct
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
         val position = new Vector3f(55F, 994F, -1515F);
@@ -123,7 +119,7 @@ public final class BufferProviderTest {
                   .normal(normals.get(index))
                   .color(colors.get(index))
                   .texture(textures.get(index));
-            buffer.v$position(index + 1);
+            buffer.v$next();
         }
         buffer.v$clear();
 
@@ -146,39 +142,39 @@ public final class BufferProviderTest {
         // Create the test buffer
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
 
-        // Write constant A to the buffer SIZE_A times
+        // Write CONSTANT_1 to the buffer SIZE_A times
         for (var i = 0; i < SIZE_A; i++) {
-            buffer.position(CONSTANT_A)
-                  .normal(CONSTANT_A)
-                  .color(CONSTANT_A)
-                  .texture(CONSTANT_A);
+            buffer.position(CONSTANT_1)
+                  .normal(CONSTANT_1)
+                  .color(CONSTANT_1)
+                  .texture(CONSTANT_1);
             buffer.v$next();
         }
-        // Write constant B to the buffer SIZE_B times
+        // Write CONSTANT_2 to the buffer SIZE_B times
         for (var i = 0; i < SIZE_B; i++) {
-            buffer.position(2)
-                  .normal(2)
-                  .color(2)
-                  .texture(2);
+            buffer.position(CONSTANT_2)
+                  .normal(CONSTANT_2)
+                  .color(CONSTANT_2)
+                  .texture(CONSTANT_2);
             buffer.v$next();
         }
         // Flip the buffer
         buffer.v$flip();
 
-        // Read the CONSTANT_A values from the buffer
+        // Read the CONSTANT_1 values from the buffer
         for (var i = 0; i < SIZE_A; i++) {
-            assertEquals(CONSTANT_A, buffer.position());
-            assertEquals(CONSTANT_A, buffer.normal());
-            assertEquals(CONSTANT_A, buffer.color());
-            assertEquals(CONSTANT_A, buffer.texture());
+            assertEquals(CONSTANT_1, buffer.position());
+            assertEquals(CONSTANT_1, buffer.normal());
+            assertEquals(CONSTANT_1, buffer.color());
+            assertEquals(CONSTANT_1, buffer.texture());
             buffer.v$next();
         }
-        // Read half of the CONSTANT_B values from the buffer
+        // Read half of the CONSTANT_2 values from the buffer
         for (var i = 0; i < middleOfB; i++) {
-            assertEquals(CONSTANT_B, buffer.position());
-            assertEquals(CONSTANT_B, buffer.normal());
-            assertEquals(CONSTANT_B, buffer.color());
-            assertEquals(CONSTANT_B, buffer.texture());
+            assertEquals(CONSTANT_2, buffer.position());
+            assertEquals(CONSTANT_2, buffer.normal());
+            assertEquals(CONSTANT_2, buffer.color());
+            assertEquals(CONSTANT_2, buffer.texture());
             buffer.v$next();
         }
         // Compact the buffer
@@ -186,28 +182,28 @@ public final class BufferProviderTest {
 
         // Write constant C to the buffer SIZE_C times
         for (var i = 0; i < SIZE_C; i++) {
-            buffer.position(CONSTANT_C)
-                  .normal(CONSTANT_C)
-                  .color(CONSTANT_C)
-                  .texture(CONSTANT_C);
+            buffer.position(CONSTANT_3)
+                  .normal(CONSTANT_3)
+                  .color(CONSTANT_3)
+                  .texture(CONSTANT_3);
             buffer.v$next();
         }
         buffer.v$flip();
 
-        // Read the rest of the CONSTANT_B values from the buffer
+        // Read the rest of the CONSTANT_2 values from the buffer
         for (var i = 0; i < middleOfB; i++) {
-            assertEquals(CONSTANT_B, buffer.position());
-            assertEquals(CONSTANT_B, buffer.normal());
-            assertEquals(CONSTANT_B, buffer.color());
-            assertEquals(CONSTANT_B, buffer.texture());
+            assertEquals(CONSTANT_2, buffer.position());
+            assertEquals(CONSTANT_2, buffer.normal());
+            assertEquals(CONSTANT_2, buffer.color());
+            assertEquals(CONSTANT_2, buffer.texture());
             buffer.v$next();
         }
-        // Read the CONSTANT_C values from the buffer
+        // Read the CONSTANT_3 values from the buffer
         for (var i = 0; i < SIZE_C; i++) {
-            assertEquals(CONSTANT_C, buffer.position());
-            assertEquals(CONSTANT_C, buffer.normal());
-            assertEquals(CONSTANT_C, buffer.color());
-            assertEquals(CONSTANT_C, buffer.texture());
+            assertEquals(CONSTANT_3, buffer.position());
+            assertEquals(CONSTANT_3, buffer.normal());
+            assertEquals(CONSTANT_3, buffer.color());
+            assertEquals(CONSTANT_3, buffer.texture());
             buffer.v$next();
         }
     }
@@ -243,37 +239,61 @@ public final class BufferProviderTest {
 
     // Duplicate
     @Test
-    public void test5() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    public void duplicate() {
+        // Create the test buffer
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+
+        // Fill buffer with numbers 0 to 9
+        for (var i = 0; i < 10; i++) {
+            buffer.position(i)
+                  .normal(i)
+                  .color(i)
+                  .texture(i);
+            buffer.v$next();
+        }
+
+        // Duplicate the buffer
+        val duplicateBuffer = buffer.v$duplicate();
+        // Flip the duplicate buffer
+        duplicateBuffer.v$flip();
+
+        // Read the duplicate buffer
+        for (var i = 0; i < 10; i++) {
+            assertEquals(i, duplicateBuffer.position());
+            assertEquals(i, duplicateBuffer.normal());
+            assertEquals(i, duplicateBuffer.color());
+            assertEquals(i, duplicateBuffer.texture());
+            duplicateBuffer.v$next();
+        }
     }
 
     // Slice
     @Test
-    public void test6() {
+    public void slice() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Read-Only
     @Test
-    public void test7() {
+    public void readOnly() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Iterate
     @Test
-    public void test8() {
+    public void iterate() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Stream
     @Test
-    public void test9() {
+    public void stream() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 
     // Buffer to Buffer transfers
     @Test
-    public void test10() {
+    public void bufferToBuffer() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
     }
 

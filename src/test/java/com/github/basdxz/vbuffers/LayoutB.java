@@ -9,20 +9,20 @@ import org.joml.Vector4f;
          @Attribute(value = "normal", type = Vector3f.class),
          @Attribute(value = "color", type = Vector4f.class),
          @Attribute(value = "texture", type = Vector2f.class)})
-public interface LayoutB extends VBuffer {
-    LayoutB position(Vector3f value);
+public interface LayoutB<LAYOUT extends LayoutA<LAYOUT>> extends VBuffer<LAYOUT> {
+    LayoutB<LAYOUT> position(Vector3f value);
 
     Vector3f position();
 
-    LayoutB normal(Vector3f value);
+    LayoutB<LAYOUT> normal(Vector3f value);
 
     Vector3f normal();
 
-    LayoutB color(Vector4f value);
+    LayoutB<LAYOUT> color(Vector4f value);
 
     Vector4f color();
 
-    LayoutB texture(Vector2f value);
+    LayoutB<LAYOUT> texture(Vector2f value);
 
     Vector2f texture();
 }
