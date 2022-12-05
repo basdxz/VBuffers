@@ -26,10 +26,10 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     public VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
         val layoutAnnotation = layout.getAnnotation(Layout.class);
-        var attributeOffsets = new HashMap<String, Integer>();
-        var attributeTypes = new HashMap<String, AttributeType>();
+        val attributeOffsets = new HashMap<String, Integer>();
+        val attributeTypes = new HashMap<String, AttributeType>();
         var offset = 0;
-        for (Layout.Attribute attribute : layoutAnnotation.value()) {
+        for (val attribute : layoutAnnotation.value()) {
             val name = Objects.requireNonNull(attribute.value());
             attributeOffsets.put(attribute.value(), offset);
             val typeClass = Objects.requireNonNull(attribute.type());
@@ -69,6 +69,10 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
+    protected VBufferHandler<LAYOUT> copy() {
+        return new VBufferHandler<>(this);
+    }
+
     public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
                                                                     Allocator allocator) {
         return newBuffer(layout, allocator, 1);
@@ -91,8 +95,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    public void v$position(int position) {
+    public LAYOUT v$position(int position) {
         this.position = position;
+        return proxy;
     }
 
     @Override
@@ -101,68 +106,76 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    public void v$limit(int limit) {
+    public LAYOUT v$limit(int limit) {
         this.limit = limit;
+        return proxy;
     }
 
     @Override
-    public void v$mark() {
+    public LAYOUT v$mark() {
         mark = position;
+        return proxy;
     }
 
     @Override
-    public void v$reset() {
+    public LAYOUT v$reset() {
         position = mark;
+        return proxy;
     }
 
     @Override
-    public void v$clear() {
+    public LAYOUT v$clear() {
         limit = capacity;
         position = 0;
         mark = -1;
+        return proxy;
     }
 
     @Override
-    public void v$flip() {
+    public LAYOUT v$flip() {
         limit = position;
         position = 0;
         mark = -1;
+        return proxy;
     }
 
     @Override
-    public void v$rewind() {
+    public LAYOUT v$rewind() {
         position = 0;
         mark = -1;
+        return proxy;
     }
 
     @Override
-    public void v$compact() {
+    public LAYOUT v$compact() {
         val size = limit - position;
         v$copy(position, 0, size);
         position = size;
         limit = capacity;
         mark = -1;
+        return proxy;
     }
 
     @Override
-    public void v$copy(int sourceIndex, int targetIndex) {
+    public LAYOUT v$copy(int sourceIndex, int targetIndex) {
         v$copy(sourceIndex, targetIndex, 1);
+        return proxy;
     }
 
     @Override
-    public void v$copy(int sourceIndex, int targetIndex, int length) {
+    public LAYOUT v$copy(int sourceIndex, int targetIndex, int length) {
         val sourceOffsetBytes = sourceIndex * strideBytes;
         val targetOffsetBytes = targetIndex * strideBytes;
         val lengthBytes = length * strideBytes;
         backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
+        return proxy;
     }
 
     @Override
-    public boolean v$next() {
-        if (position >= limit)
-            return false;
-        position++;
-        return true;
+    public LAYOUT v$next() {
+        if (position < limit)
+            position++;
+        return proxy;
     }
 
     @Override
@@ -177,7 +190,19 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$duplicate() {
-        return new VBufferHandler<>(this).proxy;
+        return copy().proxy;
+    }
+
+    @Override
+    public LAYOUT v$slice() {
+        val copy = copy();
+        return copy.proxy;
+    }
+
+    @Override
+    public LAYOUT v$asReadOnly() {
+        val copy = copy();
+        return copy.proxy;
     }
 
     @Override
@@ -193,7 +218,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
             return Optional.empty();
         // Call the method from this class
         try {
-            method = getClass().getMethod(methodName, method.getParameterTypes());
             var result = method.invoke(this, args);
             if (result == null)
                 result = 0;
@@ -204,12 +228,15 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected Object invokeMutator(Object proxy, Method method, Object[] args) {
+        // Get the attribute name
         val key = method.getName();
         try {
+            // If the method is a setter, set the value and return the proxy
             if (args != null) {
                 set(key, args[0]);
                 return proxy;
             }
+            // Otherwise, return the value
             return get(key);
         } catch (Exception e) {
             throw new RuntimeException("Failed to handle key " + key, e);

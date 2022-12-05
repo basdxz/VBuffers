@@ -7,33 +7,40 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
 
     int v$position();
 
-    void v$position(int position);
+    // TODO: make throw
+    LAYOUT v$position(int position);
 
     int v$limit();
 
-    void v$limit(int limit);
+    // TODO: make throw
+    LAYOUT v$limit(int limit);
 
-    void v$mark();
+    LAYOUT v$mark();
 
-    void v$reset();
+    LAYOUT v$reset();
 
-    void v$clear();
+    LAYOUT v$clear();
 
-    void v$flip();
+    LAYOUT v$flip();
 
-    void v$rewind();
+    LAYOUT v$rewind();
 
-    void v$compact();
+    LAYOUT v$compact();
 
-    void v$copy(int sourceIndex, int targetIndex, int length);
+    LAYOUT v$copy(int sourceIndex, int targetIndex, int length);
 
-    void v$copy(int sourceIndex, int targetIndex);
+    LAYOUT v$copy(int sourceIndex, int targetIndex);
 
-    boolean v$next();
+    //TODO: make throw
+    LAYOUT v$next();
 
     boolean v$hasRemaining();
 
     int v$remaining();
 
     LAYOUT v$duplicate();
+
+    LAYOUT v$slice();
+
+    LAYOUT v$asReadOnly();
 }
