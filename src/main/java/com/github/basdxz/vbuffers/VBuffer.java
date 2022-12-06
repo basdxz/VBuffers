@@ -21,20 +21,11 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     @Contract(pure = true)
     int v$position();
 
-    @Contract("_-> this")
-    LAYOUT v$position(int position);
-
     @Contract("-> this")
-    LAYOUT v$increment();
+    LAYOUT v$next();
 
     @Contract("_-> this")
-    LAYOUT v$increment(int indexCount);
-
-    @Contract("-> this")
-    LAYOUT v$decrement();
-
-    @Contract("_-> this")
-    LAYOUT v$decrement(int indexCount);
+    LAYOUT v$position(int newPosition);
 
     @Contract(pure = true)
     int v$limit();
@@ -61,10 +52,10 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     LAYOUT v$compact();
 
     @Contract("_,_,_-> this")
-    LAYOUT v$copyStrides(int sourceIndex, int targetIndex, int length);
+    LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length);
 
     @Contract("_,_-> this")
-    LAYOUT v$copyStride(int sourceIndex, int targetIndex);
+    LAYOUT v$copyStride(int targetIndex, int sourceIndex);
 
     LAYOUT v$put(LAYOUT source);
 

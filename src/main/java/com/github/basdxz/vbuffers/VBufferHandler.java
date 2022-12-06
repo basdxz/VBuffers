@@ -43,59 +43,47 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     // Normal Constructor
     protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
-        // Set the layout
-        this.layout = layout;
+        val layoutAnnotation = layout.getAnnotation(Layout.class);
+        Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
 
-        // Set the default pointers
+        val attributeOffsets = new HashMap<String, Integer>();
+        val attributeTypes = new HashMap<String, AttributeType>();
+        // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
+        var offsetBytes = 0;
+
+        for (val attribute : layoutAnnotation.value()) {
+            val attributeName = Objects.requireNonNull(attribute.value(), "Attribute name cannot be null");
+            val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
+
+            // Attribute type lookup, the dirtiest part of this constructor
+            val attributeType = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attributeTypeClass),
+                                                       "Attribute type must be a supported type");
+
+            attributeOffsets.put(attributeName, offsetBytes);
+            attributeTypes.put(attributeName, attributeType);
+
+            offsetBytes += attributeType.sizeBytes();
+        }
+
+        this.layout = layout;
+        this.proxy = initProxy();
+        // Attribute maps are immutable as they are shared between multiple VBufferHandlers
+        this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
+        this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
+        this.strideSizeBytes = offsetBytes;
+        this.backing = allocator.allocate(offsetBytes * capacity);
         this.capacity = capacity;
+        // Set Default pointer values
         this.position = 0;
         this.limit = capacity;
         this.mark = -1;
         this.readOnly = false;
-
-        // Get the layout annotation and ensure it is not null
-        val layoutAnnotation = layout.getAnnotation(Layout.class);
-        Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
-
-        // Creates the attribute offset and type maps
-        val attributeOffsets = new HashMap<String, Integer>();
-        val attributeTypes = new HashMap<String, AttributeType>();
-
-        // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
-        var offsetBytes = 0;
-
-        // Get the attributes from the layout annotation
-        for (val attribute : layoutAnnotation.value()) {
-            // Get the values from the attribute annotation
-            val attributeName = Objects.requireNonNull(attribute.value(), "Attribute name cannot be null");
-            val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
-            val attributeType = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attributeTypeClass), "Attribute type must be a supported type");
-
-            // Store the attribute offset and type
-            attributeOffsets.put(attributeName, offsetBytes);
-            attributeTypes.put(attributeName, attributeType);
-
-            // Increment the offset by the attribute size in bytes
-            offsetBytes += attributeType.sizeBytes();
-        }
-
-        // Set the attribute maps
-        this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
-        this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
-
-        // Set the stride size
-        this.strideSizeBytes = offsetBytes;
-        // Set the backing buffer
-        this.backing = allocator.allocate(offsetBytes * capacity);
-
-        // Create the proxy
-        this.proxy = initProxy();
     }
 
     // Copy constructor
     protected VBufferHandler(VBufferHandler<LAYOUT> other) {
-        // Copy values from the other handler
         this.layout = other.layout;
+        this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
         this.attributeTypes = other.attributeTypes;
         this.strideSizeBytes = other.strideSizeBytes;
@@ -105,15 +93,12 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.limit = other.limit;
         this.mark = other.mark;
         this.readOnly = other.readOnly;
-
-        // Create a new proxy for the layout
-        this.proxy = initProxy();
     }
 
     // Slice Copy constructor
     protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
-        // Copy values from the other handler
         this.layout = other.layout;
+        this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
         this.attributeTypes = other.attributeTypes;
         this.strideSizeBytes = other.strideSizeBytes;
@@ -125,9 +110,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
         // Get a slice of the backing buffer from the other handler and set it as the backing buffer
         this.backing = other.backing.slice(strideIndexToBytes(startIndex), strideIndexToBytes(size));
-
-        // Create a new proxy for the layout
-        this.proxy = initProxy();
     }
 
     @SuppressWarnings("unchecked")
@@ -180,30 +162,15 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    public LAYOUT v$position(int position) {
-        Objects.checkIndex(position, limit + 1);
-        this.position = position;
+    public LAYOUT v$next() {
+        return v$position(position + 1);
+    }
+
+    @Override
+    public LAYOUT v$position(int newPosition) {
+        Objects.checkIndex(newPosition, limit + 1);
+        position = newPosition;
         return proxy;
-    }
-
-    @Override
-    public LAYOUT v$increment() {
-        return v$increment(1);
-    }
-
-    @Override
-    public LAYOUT v$increment(int indexCount) {
-        return v$position(position + indexCount);
-    }
-
-    @Override
-    public LAYOUT v$decrement() {
-        return v$decrement(1);
-    }
-
-    @Override
-    public LAYOUT v$decrement(int indexCount) {
-        return v$position(position - indexCount);
     }
 
     @Override
@@ -256,7 +223,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$compact() {
-        // Ensure the buffer is writable
         ensureWritable();
 
         // Copy the remaining strides to the start of the buffer
@@ -264,7 +230,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val source = position;
         v$copyStrides(0, source, length);
 
-        // Reset the position and limit
+        // Reset the pointers
         position = length;
         limit = capacity;
         mark = -1;
@@ -273,65 +239,50 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$copyStride(int targetIndex, int sourceIndex) {
-        // Ensure the buffer is writable
         ensureWritable();
-        // Copy a single stride
         return v$copyStrides(targetIndex, sourceIndex, 1);
     }
 
     @Override
     public LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length) {
-        // Ensure the buffer is writeable, and that the source and target indices are within bounds
         ensureWritable();
         Objects.checkFromIndexSize(targetIndex, length, limit);
         Objects.checkFromIndexSize(sourceIndex, length, limit);
-
-        // If the source and target indices are the same, do nothing
         if (sourceIndex == targetIndex)
             return proxy;
 
-        // Get the source and target byte offsets and the length in bytes
+        // Copy the strides, keeping the positions untouched
         val sourceOffsetBytes = strideIndexToBytes(sourceIndex);
         val targetOffsetBytes = strideIndexToBytes(targetIndex);
         val lengthBytes = strideIndexToBytes(length);
-
-        // Copy the stride
         backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
         return proxy;
     }
 
     @Override
     public LAYOUT v$put(LAYOUT source) {
-        // Ensure the buffer is writable
         ensureWritable();
-
-        // If the source has no remaining strides, do nothing
         if (!source.v$hasRemaining())
             return proxy;
-
-        // Set target
         val target = this;
 
-        // Get the stride length
         val strideLength = source.v$remaining();
-        // Ensure the target has enough remaining strides
         if (target.v$remaining() < strideLength)
             throw new BufferOverflowException();
-
-        // Set the byte length
         val lengthBytes = strideIndexToBytes(strideLength);
-        // Get the source and target backings
-        val sourceBacking = source.v$backing();
-        val targetBacking = target.v$backing();
-        // Get the source and target offsets
-        val sourceOffsetBytes = strideIndexToBytes(source.v$position());
-        val targetOffsetBytes = strideIndexToBytes(target.v$position());
 
-        // Copy the buffer
+        val sourceBacking = source.v$backing();
+        val sourcePosition = source.v$position();
+        val sourceOffsetBytes = strideIndexToBytes(sourcePosition);
+
+        val targetBacking = target.v$backing();
+        val targetPosition = target.v$position();
+        val targetOffsetBytes = strideIndexToBytes(targetPosition);
+
+        // Copy the remaining buffer, incrementing the positions
         targetBacking.put(targetOffsetBytes, sourceBacking, sourceOffsetBytes, lengthBytes);
-        // Increment the position based on the number of strides copied
-        target.v$increment(strideLength);
-        source.v$increment(strideLength);
+        source.v$position(sourcePosition + strideLength);
+        target.v$position(targetPosition + strideLength);
 
         return proxy;
     }
@@ -359,7 +310,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     @Override
     public LAYOUT v$nextStrideView() {
         val singleView = v$strideView();
-        v$increment();
+        v$next();
         return singleView;
     }
 
@@ -385,7 +336,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$asReadOnlyView() {
-        // Create a copy of this handler and set it to read only
         val copy = newCopy();
         copy.readOnly = true;
         return copy.proxy;
@@ -419,10 +369,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected Optional<Object> handleInternalMethod(Method method, Object[] args) {
-        // Get the method name
         val methodName = method.getName();
-
-        // Return empty optional if method is not a VBuffer method
         if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
 
@@ -444,27 +391,21 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
-        // If no strides remain, throw an exception
         if (!v$hasRemaining())
             throw new BufferUnderflowException();
-
-        // Get the attribute name
         val attributeName = method.getName();
 
-        // If the method is a setter, set the value and return the proxy
+        // If the args are null, assume this is a getter
         if (args != null) {
             set(attributeName, args[0]);
             return proxy;
         }
-
-        // Otherwise, return the value
         return get(attributeName);
     }
 
     protected void set(String attributeName, Object value) {
         ensureWritable();
         try {
-            // Set the attribute to provided value
             attributeType(attributeName).set(backing, attributeOffset(attributeName), value);
         } catch (Exception e) {
             throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
@@ -481,12 +422,10 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected AttributeType attributeType(String attributeName) {
-        // Get the attribute type
         return attributeTypes.get(attributeName);
     }
 
     protected int attributeOffset(String attributeName) {
-        // Get the attribute offset including the position offset
         return attributeOffsets.get(attributeName) + strideIndexToBytes(position);
     }
 

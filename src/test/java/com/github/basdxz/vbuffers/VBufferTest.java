@@ -26,7 +26,7 @@ public final class VBufferTest {
     private static final int SIZE_D = 1000;
 
     @Test
-    public void test0() {
+    public void singleReadWrite() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocate);
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
@@ -47,7 +47,7 @@ public final class VBufferTest {
     }
 
     @Test
-    public void test1() {
+    public void directBackingReadWrite() {
         val intBackingBox = new IntBuffer[1];
         val buffer = VBufferHandler.newBuffer(LayoutA.class, capacity -> {
             val allocation = ByteBuffer.allocate(capacity);
@@ -75,7 +75,7 @@ public final class VBufferTest {
     }
 
     @Test
-    public void test2() {
+    public void basicJOMLVectors() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
         val position = new Vector3f(55F, 994F, -1515F);
@@ -94,10 +94,8 @@ public final class VBufferTest {
         assertEquals(texture, buffer.texture());
     }
 
-    // Buffer treated as an array for reads and writes
-    // https://www.baeldung.com/java-bytebuffer
     @Test
-    public void test3() {
+    public void readWriteStrides() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_D);
         val positions = IntStream.range(0, SIZE_D)
                                  .mapToObj(Vector3f::new)
@@ -118,7 +116,7 @@ public final class VBufferTest {
                   .normal(normals.get(index))
                   .color(colors.get(index))
                   .texture(textures.get(index));
-            buffer.v$increment();
+            buffer.v$next();
         }
         buffer.v$clear();
 
@@ -128,14 +126,12 @@ public final class VBufferTest {
             assertEquals(normals.get(index), buffer.normal());
             assertEquals(colors.get(index), buffer.color());
             assertEquals(textures.get(index), buffer.texture());
-            buffer.v$increment();
+            buffer.v$next();
         }
     }
 
-    // Flip/Compact demonstration
-    // https://www.happycoders.eu/java/bytebuffer-flip-compact
     @Test
-    public void test4() {
+    public void flipAndCompact() {
         val middleOfB = SIZE_B / 2;
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
 
@@ -145,7 +141,7 @@ public final class VBufferTest {
                   .normal(1)
                   .color(1)
                   .texture(1);
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Write 2s
         for (var i = 0; i < SIZE_B; i++) {
@@ -153,7 +149,7 @@ public final class VBufferTest {
                   .normal(2)
                   .color(2)
                   .texture(2);
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Flip
         buffer.v$flip();
@@ -164,7 +160,7 @@ public final class VBufferTest {
             assertEquals(1, buffer.normal());
             assertEquals(1, buffer.color());
             assertEquals(1, buffer.texture());
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Read half of the 2s
         for (var i = 0; i < middleOfB; i++) {
@@ -172,7 +168,7 @@ public final class VBufferTest {
             assertEquals(2, buffer.normal());
             assertEquals(2, buffer.color());
             assertEquals(2, buffer.texture());
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Compact
         buffer.v$compact();
@@ -183,7 +179,7 @@ public final class VBufferTest {
                   .normal(3)
                   .color(3)
                   .texture(3);
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Flip
         buffer.v$flip();
@@ -194,7 +190,7 @@ public final class VBufferTest {
             assertEquals(2, buffer.normal());
             assertEquals(2, buffer.color());
             assertEquals(2, buffer.texture());
-            buffer.v$increment();
+            buffer.v$next();
         }
         // Read the 3s
         for (var i = 0; i < SIZE_C; i++) {
@@ -202,12 +198,12 @@ public final class VBufferTest {
             assertEquals(3, buffer.normal());
             assertEquals(3, buffer.color());
             assertEquals(3, buffer.texture());
-            buffer.v$increment();
+            buffer.v$next();
         }
     }
 
     @Test
-    public void testCopy() {
+    public void internalStrideCopy() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_A);
 
         val position = new Vector3f(55F, 994F, -1515F);
@@ -243,7 +239,7 @@ public final class VBufferTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$increment();
+            buffer.v$next();
         }
 
         // Read the duplicate buffer
@@ -254,7 +250,7 @@ public final class VBufferTest {
             assertEquals(i, duplicateBuffer.normal());
             assertEquals(i, duplicateBuffer.color());
             assertEquals(i, duplicateBuffer.texture());
-            duplicateBuffer.v$increment();
+            duplicateBuffer.v$next();
         }
     }
 
@@ -268,7 +264,7 @@ public final class VBufferTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$increment();
+            buffer.v$next();
         }
 
         // Read the slice buffer
@@ -278,7 +274,7 @@ public final class VBufferTest {
             assertEquals(i + 3, sliceBuffer.normal());
             assertEquals(i + 3, sliceBuffer.color());
             assertEquals(i + 3, sliceBuffer.texture());
-            sliceBuffer.v$increment();
+            sliceBuffer.v$next();
         }
     }
 
@@ -293,7 +289,7 @@ public final class VBufferTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$increment();
+            buffer.v$next();
         }
         buffer.v$flip();
 
@@ -305,7 +301,7 @@ public final class VBufferTest {
             assertEquals(i, readOnlyBuffer.normal());
             assertEquals(i, readOnlyBuffer.color());
             assertEquals(i, readOnlyBuffer.texture());
-            readOnlyBuffer.v$increment();
+            readOnlyBuffer.v$next();
         }
         readOnlyBuffer.v$flip();
 
@@ -349,7 +345,7 @@ public final class VBufferTest {
         // Create immutable list of integers
         val testValues = IntStream.range(0, SIZE_D).boxed().toList();
 
-        val tempList = new ArrayList<Integer>(testValues);
+        val tempList = new ArrayList<>(testValues);
         buffer.v$stream().forEach(layoutB -> {
             // Get the first element from the list
             val value = tempList.remove(0);
@@ -414,7 +410,7 @@ public final class VBufferTest {
                    .normal(i)
                    .color(i)
                    .texture(i);
-            bufferA.v$increment();
+            bufferA.v$next();
         }
         bufferA.v$flip();
 
@@ -429,7 +425,7 @@ public final class VBufferTest {
             assertEquals(i, bufferB.normal());
             assertEquals(i, bufferB.color());
             assertEquals(i, bufferB.texture());
-            bufferB.v$increment();
+            bufferB.v$next();
         }
         bufferB.v$flip();
     }
