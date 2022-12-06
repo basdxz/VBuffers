@@ -23,8 +23,8 @@ public class ShaderDemo {
         // Apply UVs to the buffer
         for (var y = 0; y < CANVAS_HEIGHT; y++) {
             for (var x = 0; x < CANVAS_WIDTH; x++) {
-                buffer.v$next();
                 applyUV(buffer, x, y);
+                buffer.v$next();
             }
         }
         buffer.v$flip();
