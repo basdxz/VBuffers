@@ -4,6 +4,7 @@ import lombok.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -26,6 +27,7 @@ public final class VBufferTest {
     private static final int SIZE_D = 1000;
 
     @Test
+    @DisplayName("Simple I/O")
     public void singleReadWrite() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocate);
         for (val value : SAMPLE_VALUES) {
@@ -47,6 +49,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("Simple I/O with ByteBuffer interop")
     public void directBackingReadWrite() {
         val intBackingBox = new IntBuffer[1];
         val buffer = VBufferHandler.newBuffer(LayoutA.class, capacity -> {
@@ -75,6 +78,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("JOML interop")
     public void basicJOMLVectors() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
@@ -95,6 +99,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("Multiple strides per buffer")
     public void readWriteStrides() {
         val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_D);
         val positions = IntStream.range(0, SIZE_D)
@@ -131,6 +136,13 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("ByteBuffer-like API for navigation")
+    public void navigation() {
+        //TODO: test navigation
+    }
+
+    @Test
+    @DisplayName("ByteBuffer-like API for flip and compact")
     public void flipAndCompact() {
         val middleOfB = SIZE_B / 2;
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
@@ -203,33 +215,7 @@ public final class VBufferTest {
     }
 
     @Test
-    public void internalStrideCopy() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_A);
-
-        val position = new Vector3f(55F, 994F, -1515F);
-        val normal = new Vector3f(35F, 300F, -105F);
-        val color = new Vector4f(7777F, 0F, -1F, 1000F);
-        val texture = new Vector2f(-642F, 0.66F);
-
-        // Write the test data
-        buffer.v$position(3);
-        buffer.position(position)
-              .normal(normal)
-              .color(color)
-              .texture(texture);
-
-        // Copy the test data
-        buffer.v$copyStride(9, 3);
-
-        // Read the test data
-        buffer.v$position(9);
-        assertEquals(position, buffer.position());
-        assertEquals(normal, buffer.normal());
-        assertEquals(color, buffer.color());
-        assertEquals(texture, buffer.texture());
-    }
-
-    @Test
+    @DisplayName("ByteBuffer-like API for duplicate views")
     public void duplicate() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
@@ -255,6 +241,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("ByteBuffer-like API for slice views")
     public void slice() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
@@ -278,8 +265,8 @@ public final class VBufferTest {
         }
     }
 
-    // Read-Only
     @Test
+    @DisplayName("ByteBuffer-like API for read only views")
     public void readOnly() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
@@ -314,6 +301,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("Iterators")
     public void iteration() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
@@ -339,6 +327,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("Streams")
     public void streams() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
 
@@ -369,6 +358,7 @@ public final class VBufferTest {
     }
 
     @Test
+    @DisplayName("Parallel Streams")
     public void parallelStreams() {
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
         val testValues = IntStream.range(0, SIZE_D).boxed().toList();
@@ -400,7 +390,36 @@ public final class VBufferTest {
     }
 
     @Test
-    public void bufferToBuffer() {
+    @DisplayName("Internal stride copying")
+    public void internalCopy() {
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_A);
+
+        val position = new Vector3f(55F, 994F, -1515F);
+        val normal = new Vector3f(35F, 300F, -105F);
+        val color = new Vector4f(7777F, 0F, -1F, 1000F);
+        val texture = new Vector2f(-642F, 0.66F);
+
+        // Write the test data
+        buffer.v$position(3);
+        buffer.position(position)
+              .normal(normal)
+              .color(color)
+              .texture(texture);
+
+        // Copy the test data
+        buffer.v$copyStride(9, 3);
+
+        // Read the test data
+        buffer.v$position(9);
+        assertEquals(position, buffer.position());
+        assertEquals(normal, buffer.normal());
+        assertEquals(color, buffer.color());
+        assertEquals(texture, buffer.texture());
+    }
+
+    @Test
+    @DisplayName("ByteBuffer-like API for read only views")
+    public void bufferToBufferCopy() {
         val bufferA = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
         val bufferB = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 

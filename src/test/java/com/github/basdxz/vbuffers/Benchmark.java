@@ -11,7 +11,6 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-//TODO implement benchmarking
 public class Benchmark {
     protected static final int BUFFER_SIZE_C = 1000;
 

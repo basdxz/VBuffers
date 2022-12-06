@@ -15,6 +15,7 @@ public class VBufferIterator<LAYOUT extends VBuffer<LAYOUT>> implements Iterator
 
     @Override
     public LAYOUT next() {
+        // Provides a new instance of the layout which holds a single stride
         return bufferHandler.v$nextStrideView();
     }
 }

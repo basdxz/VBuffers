@@ -17,7 +17,6 @@ import java.util.stream.StreamSupport;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
-//TODO: Rename setters to more put like names
 public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
