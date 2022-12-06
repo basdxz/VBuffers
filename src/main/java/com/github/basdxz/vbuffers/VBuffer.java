@@ -89,11 +89,15 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     @Contract(value = "-> new", pure = true)
     LAYOUT v$asReadOnlyView();
 
+    @Contract(value = "-> new", pure = true)
     Stream<LAYOUT> v$stream();
 
+    @Contract(value = "-> new", pure = true)
     Stream<LAYOUT> v$parallelStream();
 
+    @Contract(value = "-> new", pure = true)
     Spliterator<LAYOUT> v$spliterator();
 
+    @Contract(value = "-> new", pure = true)
     Iterator<LAYOUT> v$iterator();
 }

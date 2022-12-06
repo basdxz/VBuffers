@@ -15,6 +15,7 @@ import java.util.stream.StreamSupport;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
+//TODO: Rename setters to more put like names
 public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
@@ -38,7 +39,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected int mark;
     protected boolean readOnly;
 
-    public VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
+    // Normal Constructor
+    protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
         // Set the layout
         this.layout = layout;
 
@@ -89,7 +91,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     // Copy constructor
-    public VBufferHandler(VBufferHandler<LAYOUT> other) {
+    protected VBufferHandler(VBufferHandler<LAYOUT> other) {
         // Copy values from the other handler
         this.layout = other.layout;
         this.attributeOffsets = other.attributeOffsets;
@@ -107,7 +109,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     // Slice Copy constructor
-    public VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
+    protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
         // Copy values from the other handler
         this.layout = other.layout;
         this.attributeOffsets = other.attributeOffsets;
@@ -142,11 +144,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         return new VBufferHandler<>(this, position, v$remaining());
     }
 
+    // Static constructor
     public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT
     newBuffer(@NonNull Class<LAYOUT> layout, Allocator allocator) {
         return newBuffer(layout, allocator, 1);
     }
 
+    // Static constructor
     public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(
             @NonNull Class<LAYOUT> layout, Allocator allocator, int capacity) {
         return new VBufferHandler<>(layout, allocator, capacity).proxy;
@@ -258,8 +262,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$copyStride(int sourceIndex, int targetIndex) {
-        v$copyStride(sourceIndex, targetIndex, 1);
-        return proxy;
+        return v$copyStride(sourceIndex, targetIndex, 1);
     }
 
     @Override
