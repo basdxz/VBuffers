@@ -121,7 +121,7 @@ public final class BufferProviderTest {
                   .normal(normals.get(index))
                   .color(colors.get(index))
                   .texture(textures.get(index));
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         buffer.v$clear();
 
@@ -150,7 +150,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_1)
                   .color(CONSTANT_1)
                   .texture(CONSTANT_1);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         // Write CONSTANT_2 to the buffer SIZE_B times
         for (var i = 0; i < SIZE_B; i++) {
@@ -158,7 +158,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_2)
                   .color(CONSTANT_2)
                   .texture(CONSTANT_2);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         // Flip the buffer
         buffer.v$flip();
@@ -169,7 +169,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_1, buffer.normal());
             assertEquals(CONSTANT_1, buffer.color());
             assertEquals(CONSTANT_1, buffer.texture());
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         // Read half of the CONSTANT_2 values from the buffer
         for (var i = 0; i < middleOfB; i++) {
@@ -177,7 +177,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_2, buffer.normal());
             assertEquals(CONSTANT_2, buffer.color());
             assertEquals(CONSTANT_2, buffer.texture());
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         // Compact the buffer
         buffer.v$compact();
@@ -188,7 +188,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_3)
                   .color(CONSTANT_3)
                   .texture(CONSTANT_3);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         buffer.v$flip();
 
@@ -198,7 +198,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_2, buffer.normal());
             assertEquals(CONSTANT_2, buffer.color());
             assertEquals(CONSTANT_2, buffer.texture());
-            buffer.v$next();
+            buffer.v$oldNext();
         }
         // Read the CONSTANT_3 values from the buffer
         for (var i = 0; i < SIZE_C; i++) {
@@ -206,7 +206,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_3, buffer.normal());
             assertEquals(CONSTANT_3, buffer.color());
             assertEquals(CONSTANT_3, buffer.texture());
-            buffer.v$next();
+            buffer.v$oldNext();
         }
     }
 
@@ -250,11 +250,11 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
 
         // Duplicate the buffer
-        val duplicateBuffer = buffer.v$duplicate();
+        val duplicateBuffer = buffer.v$duplicateView();
         // Flip the duplicate buffer
         duplicateBuffer.v$flip();
 
@@ -264,7 +264,7 @@ public final class BufferProviderTest {
             assertEquals(i, duplicateBuffer.normal());
             assertEquals(i, duplicateBuffer.color());
             assertEquals(i, duplicateBuffer.texture());
-            duplicateBuffer.v$next();
+            duplicateBuffer.v$oldNext();
         }
     }
 
@@ -279,11 +279,11 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
 
         // Slice the buffer from index 3 with a length of 7
-        val sliceBuffer = buffer.v$slice(3, 7);
+        val sliceBuffer = buffer.v$sliceView(3, 7);
 
         // Read the slice buffer
         for (var i = 0; i < 7; i++) {
@@ -291,7 +291,7 @@ public final class BufferProviderTest {
             assertEquals(i + 3, sliceBuffer.normal());
             assertEquals(i + 3, sliceBuffer.color());
             assertEquals(i + 3, sliceBuffer.texture());
-            sliceBuffer.v$next();
+            sliceBuffer.v$oldNext();
         }
     }
 
@@ -306,14 +306,14 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$next();
+            buffer.v$oldNext();
         }
 
         // Flip the buffer
         buffer.v$flip();
 
         // Create a read-only buffer
-        val readOnlyBuffer = buffer.v$asReadOnly();
+        val readOnlyBuffer = buffer.v$asReadOnlyView();
 
         // Read the read-only buffer
         for (var i = 0; i < 10; i++) {
@@ -321,7 +321,7 @@ public final class BufferProviderTest {
             assertEquals(i, readOnlyBuffer.normal());
             assertEquals(i, readOnlyBuffer.color());
             assertEquals(i, readOnlyBuffer.texture());
-            readOnlyBuffer.v$next();
+            readOnlyBuffer.v$oldNext();
         }
 
         // Try to write to the read-only buffer
@@ -333,11 +333,30 @@ public final class BufferProviderTest {
         });
     }
 
-    // Iterate
     @Test
-    public void iterate() {
+    public void iteration() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+
+        // Fill buffer with numbers 0 to 9
+        var value = 0;
+        for (val stride : buffer) {
+            stride.position(value)
+                  .normal(value)
+                  .color(value)
+                  .texture(value);
+            value++;
+        }
+
+        // Read the buffer
+        value = 0;
+        for (val stride : buffer) {
+            assertEquals(value, stride.position());
+            assertEquals(value, stride.normal());
+            assertEquals(value, stride.color());
+            assertEquals(value, stride.texture());
+            value++;
+        }
     }
 
     // Stream

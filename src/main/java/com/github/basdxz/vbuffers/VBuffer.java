@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers;
 
-public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
+public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT> {
     String BUFFER_METHOD_PREFIX = "v$";
 
     int v$capacity();
@@ -9,6 +9,14 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
 
     // TODO: make throw
     LAYOUT v$position(int position);
+
+    LAYOUT v$increment();
+
+    LAYOUT v$increment(int indexCount);
+
+    LAYOUT v$decrement();
+
+    LAYOUT v$decrement(int indexCount);
 
     int v$limit();
 
@@ -31,22 +39,25 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> {
 
     LAYOUT v$copyStride(int sourceIndex, int targetIndex);
 
-    //TODO: make throw
-    LAYOUT v$next();
+    @Deprecated
+    LAYOUT v$oldNext();
 
     boolean v$hasRemaining();
 
     int v$remaining();
 
-    LAYOUT v$duplicate();
+    // These return NEW Layout obj
+    LAYOUT v$duplicateView();
 
-    LAYOUT v$single();
+    LAYOUT v$nextStrideView();
 
-    LAYOUT v$single(int index);
+    LAYOUT v$strideView();
 
-    LAYOUT v$slice();
+    LAYOUT v$strideView(int index);
 
-    LAYOUT v$slice(int startIndex, int length);
+    LAYOUT v$sliceView();
 
-    LAYOUT v$asReadOnly();
+    LAYOUT v$sliceView(int startIndex, int length);
+
+    LAYOUT v$asReadOnlyView();
 }

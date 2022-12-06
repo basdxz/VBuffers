@@ -1,6 +1,7 @@
 package com.github.basdxz.vbuffers;
 
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -67,7 +68,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.readOnly = other.readOnly;
     }
 
-    // Slice constructor
+    // Slice Copy constructor
     public VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
         this.layout = other.layout;
         this.proxy = initProxy();
@@ -91,15 +92,24 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         return new VBufferHandler<>(this);
     }
 
-    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
-                                                                    Allocator allocator) {
+    protected VBufferHandler<LAYOUT> copyRemaining() {
+        return new VBufferHandler<>(this, position, v$remaining());
+    }
+
+    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT
+    newBuffer(@NonNull Class<LAYOUT> layout, Allocator allocator) {
         return newBuffer(layout, allocator, 1);
     }
 
-    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(@NonNull Class<LAYOUT> layout,
-                                                                    Allocator allocator,
-                                                                    int capacity) {
+    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(
+            @NonNull Class<LAYOUT> layout, Allocator allocator, int capacity) {
         return new VBufferHandler<>(layout, allocator, capacity).proxy;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<LAYOUT> iterator() {
+        return new VBufferIterator<>(copyRemaining());
     }
 
     @Override
@@ -114,8 +124,30 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$position(int position) {
+        if (position < 0 || position > limit)
+            throw new IllegalArgumentException("Position out of bounds: " + position);
         this.position = position;
         return proxy;
+    }
+
+    @Override
+    public LAYOUT v$increment() {
+        return v$increment(1);
+    }
+
+    @Override
+    public LAYOUT v$increment(int indexCount) {
+        return v$position(position + indexCount);
+    }
+
+    @Override
+    public LAYOUT v$decrement() {
+        return v$decrement(1);
+    }
+
+    @Override
+    public LAYOUT v$decrement(int indexCount) {
+        return v$position(position - indexCount);
     }
 
     @Override
@@ -125,6 +157,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$limit(int limit) {
+        if (limit < 0 || limit > capacity)
+            throw new IllegalArgumentException("Limit out of bounds: " + limit);
         this.limit = limit;
         return proxy;
     }
@@ -166,9 +200,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$compact() {
-        val size = limit - position;
-        v$copyStride(position, 0, size);
-        position = size;
+        val remaining = v$remaining();
+        v$copyStride(position, 0, remaining);
+        position = remaining;
         limit = capacity;
         mark = -1;
         return proxy;
@@ -182,12 +216,15 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length) {
+        if (sourceIndex < 0 || sourceIndex + length > limit)
+            throw new IllegalArgumentException("Source index out of bounds: " + sourceIndex);
         backing.put(stridesToBytes(targetIndex), backing, stridesToBytes(sourceIndex), stridesToBytes(length));
         return proxy;
     }
 
     @Override
-    public LAYOUT v$next() {
+    @Deprecated
+    public LAYOUT v$oldNext() {
         if (position < limit)
             position++;
         return proxy;
@@ -204,32 +241,39 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    public LAYOUT v$duplicate() {
+    public LAYOUT v$duplicateView() {
         return copy().proxy;
     }
 
     @Override
-    public LAYOUT v$single() {
-        return v$single(position);
+    public LAYOUT v$nextStrideView() {
+        val singleView = v$strideView();
+        v$increment();
+        return singleView;
     }
 
     @Override
-    public LAYOUT v$single(int index) {
+    public LAYOUT v$strideView() {
+        return v$strideView(position);
+    }
+
+    @Override
+    public LAYOUT v$strideView(int index) {
         return new VBufferHandler<>(this, index, 1).proxy;
     }
 
     @Override
-    public LAYOUT v$slice() {
-        return v$slice(position, limit - position);
+    public LAYOUT v$sliceView() {
+        return v$sliceView(position, v$remaining());
     }
 
     @Override
-    public LAYOUT v$slice(int startIndex, int length) {
+    public LAYOUT v$sliceView(int startIndex, int length) {
         return new VBufferHandler<>(this, startIndex, length).proxy;
     }
 
     @Override
-    public LAYOUT v$asReadOnly() {
+    public LAYOUT v$asReadOnlyView() {
         val copy = copy();
         copy.readOnly = true;
         return copy.proxy;
@@ -244,7 +288,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected Optional<Object> invokeInternal(Object proxy, Method method, Object[] args) {
         val methodName = method.getName();
         // Return empty optional if method is not a VBuffer method
-        if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX))
+        if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
         // Call the method from this class
         try {
@@ -259,39 +303,43 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected Object invokeMutator(Object proxy, Method method, Object[] args) {
         // Get the attribute name
-        val key = method.getName();
+        val attributeName = method.getName();
+        // If the method is a setter, set the value and return the proxy
+        if (args != null) {
+            if (readOnly)
+                throw new UnsupportedOperationException("Buffer is read-only");
+            set(attributeName, args[0]);
+            return proxy;
+        }
+        // Otherwise, return the value
+        return get(attributeName);
+    }
+
+    protected void set(String attributeName, Object value) {
         try {
-            // If the method is a setter, set the value and return the proxy
-            if (args != null) {
-                if (readOnly)
-                    throw new UnsupportedOperationException("Buffer is read-only");
-                set(key, args[0]);
-                return proxy;
-            }
-            // Otherwise, return the value
-            return get(key);
+            attributeType(attributeName).set(backing, attributeOffset(attributeName), value);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to handle key " + key, e);
+            throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
         }
     }
 
-    protected void set(String key, Object value) {
-        attributeType(key).set(backing, keyOffset(key), value);
+    protected Object get(String attributeName) {
+        try {
+            return attributeType(attributeName).get(backing, attributeOffset(attributeName));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
+        }
     }
 
-    protected Object get(String key) {
-        return attributeType(key).get(backing, keyOffset(key));
+    protected AttributeType attributeType(String attributeName) {
+        return attributeTypes.get(attributeName);
     }
 
-    protected AttributeType attributeType(String key) {
-        return attributeTypes.get(key);
+    protected int attributeOffset(String attributeName) {
+        return attributeOffsets.get(attributeName) + stridesToBytes(position);
     }
 
-    protected int keyOffset(String key) {
-        return attributeOffsets.get(key) + stridesToBytes(position);
-    }
-
-    protected int stridesToBytes(int index) {
-        return index * strideBytes;
+    protected int stridesToBytes(int strideCount) {
+        return strideCount * strideBytes;
     }
 }
