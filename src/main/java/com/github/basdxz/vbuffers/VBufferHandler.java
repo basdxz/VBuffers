@@ -29,81 +29,116 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected final LAYOUT proxy;
     protected final Map<String, Integer> attributeOffsets;
     protected final Map<String, AttributeType> attributeTypes;
-    protected final int strideBytes;
+    protected final int strideSizeBytes;
     protected final ByteBuffer backing;
     protected final int capacity;
+
     protected int position;
     protected int limit;
     protected int mark;
     protected boolean readOnly;
 
     public VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
-        val layoutAnnotation = layout.getAnnotation(Layout.class);
-        val attributeOffsets = new HashMap<String, Integer>();
-        val attributeTypes = new HashMap<String, AttributeType>();
-        var offset = 0;
-        for (val attribute : layoutAnnotation.value()) {
-            val name = Objects.requireNonNull(attribute.value());
-            attributeOffsets.put(attribute.value(), offset);
-            val typeClass = Objects.requireNonNull(attribute.type());
-            val type = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attribute.type()));
-
-            offset += type.sizeBytes();
-            attributeTypes.put(attribute.value(), type);
-        }
+        // Set the layout
         this.layout = layout;
-        this.proxy = initProxy();
-        this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
-        this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
-        this.strideBytes = offset;
-        this.backing = allocator.allocate(offset * capacity);
+
+        // Set the default pointers
         this.capacity = capacity;
         this.position = 0;
         this.limit = capacity;
         this.mark = -1;
         this.readOnly = false;
+
+        // Get the layout annotation and ensure it is not null
+        val layoutAnnotation = layout.getAnnotation(Layout.class);
+        Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
+
+        // Creates the attribute offset and type maps
+        val attributeOffsets = new HashMap<String, Integer>();
+        val attributeTypes = new HashMap<String, AttributeType>();
+
+        // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
+        var offsetBytes = 0;
+
+        // Get the attributes from the layout annotation
+        for (val attribute : layoutAnnotation.value()) {
+            // Get the values from the attribute annotation
+            val attributeName = Objects.requireNonNull(attribute.value(), "Attribute name cannot be null");
+            val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
+            val attributeType = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attributeTypeClass), "Attribute type must be a supported type");
+
+            // Store the attribute offset and type
+            attributeOffsets.put(attributeName, offsetBytes);
+            attributeTypes.put(attributeName, attributeType);
+
+            // Increment the offset by the attribute size in bytes
+            offsetBytes += attributeType.sizeBytes();
+        }
+
+        // Set the attribute maps
+        this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
+        this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
+
+        // Set the stride size
+        this.strideSizeBytes = offsetBytes;
+        // Set the backing buffer
+        this.backing = allocator.allocate(offsetBytes * capacity);
+
+        // Create the proxy
+        this.proxy = initProxy();
     }
 
     // Copy constructor
     public VBufferHandler(VBufferHandler<LAYOUT> other) {
+        // Copy values from the other handler
         this.layout = other.layout;
-        this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
         this.attributeTypes = other.attributeTypes;
-        this.strideBytes = other.strideBytes;
+        this.strideSizeBytes = other.strideSizeBytes;
         this.backing = other.backing;
         this.capacity = other.capacity;
         this.position = other.position;
         this.limit = other.limit;
         this.mark = other.mark;
         this.readOnly = other.readOnly;
+
+        // Create a new proxy for the layout
+        this.proxy = initProxy();
     }
 
     // Slice Copy constructor
     public VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
+        // Copy values from the other handler
         this.layout = other.layout;
-        this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
         this.attributeTypes = other.attributeTypes;
-        this.strideBytes = other.strideBytes;
-        this.backing = other.backing.slice(stridesToBytes(startIndex), stridesToBytes(size));
+        this.strideSizeBytes = other.strideSizeBytes;
         this.capacity = size;
         this.position = 0;
         this.limit = size;
         this.mark = -1;
         this.readOnly = other.readOnly;
+
+        // Get a slice of the backing buffer from the other handler and set it as the backing buffer
+        this.backing = other.backing.slice(strideIndexToBytes(startIndex), strideIndexToBytes(size));
+
+        // Create a new proxy for the layout
+        this.proxy = initProxy();
     }
 
     @SuppressWarnings("unchecked")
     protected LAYOUT initProxy() {
+        // Create a new proxy for the handler, must be called after layout is set
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
     protected VBufferHandler<LAYOUT> copy() {
+        // Create a deep copy of this VBufferHandler
         return new VBufferHandler<>(this);
     }
 
     protected VBufferHandler<LAYOUT> copyRemaining() {
+        // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining elements
         return new VBufferHandler<>(this, position, v$remaining());
     }
 
@@ -233,7 +268,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
             throw new IllegalArgumentException("Source index out of bounds: " + sourceIndex);
         if (readOnly)
             throw new ReadOnlyBufferException();
-        backing.put(stridesToBytes(targetIndex), backing, stridesToBytes(sourceIndex), stridesToBytes(length));
+        backing.put(strideIndexToBytes(targetIndex), backing, strideIndexToBytes(sourceIndex), strideIndexToBytes(length));
         return proxy;
     }
 
@@ -281,6 +316,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$asReadOnlyView() {
+        // Create a copy of this handler and set it to read only
         val copy = copy();
         copy.readOnly = true;
         return copy.proxy;
@@ -308,11 +344,12 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        return invokeInternal(proxy, method, args)
-                .orElseGet(() -> invokeMutator(proxy, method, args));
+        // Invoke the internal method if it exists, try to invoke a mu
+        return handleInternalMethod(proxy, method, args)
+                .orElseGet(() -> handleAttributeMethod(proxy, method, args));
     }
 
-    protected Optional<Object> invokeInternal(Object proxy, Method method, Object[] args) {
+    protected Optional<Object> handleInternalMethod(Object proxy, Method method, Object[] args) {
         val methodName = method.getName();
         // Return empty optional if method is not a VBuffer method
         if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX) && !methodName.equals("iterator"))
@@ -331,7 +368,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         }
     }
 
-    protected Object invokeMutator(Object proxy, Method method, Object[] args) {
+    protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
         // Get the attribute name
         val attributeName = method.getName();
         // If the method is a setter, set the value and return the proxy
@@ -347,6 +384,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected void set(String attributeName, Object value) {
         try {
+            // Set the attribute to provided value
             attributeType(attributeName).set(backing, attributeOffset(attributeName), value);
         } catch (Exception e) {
             throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
@@ -355,6 +393,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected Object get(String attributeName) {
         try {
+            // Get the attribute value
             return attributeType(attributeName).get(backing, attributeOffset(attributeName));
         } catch (Exception e) {
             throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
@@ -362,14 +401,17 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected AttributeType attributeType(String attributeName) {
+        // Get the attribute type
         return attributeTypes.get(attributeName);
     }
 
     protected int attributeOffset(String attributeName) {
-        return attributeOffsets.get(attributeName) + stridesToBytes(position);
+        // Get the attribute offset including the position offset
+        return attributeOffsets.get(attributeName) + strideIndexToBytes(position);
     }
 
-    protected int stridesToBytes(int strideCount) {
-        return strideCount * strideBytes;
+    protected int strideIndexToBytes(int strideIndex) {
+        // Convert the stride index to stride bytes
+        return strideIndex * strideSizeBytes;
     }
 }
