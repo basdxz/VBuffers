@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 
+// TODO: Make tests to make the warnings redundant
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT> {
     String BUFFER_METHOD_PREFIX = "v$";
 
@@ -27,13 +29,13 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     @Contract("-> this")
     LAYOUT v$decrement();
 
-    @Contract("-> this")
+    @Contract("_-> this")
     LAYOUT v$decrement(int indexCount);
 
     @Contract(pure = true)
     int v$limit();
 
-    @Contract("-> this")
+    @Contract("_-> this")
     LAYOUT v$limit(int limit);
 
     @Contract("-> this")
@@ -54,10 +56,10 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     @Contract("-> this")
     LAYOUT v$compact();
 
-    @Contract("___-> this")
+    @Contract("_,_,_-> this")
     LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length);
 
-    @Contract("__-> this")
+    @Contract("_,_-> this")
     LAYOUT v$copyStride(int sourceIndex, int targetIndex);
 
     @Contract(pure = true)
@@ -81,7 +83,7 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     @Contract(value = "-> new", pure = true)
     LAYOUT v$sliceView();
 
-    @Contract(value = "__-> new", pure = true)
+    @Contract(value = "_,_-> new", pure = true)
     LAYOUT v$sliceView(int startIndex, int length);
 
     @Contract(value = "-> new", pure = true)
