@@ -4,9 +4,11 @@ import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
+import java.nio.ReadOnlyBufferException;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -209,6 +211,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$compact() {
+        if (readOnly)
+            throw new ReadOnlyBufferException();
         val remaining = v$remaining();
         v$copyStride(position, 0, remaining);
         position = remaining;
@@ -227,6 +231,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     public LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length) {
         if (sourceIndex < 0 || sourceIndex + length > limit)
             throw new IllegalArgumentException("Source index out of bounds: " + sourceIndex);
+        if (readOnly)
+            throw new ReadOnlyBufferException();
         backing.put(stridesToBytes(targetIndex), backing, stridesToBytes(sourceIndex), stridesToBytes(length));
         return proxy;
     }
@@ -313,12 +319,15 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
             return Optional.empty();
         // Call the method from this class
         try {
-            var result = method.invoke(this, args);
-            if (result == null)
-                result = 0;
-            return Optional.of(result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            // If the method is a VBuffer method, call it
+            // Internal method never return null or void
+            return Optional.of(method.invoke(this, args));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            val cause = e.getCause();
+            // If cause is a read only exception, cast and throw it
+            if (cause instanceof ReadOnlyBufferException)
+                throw (ReadOnlyBufferException) cause;
+            throw new RuntimeException("Failed to invoke internal method: %s".formatted(methodName), e);
         }
     }
 
@@ -328,7 +337,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         // If the method is a setter, set the value and return the proxy
         if (args != null) {
             if (readOnly)
-                throw new UnsupportedOperationException("Buffer is read-only");
+                throw new ReadOnlyBufferException();
             set(attributeName, args[0]);
             return proxy;
         }

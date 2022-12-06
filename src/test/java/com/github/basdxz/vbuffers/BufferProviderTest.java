@@ -300,6 +300,7 @@ public final class BufferProviderTest {
     }
 
     // Read-Only
+    @Test
     public void readOnly() {
         // Create the test buffer
         val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
@@ -335,6 +336,9 @@ public final class BufferProviderTest {
                           .color(0)
                           .texture(0);
         });
+
+        // Try to compact the read-only buffer
+        assertThrows(ReadOnlyBufferException.class, readOnlyBuffer::v$compact);
     }
 
     @Test
