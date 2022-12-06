@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ReadOnlyBufferException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -22,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public final class BufferProviderTest {
     private static final int[] SAMPLE_VALUES = new int[]{12, 100, 340, 4300};
 
-    private static final int BUFFER_SIZE = 1000;
+    private static final int BUFFER_SIZE_A = 10;
+    private static final int BUFFER_SIZE_B = 100;
+    private static final int BUFFER_SIZE_C = 1000;
 
     private static final int CONSTANT_1 = 1;
     private static final int CONSTANT_2 = 2;
@@ -105,13 +108,13 @@ public final class BufferProviderTest {
     // https://www.baeldung.com/java-bytebuffer
     @Test
     public void test3() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
-        val positions = newRangeList(BUFFER_SIZE, Vector3f::new);
-        val normals = newRangeList(BUFFER_SIZE, Vector3f::new);
-        val colors = IntStream.range(0, BUFFER_SIZE)
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
+        val positions = newRangeList(BUFFER_SIZE_C, Vector3f::new);
+        val normals = newRangeList(BUFFER_SIZE_C, Vector3f::new);
+        val colors = IntStream.range(0, BUFFER_SIZE_C)
                               .mapToObj(Vector4f::new)
                               .toList();
-        val textures = IntStream.range(0, BUFFER_SIZE)
+        val textures = IntStream.range(0, BUFFER_SIZE_C)
                                 .mapToObj(Vector2f::new)
                                 .toList();
 
@@ -142,7 +145,7 @@ public final class BufferProviderTest {
         val middleOfB = SIZE_B / 2;
 
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
 
         // Write CONSTANT_1 to the buffer SIZE_A times
         for (var i = 0; i < SIZE_A; i++) {
@@ -213,7 +216,7 @@ public final class BufferProviderTest {
     @Test
     public void testCopy() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
         //  Create the test data
         val position = new Vector3f(55F, 994F, -1515F);
@@ -242,10 +245,10 @@ public final class BufferProviderTest {
     @Test
     public void duplicate() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
-        // Fill buffer with numbers 0 to 9
-        for (var i = 0; i < 10; i++) {
+        // Fill buffer
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
             buffer.position(i)
                   .normal(i)
                   .color(i)
@@ -259,7 +262,7 @@ public final class BufferProviderTest {
         duplicateBuffer.v$flip();
 
         // Read the duplicate buffer
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
             assertEquals(i, duplicateBuffer.position());
             assertEquals(i, duplicateBuffer.normal());
             assertEquals(i, duplicateBuffer.color());
@@ -271,10 +274,10 @@ public final class BufferProviderTest {
     @Test
     public void slice() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
-        // Fill buffer with numbers 0 to 9
-        for (var i = 0; i < 10; i++) {
+        // Fill buffer
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
             buffer.position(i)
                   .normal(i)
                   .color(i)
@@ -298,10 +301,10 @@ public final class BufferProviderTest {
     // Read-Only
     public void readOnly() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
-        // Fill buffer with numbers 0 to 9
-        for (var i = 0; i < 10; i++) {
+        // Fill buffer
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
             buffer.position(i)
                   .normal(i)
                   .color(i)
@@ -316,7 +319,7 @@ public final class BufferProviderTest {
         val readOnlyBuffer = buffer.v$asReadOnlyView();
 
         // Read the read-only buffer
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
             assertEquals(i, readOnlyBuffer.position());
             assertEquals(i, readOnlyBuffer.normal());
             assertEquals(i, readOnlyBuffer.color());
@@ -336,7 +339,7 @@ public final class BufferProviderTest {
     @Test
     public void iteration() {
         // Create the test buffer
-        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
         // Fill buffer with numbers 0 to 9
         var value = 0;
@@ -359,16 +362,40 @@ public final class BufferProviderTest {
         }
     }
 
-    // Stream
     @Test
-    public void stream() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+    public void streams() {
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
+
+        // Create immutable list of integers
+        val testValues = IntStream.range(0, BUFFER_SIZE_C).boxed().toList();
+
+        val tempList = new ArrayList<Integer>(testValues);
+        buffer.v$parallelStream().forEach(layoutB -> {
+            // Get the first element from the list
+            val value = tempList.remove(0);
+            // Write the value to the buffer
+            layoutB.position(value)
+                   .normal(value)
+                   .color(value)
+                   .texture(value);
+        });
+
+        tempList.addAll(testValues);
+        buffer.v$parallelStream().forEach(layoutB -> {
+            // Get the first element from the list
+            val value = tempList.remove(0);
+            // Read the value from the buffer
+            assertEquals(value, layoutB.position());
+            assertEquals(value, layoutB.normal());
+            assertEquals(value, layoutB.color());
+            assertEquals(value, layoutB.texture());
+        });
     }
 
     // Buffer to Buffer transfers
     @Test
     public void bufferToBuffer() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, 10);
+        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
     }
 
     @NotNull

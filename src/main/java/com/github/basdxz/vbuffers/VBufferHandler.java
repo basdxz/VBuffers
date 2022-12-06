@@ -8,11 +8,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
 
 public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
+    protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
+                                                             Spliterator.DISTINCT |
+                                                             Spliterator.SIZED |
+                                                             Spliterator.NONNULL |
+                                                             Spliterator.IMMUTABLE |
+                                                             Spliterator.CONCURRENT |
+                                                             Spliterator.SUBSIZED;
 
     protected final Class<LAYOUT> layout;
     protected final LAYOUT proxy;
@@ -109,7 +118,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     @NotNull
     @Override
     public Iterator<LAYOUT> iterator() {
-        return new VBufferIterator<>(copyRemaining());
+        return v$iterator();
     }
 
     @Override
@@ -277,6 +286,26 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val copy = copy();
         copy.readOnly = true;
         return copy.proxy;
+    }
+
+    @Override
+    public Stream<LAYOUT> v$stream() {
+        return StreamSupport.stream(v$spliterator(), false);
+    }
+
+    @Override
+    public Stream<LAYOUT> v$parallelStream() {
+        return StreamSupport.stream(v$spliterator(), true);
+    }
+
+    @Override
+    public Spliterator<LAYOUT> v$spliterator() {
+        return Spliterators.spliterator(v$iterator(), v$remaining(), SPLITERATOR_CHARACTERISTICS);
+    }
+
+    @Override
+    public Iterator<LAYOUT> v$iterator() {
+        return new VBufferIterator<>(copyRemaining());
     }
 
     @Override

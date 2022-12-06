@@ -1,5 +1,9 @@
 package com.github.basdxz.vbuffers;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+
 public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT> {
     String BUFFER_METHOD_PREFIX = "v$";
 
@@ -60,4 +64,12 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     LAYOUT v$sliceView(int startIndex, int length);
 
     LAYOUT v$asReadOnlyView();
+
+    Stream<LAYOUT> v$stream();
+
+    Stream<LAYOUT> v$parallelStream();
+
+    Spliterator<LAYOUT> v$spliterator();
+
+    Iterator<LAYOUT> v$iterator();
 }
