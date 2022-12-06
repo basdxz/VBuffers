@@ -11,7 +11,6 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
 
     int v$position();
 
-    // TODO: make throw
     LAYOUT v$position(int position);
 
     LAYOUT v$increment();
@@ -24,7 +23,6 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
 
     int v$limit();
 
-    // TODO: make throw
     LAYOUT v$limit(int limit);
 
     LAYOUT v$mark();
@@ -42,9 +40,6 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length);
 
     LAYOUT v$copyStride(int sourceIndex, int targetIndex);
-
-    @Deprecated
-    LAYOUT v$oldNext();
 
     boolean v$hasRemaining();
 

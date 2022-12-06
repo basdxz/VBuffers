@@ -125,7 +125,7 @@ public final class BufferProviderTest {
                   .normal(normals.get(index))
                   .color(colors.get(index))
                   .texture(textures.get(index));
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         buffer.v$clear();
 
@@ -135,7 +135,7 @@ public final class BufferProviderTest {
             assertEquals(normals.get(index), buffer.normal());
             assertEquals(colors.get(index), buffer.color());
             assertEquals(textures.get(index), buffer.texture());
-            buffer.v$position(index + 1);
+            buffer.v$increment();
         }
     }
 
@@ -154,7 +154,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_1)
                   .color(CONSTANT_1)
                   .texture(CONSTANT_1);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         // Write CONSTANT_2 to the buffer SIZE_B times
         for (var i = 0; i < SIZE_B; i++) {
@@ -162,7 +162,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_2)
                   .color(CONSTANT_2)
                   .texture(CONSTANT_2);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         // Flip the buffer
         buffer.v$flip();
@@ -173,7 +173,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_1, buffer.normal());
             assertEquals(CONSTANT_1, buffer.color());
             assertEquals(CONSTANT_1, buffer.texture());
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         // Read half of the CONSTANT_2 values from the buffer
         for (var i = 0; i < middleOfB; i++) {
@@ -181,7 +181,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_2, buffer.normal());
             assertEquals(CONSTANT_2, buffer.color());
             assertEquals(CONSTANT_2, buffer.texture());
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         // Compact the buffer
         buffer.v$compact();
@@ -192,7 +192,7 @@ public final class BufferProviderTest {
                   .normal(CONSTANT_3)
                   .color(CONSTANT_3)
                   .texture(CONSTANT_3);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         buffer.v$flip();
 
@@ -202,7 +202,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_2, buffer.normal());
             assertEquals(CONSTANT_2, buffer.color());
             assertEquals(CONSTANT_2, buffer.texture());
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
         // Read the CONSTANT_3 values from the buffer
         for (var i = 0; i < SIZE_C; i++) {
@@ -210,7 +210,7 @@ public final class BufferProviderTest {
             assertEquals(CONSTANT_3, buffer.normal());
             assertEquals(CONSTANT_3, buffer.color());
             assertEquals(CONSTANT_3, buffer.texture());
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
     }
 
@@ -254,7 +254,7 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
 
         // Duplicate the buffer
@@ -268,7 +268,7 @@ public final class BufferProviderTest {
             assertEquals(i, duplicateBuffer.normal());
             assertEquals(i, duplicateBuffer.color());
             assertEquals(i, duplicateBuffer.texture());
-            duplicateBuffer.v$oldNext();
+            duplicateBuffer.v$increment();
         }
     }
 
@@ -283,7 +283,7 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
 
         // Slice the buffer from index 3 with a length of 7
@@ -295,7 +295,7 @@ public final class BufferProviderTest {
             assertEquals(i + 3, sliceBuffer.normal());
             assertEquals(i + 3, sliceBuffer.color());
             assertEquals(i + 3, sliceBuffer.texture());
-            sliceBuffer.v$oldNext();
+            sliceBuffer.v$increment();
         }
     }
 
@@ -310,7 +310,7 @@ public final class BufferProviderTest {
                   .normal(i)
                   .color(i)
                   .texture(i);
-            buffer.v$oldNext();
+            buffer.v$increment();
         }
 
         // Flip the buffer
@@ -325,7 +325,7 @@ public final class BufferProviderTest {
             assertEquals(i, readOnlyBuffer.normal());
             assertEquals(i, readOnlyBuffer.color());
             assertEquals(i, readOnlyBuffer.texture());
-            readOnlyBuffer.v$oldNext();
+            readOnlyBuffer.v$increment();
         }
 
         // Try to write to the read-only buffer

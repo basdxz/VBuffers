@@ -2,7 +2,6 @@ package com.github.basdxz.vbuffers;
 
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class Benchmark {
     protected static final int BUFFER_SIZE_C = 1000;
 
-    @Test
+//    @Test
     public void streams() {
         var startTime = System.nanoTime();
         var buffer = demoNewBuffer();
@@ -93,7 +92,7 @@ public class Benchmark {
         };
     }
 
-    @Test
+    //    @Test
     public void byteBufferPerformanceTest() {
         // Create bytebuffer to fit 4000 ints
         val buffer = ByteBuffer.allocateDirect(4000 * Integer.BYTES);

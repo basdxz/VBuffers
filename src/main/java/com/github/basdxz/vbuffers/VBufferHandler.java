@@ -232,14 +232,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
-    @Deprecated
-    public LAYOUT v$oldNext() {
-        if (position < limit)
-            position++;
-        return proxy;
-    }
-
-    @Override
     public boolean v$hasRemaining() {
         return position < limit;
     }
