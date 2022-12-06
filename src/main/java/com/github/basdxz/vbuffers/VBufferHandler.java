@@ -250,8 +250,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$compact() {
-        if (readOnly)
-            throw new ReadOnlyBufferException();
+        ensureWritable();
         val remaining = v$remaining();
         v$copyStride(position, 0, remaining);
         position = remaining;
@@ -262,17 +261,22 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$copyStride(int sourceIndex, int targetIndex) {
+        ensureWritable();
         return v$copyStride(sourceIndex, targetIndex, 1);
     }
 
     @Override
     public LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length) {
+        ensureWritable();
         if (sourceIndex < 0 || sourceIndex + length > limit)
             throw new IllegalArgumentException("Source index out of bounds: " + sourceIndex);
-        if (readOnly)
-            throw new ReadOnlyBufferException();
         backing.put(strideIndexToBytes(targetIndex), backing, strideIndexToBytes(sourceIndex), strideIndexToBytes(length));
         return proxy;
+    }
+
+    protected void ensureWritable() {
+        if (readOnly)
+            throw new ReadOnlyBufferException();
     }
 
     @Override
@@ -376,8 +380,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val attributeName = method.getName();
         // If the method is a setter, set the value and return the proxy
         if (args != null) {
-            if (readOnly)
-                throw new ReadOnlyBufferException();
             set(attributeName, args[0]);
             return proxy;
         }
@@ -386,6 +388,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected void set(String attributeName, Object value) {
+        ensureWritable();
         try {
             // Set the attribute to provided value
             attributeType(attributeName).set(backing, attributeOffset(attributeName), value);
