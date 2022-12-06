@@ -18,106 +18,108 @@
 
 #### Layout
 
-- [x] Layout Definition [Missing Test]
-- [ ] Layout size constraints
-- [ ] Layout annotation inference
+| Name                 | Priority  | Impl | Test | Docs | Bench |
+|----------------------|-----------|------|------|------|-------|
+| Definition           | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Size Constraints     | High      | ❌    | ❌    | ❌    | ❌     |
+| Custom Alignment     | High      | ❌    | ❌    | ❌    | ❌     |
+| Annotation Inference | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
 #### Attributes
 
-- [ ] Different I/O class types
-- [ ] Mutator/Accessor annotations
-- [ ] Mutator/Accessor templates
-- [ ] Padding/Alignment/Overlapping
-- [ ] Name Aliasing
-- [ ] Type Aliasing
+| Name                         | Priority  | Impl | Test | Docs | Bench |
+|------------------------------|-----------|------|------|------|-------|
+| Definition                   | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Mutator/Accessor Annotations | High      | ❌    | ❌    | ❌    | ❌     |
+| Name Aliasing                | High      | ❌    | ❌    | ❌    | ❌     |
+| Type Aliasing                | Neat      | ❌    | ❌    | ❌    | ❌     |
+| Different I/O Class Types    | Neat      | ❌    | ❌    | ❌    | ❌     |
+| Mutator/Accessor Templates   | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
 #### Type handling
 
-- [ ] Primitives/boxed primitives
-- [ ] Extensible API
-- [ ] JOML support
-- [ ] JUnion support
-- [ ] Type Handling for nested attributes
+| Name                     | Priority  | Impl | Test | Docs | Bench |
+|--------------------------|-----------|------|------|------|-------|
+| Definition               | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Primitives/Boxed Support | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| JOML Support             | High      | ✴️   | ✴️   | ❌    | ❌     |
+| Nested VBuffers Support  | Neat      | ❌    | ❌    | ❌    | ❌     |
+| JUnion Support           | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
 #### Backing
 
-- [x] ByteBuffer/Java NIO
-- [ ] Extensible API
-- [ ] Java Unsafe
-- [ ] LWJGL 2 OpenGL
-- [ ] MemorySegment/Foreign Memory Access
-- [ ] Disk/Filesystem
+| Name                | Priority  | Impl | Test | Docs | Bench |
+|---------------------|-----------|------|------|------|-------|
+| Definition          | Essential | ❌    | ❌    | ❌    | ❌     |
+| Byte Array          | Essential | ❌    | ❌    | ❌    | ❌     |
+| ByteBuffer/Java NIO | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| MemorySegment       | High      | ❌    | ❌    | ❌    | ❌     |
+| Java Unsafe         | Neat      | ❌    | ❌    | ❌    | ❌     |
+| Disk/Filesystem     | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
 #### Instance creation
 
-- [x] Dynamic Proxy [Missing Test]
-- [ ] Object Web ASM
+| Name           | Priority  | Impl | Test | Docs | Bench |
+|----------------|-----------|------|------|------|-------|
+| Dynamic Proxy  | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| Object Web ASM | High      | ❌    | ❌    | ❌    | ❌     |
 
-<br>
+Dynamic Proxies make for great prototyping tools but are not suitable for production use.
+They are slow, have a lot of overhead and are generally more clunky.
 
-#### Input/Output
-
-- [x] Basic Read/Write
+ASM will take longer to implement but will be much faster and more efficient.
 
 <br>
 
 #### ByteBuffer-esq API
 
-- [ ] Navigation
-- [x] Flip
-- [x] Compact
-- [x] Duplicate View
-- [x] Slice View
-- [x] Read-Only View
+| Name           | Priority | Impl | Test | Docs | Bench |
+|----------------|----------|------|------|------|-------|
+| Navigation     | High     | ✴️   | ❌    | ❌    | ❌     |
+| Slice View     | High     | ✴️   | ✴️   | ❌    | ❌     |
+| Flip           | Neat     | ✴️   | ✴️   | ❌    | ❌     |
+| Compact        | Neat     | ✴️   | ✴️   | ❌    | ❌     |
+| Duplicate View | Neat     | ✴️   | ✴️   | ❌    | ❌     |
+| Read-Only View | Neat     | ✴️   | ✴️   | ❌    | ❌     |
 
 <br>
 
 #### Collections
 
-- [x] Basic Array
-- [x] Singleton [Missing Test]
-- [x] Iterators
-- [x] Streams
-- [x] Parallel Streams
+| Name             | Priority  | Impl | Test | Docs | Bench |
+|------------------|-----------|------|------|------|-------|
+| Basic Array      | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| Singleton        | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Iterators        | High      | ✴️   | ✴️   | ❌    | ❌     |
+| Streams          | High      | ✴️   | ✴️   | ❌    | ❌     |
+| Parallel Streams | Neat      | ✴️   | ✴️   | ❌    | ❌     |
 
 <br>
 
 #### Copy
 
-- [x] Internally 1:1
-- [ ] Internally Swizzling
-- [x] Externally 1:1 [Incomplete]
-- [ ] Externally Swizzling
-- [ ] Externally between different backings
-- [ ] with SSE/AVX acceleration
+| Name                 | Priority  | Impl | Test | Docs | Bench |
+|----------------------|-----------|------|------|------|-------|
+| Internally 1:1       | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| Externally 1:1       | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Internally Swizzling | Essential | ❌    | ❌    | ❌    | ❌     |
+| Externally Swizzling | Essential | ❌    | ❌    | ❌    | ❌     |
+| Different Backings   | High      | ❌    | ❌    | ❌    | ❌     |
+| SSE/AVX acceleration | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 ### Correctness
 
-- [ ] Using the terms Mutator/Accessor correctly [Look it up/Ask for Help]
-- [ ] ByteBuffer navigation constraints
-- [ ] JetBrains method contracts
-- [ ] Static analysis for nullity
-- [ ] Static analysis for bounds
-- [ ] Comprehensive exceptions (tell what and where was wrong)
-
-### Benchmarking
-
-- [ ] New layout interface generation
-- [ ] Layout/View creation
-- [ ] Allocation/Slicing
-- [ ] Iteration I/O
-- [ ] Copying
-
-### Documentation
-
-- [ ] Currently existing tests
-- [ ] VBuffer interface
-- [ ] VBuffer Handler/Implementation
+- Using the terms Mutator/Accessor correctly [Look it up/Ask for Help]
+- ByteBuffer navigation constraints
+- JetBrains method contracts
+- Static analysis for nullity
+- Static analysis for bounds
+- Comprehensive exceptions (tell what and where was wrong)
