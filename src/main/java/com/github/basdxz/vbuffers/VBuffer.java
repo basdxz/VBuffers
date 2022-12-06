@@ -2,6 +2,7 @@ package com.github.basdxz.vbuffers;
 
 import org.jetbrains.annotations.Contract;
 
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.stream.Stream;
@@ -10,6 +11,9 @@ import java.util.stream.Stream;
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT> {
     String BUFFER_METHOD_PREFIX = "v$";
+
+    @Contract(pure = true)
+    ByteBuffer v$backing();
 
     @Contract(pure = true)
     int v$capacity();
@@ -57,10 +61,12 @@ public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT
     LAYOUT v$compact();
 
     @Contract("_,_,_-> this")
-    LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length);
+    LAYOUT v$copyStrides(int sourceIndex, int targetIndex, int length);
 
     @Contract("_,_-> this")
     LAYOUT v$copyStride(int sourceIndex, int targetIndex);
+
+    LAYOUT v$put(LAYOUT source);
 
     @Contract(pure = true)
     boolean v$hasRemaining();

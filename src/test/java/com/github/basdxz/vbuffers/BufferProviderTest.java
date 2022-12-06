@@ -329,13 +329,13 @@ public final class BufferProviderTest {
             readOnlyBuffer.v$increment();
         }
 
+        readOnlyBuffer.v$flip();
+
         // Try to write to the read-only buffer
-        assertThrows(ReadOnlyBufferException.class, () -> {
-            readOnlyBuffer.position(0)
-                          .normal(0)
-                          .color(0)
-                          .texture(0);
-        });
+        assertThrows(ReadOnlyBufferException.class, () -> readOnlyBuffer.position(0)
+                                                                        .normal(0)
+                                                                        .color(0)
+                                                                        .texture(0));
 
         // Try to compact the read-only buffer
         assertThrows(ReadOnlyBufferException.class, readOnlyBuffer::v$compact);
@@ -437,17 +437,30 @@ public final class BufferProviderTest {
         val bufferA = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
         val bufferB = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
 
-        // Fill buffer A with numbers 0 to 9 using streams
-        val valueList = new ArrayList<>(IntStream.range(0, BUFFER_SIZE_A).boxed().toList());
-        bufferA.v$stream().forEach(layoutA -> {
-            // Get the first element from the list
-            val value = valueList.remove(0);
-            // Write the value to the buffer
-            layoutA.position(value)
-                   .normal(value)
-                   .color(value)
-                   .texture(value);
-        });
+        // Fill buffer A
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
+            bufferA.position(i)
+                   .normal(i)
+                   .color(i)
+                   .texture(i);
+            bufferA.v$increment();
+        }
+        // Flip buffer A
+        bufferA.v$flip();
+
+        // Copy buffer A to buffer B
+        bufferB.v$put(bufferA);
+        // Flip buffer A
+        bufferB.v$flip();
+
+        // Read buffer B
+        for (var i = 0; i < BUFFER_SIZE_A; i++) {
+            assertEquals(i, bufferB.position());
+            assertEquals(i, bufferB.normal());
+            assertEquals(i, bufferB.color());
+            assertEquals(i, bufferB.texture());
+            bufferB.v$increment();
+        }
     }
 
     @NotNull

@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.util.*;
@@ -163,6 +165,11 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @Override
+    public ByteBuffer v$backing() {
+        return backing;
+    }
+
+    @Override
     public int v$capacity() {
         return capacity;
     }
@@ -174,8 +181,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$position(int position) {
-        if (position < 0 || position > limit)
-            throw new IllegalArgumentException("Position out of bounds: " + position);
+        Objects.checkIndex(position, limit + 1);
         this.position = position;
         return proxy;
     }
@@ -256,7 +262,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         // Copy the remaining strides to the start of the buffer
         val length = v$remaining();
         val source = position;
-        v$copyStride(0, source, length);
+        v$copyStrides(0, source, length);
 
         // Reset the position and limit
         position = length;
@@ -270,11 +276,11 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         // Ensure the buffer is writable
         ensureWritable();
         // Copy a single stride
-        return v$copyStride(targetIndex, sourceIndex, 1);
+        return v$copyStrides(targetIndex, sourceIndex, 1);
     }
 
     @Override
-    public LAYOUT v$copyStride(int targetIndex, int sourceIndex, int length) {
+    public LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length) {
         // Ensure the buffer is writeable, and that the source and target indices are within bounds
         ensureWritable();
         Objects.checkFromIndexSize(targetIndex, length, limit);
@@ -291,6 +297,42 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
         // Copy the stride
         backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
+        return proxy;
+    }
+
+    @Override
+    public LAYOUT v$put(LAYOUT source) {
+        // Ensure the buffer is writable
+        ensureWritable();
+
+        // If the source has no remaining strides, do nothing
+        if (!source.v$hasRemaining())
+            return proxy;
+
+        // Set target
+        val target = this;
+
+        // Get the stride length
+        val strideLength = source.v$remaining();
+        // Ensure the target has enough remaining strides
+        if (target.v$remaining() < strideLength)
+            throw new BufferOverflowException();
+
+        // Set the byte length
+        val lengthBytes = strideIndexToBytes(strideLength);
+        // Get the source and target backings
+        val sourceBacking = source.v$backing();
+        val targetBacking = target.v$backing();
+        // Get the source and target offsets
+        val sourceOffsetBytes = strideIndexToBytes(source.v$position());
+        val targetOffsetBytes = strideIndexToBytes(target.v$position());
+
+        // Copy the buffer
+        targetBacking.put(targetOffsetBytes, sourceBacking, sourceOffsetBytes, lengthBytes);
+        // Increment the position based on the number of strides copied
+        target.v$increment(strideLength);
+        source.v$increment(strideLength);
+
         return proxy;
     }
 
@@ -371,38 +413,50 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        // Invoke the internal method if it exists, try to invoke a mu
-        return handleInternalMethod(proxy, method, args)
+        // Invoke the internal method if it exists, try to handle it like an attribute
+        return handleInternalMethod(method, args)
                 .orElseGet(() -> handleAttributeMethod(proxy, method, args));
     }
 
-    protected Optional<Object> handleInternalMethod(Object proxy, Method method, Object[] args) {
+    protected Optional<Object> handleInternalMethod(Method method, Object[] args) {
+        // Get the method name
         val methodName = method.getName();
+
         // Return empty optional if method is not a VBuffer method
         if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
+
         // Call the method from this class
         try {
             // If the method is a VBuffer method, call it
             // Internal method never return null or void
             return Optional.of(method.invoke(this, args));
         } catch (IllegalAccessException | InvocationTargetException e) {
+            // If the cause was a runtime exception, report it as the cause instead.
             val cause = e.getCause();
-            // If cause is a read only exception, cast and throw it
-            if (cause instanceof ReadOnlyBufferException)
-                throw (ReadOnlyBufferException) cause;
+            // If cause is a runtime exception, cast and throw it
+            // This causes the stack trace to be the same as the original exception
+            // Which is more useful for debugging
+            if (cause instanceof RuntimeException)
+                throw (RuntimeException) cause;
             throw new RuntimeException("Failed to invoke internal method: %s".formatted(methodName), e);
         }
     }
 
     protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
+        // If no strides remain, throw an exception
+        if (!v$hasRemaining())
+            throw new BufferUnderflowException();
+
         // Get the attribute name
         val attributeName = method.getName();
+
         // If the method is a setter, set the value and return the proxy
         if (args != null) {
             set(attributeName, args[0]);
             return proxy;
         }
+
         // Otherwise, return the value
         return get(attributeName);
     }
