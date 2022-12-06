@@ -233,7 +233,7 @@ public final class BufferProviderTest {
               .texture(texture);
 
         // Copy the test data to position 9 in the buffer
-        buffer.v$copyStride(3, 9);
+        buffer.v$copyStride(9, 3);
 
         // Read the test data from position 9 in the buffer
         buffer.v$position(9);
@@ -431,10 +431,23 @@ public final class BufferProviderTest {
         assertEquals(testValues, tempList);
     }
 
-    // Buffer to Buffer transfers
     @Test
     public void bufferToBuffer() {
-        val buffer = VBufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
+        // Create the test buffers
+        val bufferA = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
+        val bufferB = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_A);
+
+        // Fill buffer A with numbers 0 to 9 using streams
+        val valueList = new ArrayList<>(IntStream.range(0, BUFFER_SIZE_A).boxed().toList());
+        bufferA.v$stream().forEach(layoutA -> {
+            // Get the first element from the list
+            val value = valueList.remove(0);
+            // Write the value to the buffer
+            layoutA.position(value)
+                   .normal(value)
+                   .color(value)
+                   .texture(value);
+        });
     }
 
     @NotNull

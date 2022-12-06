@@ -134,13 +134,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
-    protected VBufferHandler<LAYOUT> copy() {
+    protected VBufferHandler<LAYOUT> newCopy() {
         // Create a deep copy of this VBufferHandler
         return new VBufferHandler<>(this);
     }
 
-    protected VBufferHandler<LAYOUT> copyRemaining() {
-        // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining elements
+    protected VBufferHandler<LAYOUT> newCopyOfRemainingStrides() {
+        // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining strides
         return new VBufferHandler<>(this, position, v$remaining());
     }
 
@@ -250,27 +250,47 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$compact() {
+        // Ensure the buffer is writable
         ensureWritable();
-        val remaining = v$remaining();
-        v$copyStride(position, 0, remaining);
-        position = remaining;
+
+        // Copy the remaining strides to the start of the buffer
+        val length = v$remaining();
+        val source = position;
+        v$copyStride(0, source, length);
+
+        // Reset the position and limit
+        position = length;
         limit = capacity;
         mark = -1;
         return proxy;
     }
 
     @Override
-    public LAYOUT v$copyStride(int sourceIndex, int targetIndex) {
+    public LAYOUT v$copyStride(int targetIndex, int sourceIndex) {
+        // Ensure the buffer is writable
         ensureWritable();
-        return v$copyStride(sourceIndex, targetIndex, 1);
+        // Copy a single stride
+        return v$copyStride(targetIndex, sourceIndex, 1);
     }
 
     @Override
-    public LAYOUT v$copyStride(int sourceIndex, int targetIndex, int length) {
+    public LAYOUT v$copyStride(int targetIndex, int sourceIndex, int length) {
+        // Ensure the buffer is writeable, and that the source and target indices are within bounds
         ensureWritable();
-        if (sourceIndex < 0 || sourceIndex + length > limit)
-            throw new IllegalArgumentException("Source index out of bounds: " + sourceIndex);
-        backing.put(strideIndexToBytes(targetIndex), backing, strideIndexToBytes(sourceIndex), strideIndexToBytes(length));
+        Objects.checkFromIndexSize(targetIndex, length, limit);
+        Objects.checkFromIndexSize(sourceIndex, length, limit);
+
+        // If the source and target indices are the same, do nothing
+        if (sourceIndex == targetIndex)
+            return proxy;
+
+        // Get the source and target byte offsets and the length in bytes
+        val sourceOffsetBytes = strideIndexToBytes(sourceIndex);
+        val targetOffsetBytes = strideIndexToBytes(targetIndex);
+        val lengthBytes = strideIndexToBytes(length);
+
+        // Copy the stride
+        backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
         return proxy;
     }
 
@@ -291,7 +311,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public LAYOUT v$duplicateView() {
-        return copy().proxy;
+        return newCopy().proxy;
     }
 
     @Override
@@ -324,7 +344,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     @Override
     public LAYOUT v$asReadOnlyView() {
         // Create a copy of this handler and set it to read only
-        val copy = copy();
+        val copy = newCopy();
         copy.readOnly = true;
         return copy.proxy;
     }
@@ -346,7 +366,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public Iterator<LAYOUT> v$iterator() {
-        return new VBufferIterator<>(copyRemaining());
+        return new VBufferIterator<>(newCopyOfRemainingStrides());
     }
 
     @Override
