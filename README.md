@@ -1,10 +1,26 @@
+# VBuffers
+
+## Ven's Buffer Interface API
+
+### Goals
+
+- Powerful layouts based on Java Interfaces and Annotations
+- Extensive built-in collections API: Indexed, Iterables, Streams, etc.
+- User defined Getters and Setters, while providing runtime generation of the glue code
+- User defined type adapters, allowing for custom byte serialization and deserialization
+- Handling of nested types, aiming to match the power of C structs
+- Custom alignment, padding or overlapping attributes
+- Agnostic to the underlying memory implementation: NIO, Unsafe, etc.
+- Aliasing between interchangeable attributes by name and type
+- Masked, Shuffled and Swizzled copies across the same or different buffers
+
 ### Functionality
 
 #### Layout
 
 - [x] Layout Definition [Missing Test]
 - [ ] Layout size constraints
-- [ ] Layout annotation inference (allowing for fewer total annotations)
+- [ ] Layout annotation inference
 
 <br>
 
@@ -33,7 +49,7 @@
 
 - [x] ByteBuffer/Java NIO
 - [ ] Extensible API
-- [ ] with Java Unsafe
+- [ ] Java Unsafe
 - [ ] LWJGL 2 OpenGL
 - [ ] MemorySegment/Foreign Memory Access
 - [ ] Disk/Filesystem
