@@ -370,7 +370,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected Optional<Object> handleInternalMethod(Method method, Object[] args) {
         val methodName = method.getName();
-        if (!methodName.startsWith(VBuffer.BUFFER_METHOD_PREFIX) && !methodName.equals("iterator"))
+
+        // Internal methods all start with our prefix, there is also a special case for the iterator method...
+        if (!methodName.startsWith(VBuffer.INTERNAL_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
 
         // Call the method from this class
@@ -395,18 +397,18 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
             throw new BufferUnderflowException();
         val attributeName = method.getName();
 
-        // If the args are null, assume this is a getter
+        // If the args not null, assume this is a setter with a single argument
         if (args != null) {
-            set(attributeName, args[0]);
+            put(attributeName, args[0]);
             return proxy;
         }
         return get(attributeName);
     }
 
-    protected void set(String attributeName, Object value) {
+    protected void put(String attributeName, Object value) {
         ensureWritable();
         try {
-            attributeType(attributeName).set(backing, attributeOffset(attributeName), value);
+            attributeType(attributeName).put(backing, attributeOffset(attributeName), value);
         } catch (Exception e) {
             throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
         }
@@ -414,7 +416,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected Object get(String attributeName) {
         try {
-            // Get the attribute value
             return attributeType(attributeName).get(backing, attributeOffset(attributeName));
         } catch (Exception e) {
             throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);

@@ -16,7 +16,7 @@ public interface AttributeType {
 
     int sizeBytes();
 
-    void set(ByteBuffer buffer, int offsetBytes, Object value);
+    void put(ByteBuffer buffer, int offsetBytes, Object value);
 
     Object get(ByteBuffer buffer, int offsetBytes);
 
@@ -46,7 +46,7 @@ public interface AttributeType {
         }
 
         @Override
-        public void set(ByteBuffer buffer, int offsetBytes, Object value) {
+        public void put(ByteBuffer buffer, int offsetBytes, Object value) {
             if (!(value instanceof Integer))
                 throw new RuntimeException("oh no");
             buffer.putInt(offsetBytes, (Integer) value);
@@ -71,7 +71,7 @@ public interface AttributeType {
         }
 
         @Override
-        public void set(ByteBuffer buffer, int offsetBytes, Object value) {
+        public void put(ByteBuffer buffer, int offsetBytes, Object value) {
             ((Vector2f) value).get(offsetBytes, buffer);
         }
 
@@ -94,7 +94,7 @@ public interface AttributeType {
         }
 
         @Override
-        public void set(ByteBuffer buffer, int offsetBytes, Object value) {
+        public void put(ByteBuffer buffer, int offsetBytes, Object value) {
             ((Vector3f) value).get(offsetBytes, buffer);
         }
 
@@ -117,7 +117,7 @@ public interface AttributeType {
         }
 
         @Override
-        public void set(ByteBuffer buffer, int offsetBytes, Object value) {
+        public void put(ByteBuffer buffer, int offsetBytes, Object value) {
             ((Vector4f) value).get(offsetBytes, buffer);
         }
 

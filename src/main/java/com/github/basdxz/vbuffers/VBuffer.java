@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 // TODO: Make tests to make the warnings redundant
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface VBuffer<LAYOUT extends VBuffer<LAYOUT>> extends Iterable<LAYOUT> {
-    String BUFFER_METHOD_PREFIX = "v$";
+    String INTERNAL_METHOD_PREFIX = "v$";
 
     @Contract(pure = true)
     ByteBuffer v$backing();
