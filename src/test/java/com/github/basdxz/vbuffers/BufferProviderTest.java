@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -370,7 +371,7 @@ public final class BufferProviderTest {
         val testValues = IntStream.range(0, BUFFER_SIZE_C).boxed().toList();
 
         val tempList = new ArrayList<Integer>(testValues);
-        buffer.v$parallelStream().forEach(layoutB -> {
+        buffer.v$stream().forEach(layoutB -> {
             // Get the first element from the list
             val value = tempList.remove(0);
             // Write the value to the buffer
@@ -381,7 +382,7 @@ public final class BufferProviderTest {
         });
 
         tempList.addAll(testValues);
-        buffer.v$parallelStream().forEach(layoutB -> {
+        buffer.v$stream().forEach(layoutB -> {
             // Get the first element from the list
             val value = tempList.remove(0);
             // Read the value from the buffer
@@ -390,6 +391,40 @@ public final class BufferProviderTest {
             assertEquals(value, layoutB.color());
             assertEquals(value, layoutB.texture());
         });
+    }
+
+    @Test
+    public void parallelStreams() {
+        // Create the test buffer
+        val buffer = VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
+        // Create immutable list of integers
+        val testValues = IntStream.range(0, BUFFER_SIZE_C).boxed().toList();
+
+        // Fill the buffer in parallel
+        val tempList = Collections.synchronizedList(new ArrayList<>(testValues));
+        buffer.v$parallelStream().forEach(layoutB -> {
+            // Get the first element from the list
+            val value = tempList.remove(0);
+            // Write the value to the buffer
+            layoutB.position(value)
+                   .normal(value)
+                   .color(value)
+                   .texture(value);
+        });
+
+        // Read the buffer in parallel
+        buffer.v$parallelStream().forEach(layoutB -> {
+            val value = layoutB.position();
+            assertEquals(value, layoutB.normal());
+            assertEquals(value, layoutB.color());
+            assertEquals(value, layoutB.texture());
+            tempList.add(value);
+        });
+
+        // Sort the read values
+        tempList.sort(Integer::compareTo);
+        // Compare the read values with the test values
+        assertEquals(testValues, tempList);
     }
 
     // Buffer to Buffer transfers
