@@ -1,12 +1,12 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.AccessorProvider;
+import com.github.basdxz.vbuffers.accessor.impl.AccessorProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class AccessorTest {
+public class PrimitiveAccessorTest {
     protected static final byte TEST_BYTE = 0xA;
     protected static final char TEST_CHAR = 0xA;
     protected static final short TEST_SHORT = 0xAAA;
