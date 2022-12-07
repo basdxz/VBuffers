@@ -44,7 +44,8 @@
 
 | Name                     | Priority  | Impl | Test | Docs | Bench |
 |--------------------------|-----------|------|------|------|-------|
-| Definition               | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Definition               | Essential | ❌    | ❌    | ❌    | ❌     |
+| Type Accessors           | Essential | ✴️   | ❌    | ❌    | ❌     |
 | Primitives/Boxed Support | Essential | ✴️   | ✴️   | ❌    | ❌     |
 | JOML Support             | High      | ✴️   | ✴️   | ❌    | ❌     |
 | Nested VBuffers Support  | Neat      | ❌    | ❌    | ❌    | ❌     |
