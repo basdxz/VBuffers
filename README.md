@@ -44,8 +44,8 @@
 
 | Name                     | Priority  | Impl | Test | Docs | Bench |
 |--------------------------|-----------|------|------|------|-------|
-| Definition               | Essential | ❌    | ❌    | ❌    | ❌     |
-| Type Accessors           | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Definition               | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Type Accessors           | Essential | ✴️   | ✴️   | ❌    | ❌     |
 | Primitives/Boxed Support | Essential | ✴️   | ✴️   | ❌    | ❌     |
 | JOML Support             | High      | ✴️   | ✴️   | ❌    | ❌     |
 | Nested VBuffers Support  | Neat      | ❌    | ❌    | ❌    | ❌     |
@@ -58,7 +58,6 @@
 | Name                | Priority  | Impl | Test | Docs | Bench |
 |---------------------|-----------|------|------|------|-------|
 | Definition          | Essential | ❌    | ❌    | ❌    | ❌     |
-| Byte Array          | Essential | ❌    | ❌    | ❌    | ❌     |
 | ByteBuffer/Java NIO | Essential | ✴️   | ✴️   | ❌    | ❌     |
 | MemorySegment       | High      | ❌    | ❌    | ❌    | ❌     |
 | Java Unsafe         | Neat      | ❌    | ❌    | ❌    | ❌     |
@@ -118,7 +117,6 @@ ASM will take longer to implement but will be much faster and more efficient.
 
 ### Correctness
 
-- Using the terms Mutator/Accessor correctly [Look it up/Ask for Help]
 - ByteBuffer navigation constraints
 - JetBrains method contracts
 - Static analysis for nullity
