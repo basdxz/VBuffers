@@ -37,7 +37,6 @@ public class AccessorProvider {
     public static void load(Class<? extends Accessors> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
-              .toList()
               .forEach(AccessorProvider::addAccessors);
     }
 
@@ -84,7 +83,7 @@ public class AccessorProvider {
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
         val lambda = newLambdaFactory(VGetter.Immutable.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (VGetter<?>) lambda);
+            getters.put(classType, (VGetter.Immutable<?>) lambda);
     }
 
     public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {

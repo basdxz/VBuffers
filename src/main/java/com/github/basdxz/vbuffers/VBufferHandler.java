@@ -425,7 +425,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         }
     }
 
-
     @SuppressWarnings("unchecked")
     protected <T> VSetter<T> attributeSetter(String attributeName) {
         return (VSetter<T>) setters.get(attributeName);
