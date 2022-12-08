@@ -34,6 +34,11 @@ public class AccessFrontProvider {
 
         return new SetterFront() {
             @Override
+            public Object accept(Object... args) throws Throwable {
+                return null;
+            }
+
+            @Override
             public String toString() {
                 return method.getName();
             }
@@ -69,8 +74,8 @@ public class AccessFrontProvider {
 
         return new GetterFront() {
             @Override
-            public boolean isSupported(Method method) {
-                return false;
+            public Object accept(Object... args) throws Throwable {
+                return null;
             }
 
             @Override

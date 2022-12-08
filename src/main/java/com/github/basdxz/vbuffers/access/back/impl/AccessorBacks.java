@@ -38,7 +38,7 @@ public class AccessorBacks {
     public static void load(Class<? extends AccessBacks> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
-              .forEach(com.github.basdxz.vbuffers.access.back.impl.AccessorBacks::addAccessors);
+              .forEach(AccessorBacks::addAccessors);
     }
 
     public static void addAccessors(Method method) {
