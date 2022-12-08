@@ -72,6 +72,10 @@ public class ShaderDemo {
             // fragColor = vec4(0.3+dot(normalize(p), normalize(vec3(1.0,1.0,0.0))));
             fragColor.set(0.3F + new Vector3f(point).normalize().dot(new Vector3f(1F, 1F, 0F).normalize()));
         }
+        // clamp color between 0 and 1 by hand
+        fragColor.x = Math.min(Math.max(fragColor.x, 0F), 1F);
+        fragColor.y = Math.min(Math.max(fragColor.y, 0F), 1F);
+        fragColor.z = Math.min(Math.max(fragColor.z, 0F), 1F);
         return fragColor;
     }
 
@@ -93,7 +97,7 @@ public class ShaderDemo {
             val color = shaderLayout.color();
             val x = Math.round(uv.x() * CANVAS_WIDTH);
             val y = Math.round(uv.y() * CANVAS_HEIGHT);
-            val rgb = Math.round(color.x() * 255) << 8 | Math.round(color.y() * 255) << 18 | Math.round(color.z() * 255);
+            val rgb = (int) (color.x() * 255) << 16 | (int) (color.y() * 255) << 8 | (int) (color.z() * 255) | 0xFF000000;
             image.setRGB(x, y, rgb);
         }
 
