@@ -1,8 +1,8 @@
 package com.github.basdxz.vbuffers.accessor.impl;
 
 import com.github.basdxz.vbuffers.accessor.Accessors;
-import com.github.basdxz.vbuffers.accessor.Getter;
-import com.github.basdxz.vbuffers.accessor.Setter;
+import com.github.basdxz.vbuffers.accessor.VGetter;
+import com.github.basdxz.vbuffers.accessor.VSetter;
 import lombok.*;
 
 import java.lang.invoke.LambdaMetafactory;
@@ -16,21 +16,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AccessorProvider {
-    protected static final Map<Class<?>, Setter<?>> setters = new HashMap<>();
-    protected static final Map<Class<?>, Getter<?>> getters = new HashMap<>();
+    protected static final Map<Class<?>, VSetter<?>> setters = new HashMap<>();
+    protected static final Map<Class<?>, VGetter<?>> getters = new HashMap<>();
 
     static {
         load(PrimitiveAccessors.class);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Setter<T> setter(Class<T> type) {
-        return (Setter<T>) setters.get(type);
+    public static <T> VSetter<T> setter(Class<T> type) {
+        return (VSetter<T>) setters.get(type);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Getter<T> getter(Class<T> type) {
-        return (Getter<T>) getters.get(type);
+    public static <T> VGetter<T> getter(Class<T> type) {
+        return (VGetter<T>) getters.get(type);
     }
 
     public static void load(Class<? extends Accessors> accessors) {
@@ -51,39 +51,39 @@ public class AccessorProvider {
     }
 
     public static void addSetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(Setter.Accessor.class);
+        val annotation = method.getAnnotation(VSetter.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Setter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(Setter.class, method).invoke();
+        val lambda = newLambdaFactory(VSetter.class, method).invoke();
         for (val classType : classTypes)
-            setters.put(classType, (Setter<?>) lambda);
+            setters.put(classType, (VSetter<?>) lambda);
     }
 
     public static void addGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(Getter.Accessor.class);
+        val annotation = method.getAnnotation(VGetter.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(Getter.class, method).invoke();
+        val lambda = newLambdaFactory(VGetter.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (Getter<?>) lambda);
+            getters.put(classType, (VGetter<?>) lambda);
     }
 
     public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(Getter.Immutable.Accessor.class);
+        val annotation = method.getAnnotation(VGetter.Immutable.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(Getter.Immutable.class, method).invoke();
+        val lambda = newLambdaFactory(VGetter.Immutable.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (Getter<?>) lambda);
+            getters.put(classType, (VGetter<?>) lambda);
     }
 
     public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {
