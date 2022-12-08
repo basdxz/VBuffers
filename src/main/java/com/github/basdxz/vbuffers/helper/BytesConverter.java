@@ -4,94 +4,86 @@ import lombok.experimental.*;
 
 @UtilityClass
 public final class BytesConverter {
-    public static byte[] byteToBytes(byte value) {
-        return new byte[]{value};
+    public static void byteToBytes(byte[] bytes, int offset, byte value) {
+        bytes[offset] = value;
     }
 
-    public static byte bytesToByte(byte[] value) {
-        return value[0];
+    public static byte bytesToByte(byte[] bytes, int offset) {
+        return bytes[offset];
     }
 
-    public static byte[] booleanToBytes(boolean value) {
-        return new byte[]{(byte) (value ? 1 : 0)};
+    public static void booleanToBytes(byte[] bytes, int offset, boolean value) {
+        bytes[offset] = (byte) (value ? 1 : 0);
     }
 
-    public static boolean bytesToBoolean(byte[] value) {
-        return value[0] != 0;
+    public static boolean bytesToBoolean(byte[] bytes, int offset) {
+        return bytes[offset] != 0;
     }
 
-    public static byte[] charToBytes(char value) {
-        return new byte[]{
-                (byte) (value >> 8),
-                (byte) (value)
-        };
+    public static void charToBytes(byte[] bytes, int offset, char value) {
+        bytes[offset] = (byte) (value >>> 8);
+        bytes[offset + 1] = (byte) (value);
     }
 
-    public static char bytesToChar(byte[] value) {
-        return (char) ((value[0] << 8) + (value[1] & 0xFF));
+    public static char bytesToChar(byte[] bytes, int offset) {
+        return (char) ((bytes[offset] << 8) + (bytes[offset + 1] & 0xFF));
     }
 
-    public static byte[] shortToBytes(short value) {
-        return new byte[]{
-                (byte) (value >> 8),
-                (byte) (value)
-        };
+    public static void shortToBytes(byte[] bytes, int offset, short value) {
+        bytes[offset] = (byte) (value >>> 8);
+        bytes[offset + 1] = (byte) (value);
     }
 
-    public static short bytesToShort(byte[] value) {
-        return (short) ((value[0] << 8) + (value[1] & 0xFF));
+    public static short bytesToShort(byte[] bytes, int offset) {
+        return (short) ((bytes[offset] << 8) + (bytes[offset + 1] & 0xFF));
     }
 
-    public static byte[] intToBytes(int value) {
-        return new byte[]{
-                (byte) (value >> 24),
-                (byte) (value >> 16),
-                (byte) (value >> 8),
-                (byte) (value)
-        };
+    public static void intToBytes(byte[] bytes, int offset, int value) {
+        bytes[offset] = (byte) (value >>> 24);
+        bytes[offset + 1] = (byte) (value >>> 16);
+        bytes[offset + 2] = (byte) (value >>> 8);
+        bytes[offset + 3] = (byte) (value);
     }
 
-    public static int bytesToInt(byte[] value) {
-        return (value[0] << 24) + ((value[1] & 0xFF) << 16) + ((value[2] & 0xFF) << 8) + (value[3] & 0xFF);
+    public static int bytesToInt(byte[] bytes, int offset) {
+        return (bytes[offset] << 24) + ((bytes[offset + 1] & 0xFF) << 16) + ((bytes[offset + 2] & 0xFF) << 8) + (bytes[offset + 3] & 0xFF);
     }
 
-    public static byte[] longToBytes(long value) {
-        return new byte[]{
-                (byte) (value >> 56),
-                (byte) (value >> 48),
-                (byte) (value >> 40),
-                (byte) (value >> 32),
-                (byte) (value >> 24),
-                (byte) (value >> 16),
-                (byte) (value >> 8),
-                (byte) (value)
-        };
+    public static void longToBytes(byte[] bytes, int offset, long value) {
+        bytes[offset] = (byte) (value >> 56);
+        bytes[offset + 1] = (byte) (value >>> 48);
+        bytes[offset + 2] = (byte) (value >>> 40);
+        bytes[offset + 3] = (byte) (value >>> 32);
+        bytes[offset + 4] = (byte) (value >>> 24);
+        bytes[offset + 5] = (byte) (value >>> 16);
+        bytes[offset + 6] = (byte) (value >>> 8);
+        bytes[offset + 7] = (byte) (value);
     }
 
-    public static long bytesToLong(byte[] value) {
-        return ((long) value[0] << 56) +
-               ((long) (value[1] & 0xFF) << 48) +
-               ((long) (value[2] & 0xFF) << 40) +
-               ((long) (value[3] & 0xFF) << 32) +
-               ((long) (value[4] & 0xFF) << 24) +
-               ((long) (value[5] & 0xFF) << 16) +
-               ((long) (value[6] & 0xFF) << 8) +
-               ((long) (value[7] & 0xFF));
+    public static long bytesToLong(byte[] bytes, int offset) {
+        return ((long) bytes[offset] << 56) +
+               ((long) (bytes[offset + 1] & 0xFF) << 48) +
+               ((long) (bytes[offset + 2] & 0xFF) << 40) +
+               ((long) (bytes[offset + 3] & 0xFF) << 32) +
+               ((long) (bytes[offset + 4] & 0xFF) << 24) +
+               ((long) (bytes[offset + 5] & 0xFF) << 16) +
+               ((long) (bytes[offset + 6] & 0xFF) << 8) +
+               ((long) (bytes[offset + 7] & 0xFF));
     }
 
-    public static byte[] floatToBytes(float value) {
-        return intToBytes(Float.floatToIntBits(value));
+    public static void floatToBytes(byte[] bytes, int offset, float value) {
+        intToBytes(bytes, offset, Float.floatToIntBits(value));
     }
 
-    public static float bytesToFloat(byte[] value) {
-        return Float.intBitsToFloat(bytesToInt(value));
+    public static float bytesToFloat(byte[] bytes, int offset) {
+        return Float.intBitsToFloat(bytesToInt(bytes, offset));
     }
 
-    public static byte[] doubleToBytes(double value) {
-        return longToBytes(Double.doubleToLongBits(value));
+    public static void doubleToBytes(byte[] bytes, int offset, double value) {
+        longToBytes(bytes, offset, Double.doubleToLongBits(value));
     }
 
-    public static double bytesToDouble(byte[] value) {
-        return Double.longBitsToDouble(bytesToLong(value));
+    public static double bytesToDouble(byte[] bytes, int offset) {
+        return Double.longBitsToDouble(bytesToLong(bytes, offset));
     }
 }
