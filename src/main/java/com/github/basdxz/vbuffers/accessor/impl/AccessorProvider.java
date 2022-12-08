@@ -1,8 +1,8 @@
 package com.github.basdxz.vbuffers.accessor.impl;
 
 import com.github.basdxz.vbuffers.accessor.Accessors;
-import com.github.basdxz.vbuffers.accessor.VGetter;
-import com.github.basdxz.vbuffers.accessor.VSetter;
+import com.github.basdxz.vbuffers.accessor.GetterAccessor;
+import com.github.basdxz.vbuffers.accessor.SetterAccessor;
 import lombok.*;
 
 import java.lang.invoke.LambdaMetafactory;
@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AccessorProvider {
-    protected static final Map<Class<?>, VSetter<?>> setters = new HashMap<>();
-    protected static final Map<Class<?>, VGetter<?>> getters = new HashMap<>();
+    protected static final Map<Class<?>, SetterAccessor<?>> setters = new HashMap<>();
+    protected static final Map<Class<?>, GetterAccessor<?>> getters = new HashMap<>();
 
     static {
         load(PrimitiveAccessors.class);
@@ -25,13 +25,13 @@ public class AccessorProvider {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> VSetter<T> setter(Class<T> type) {
-        return (VSetter<T>) setters.get(type);
+    public static <T> SetterAccessor<T> setter(Class<T> type) {
+        return (SetterAccessor<T>) setters.get(type);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> VGetter<T> getter(Class<T> type) {
-        return (VGetter<T>) getters.get(type);
+    public static <T> GetterAccessor<T> getter(Class<T> type) {
+        return (GetterAccessor<T>) getters.get(type);
     }
 
     public static void load(Class<? extends Accessors> accessors) {
@@ -51,39 +51,39 @@ public class AccessorProvider {
     }
 
     public static void addSetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VSetter.Accessor.class);
+        val annotation = method.getAnnotation(SetterAccessor.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Setter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(VSetter.class, method).invoke();
+        val lambda = newLambdaFactory(SetterAccessor.class, method).invoke();
         for (val classType : classTypes)
-            setters.put(classType, (VSetter<?>) lambda);
+            setters.put(classType, (SetterAccessor<?>) lambda);
     }
 
     public static void addGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VGetter.Accessor.class);
+        val annotation = method.getAnnotation(GetterAccessor.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(VGetter.class, method).invoke();
+        val lambda = newLambdaFactory(GetterAccessor.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (VGetter<?>) lambda);
+            getters.put(classType, (GetterAccessor<?>) lambda);
     }
 
     public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VGetter.Immutable.Accessor.class);
+        val annotation = method.getAnnotation(GetterAccessor.Immutable.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(VGetter.Immutable.class, method).invoke();
+        val lambda = newLambdaFactory(GetterAccessor.Immutable.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (VGetter.Immutable<?>) lambda);
+            getters.put(classType, (GetterAccessor.Immutable<?>) lambda);
     }
 
     public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {

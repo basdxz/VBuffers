@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @FunctionalInterface
-public interface VGetter<T> {
+public interface GetterAccessor<T> {
     @Contract("_, _, null -> new; _, _, _ -> param3")
     T get(ByteBuffer buffer, int offsetBytes, @Nullable T output);
 
@@ -22,7 +22,7 @@ public interface VGetter<T> {
     }
 
     @FunctionalInterface
-    interface Immutable<T> extends VGetter<T> {
+    interface Immutable<T> extends GetterAccessor<T> {
         @Override
         default T get(ByteBuffer buffer, int offsetBytes, @Nullable T output) {
             return get(buffer, offsetBytes);

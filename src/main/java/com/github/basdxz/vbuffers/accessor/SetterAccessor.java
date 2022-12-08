@@ -8,7 +8,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @FunctionalInterface
-public interface VSetter<T> {
+public interface SetterAccessor<T> {
     void put(ByteBuffer buffer, int offsetBytes, T value);
 
     @Target(METHOD)
