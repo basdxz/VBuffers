@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.accessor.front;
+package com.github.basdxz.vbuffers.access.front;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

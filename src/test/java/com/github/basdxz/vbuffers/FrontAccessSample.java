@@ -1,9 +1,9 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.front.GetterFront;
-import com.github.basdxz.vbuffers.accessor.front.SetterFront;
+import com.github.basdxz.vbuffers.access.front.GetterFront;
+import com.github.basdxz.vbuffers.access.front.SetterFront;
 
-public interface FrontendAccessorExample {
+public interface FrontAccessSample {
     @SetterFront.Access
     void set0(int input);
 
@@ -11,10 +11,10 @@ public interface FrontendAccessorExample {
     void set1(int input, int offsetStrides);
 
     @SetterFront.Access
-    FrontendAccessorExample set2(int input);
+    FrontAccessSample set2(int input);
 
     @SetterFront.Access
-    FrontendAccessorExample set3(int input, int offsetStrides);
+    FrontAccessSample set3(int input, int offsetStrides);
 
     @SetterFront.Access
     int set4(int input);
@@ -29,10 +29,10 @@ public interface FrontendAccessorExample {
     void get1(int output, int offsetStrides);
 
     @GetterFront.Access
-    FrontendAccessorExample get2(int output);
+    FrontAccessSample get2(int output);
 
     @GetterFront.Access
-    FrontendAccessorExample get3(int output, int offsetStrides);
+    FrontAccessSample get3(int output, int offsetStrides);
 
     @GetterFront.Access
     int get4();

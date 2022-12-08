@@ -1,15 +1,15 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.front.GetterFront;
-import com.github.basdxz.vbuffers.accessor.front.SetterFront;
-import com.github.basdxz.vbuffers.accessor.front.impl.AccessFrontProvider;
+import com.github.basdxz.vbuffers.access.front.GetterFront;
+import com.github.basdxz.vbuffers.access.front.SetterFront;
+import com.github.basdxz.vbuffers.access.front.impl.AccessFrontProvider;
 import lombok.*;
 
-public class FrontendAccessorTest {
+public class FrontAccessTest {
     //    @Test
     public void test() {
         // FrontendAccessorExample.class methods as an array list
-        val methods = FrontendAccessorExample.class.getMethods();
+        val methods = FrontAccessSample.class.getMethods();
         for (val method : methods) {
             System.out.println("--------------------");
 

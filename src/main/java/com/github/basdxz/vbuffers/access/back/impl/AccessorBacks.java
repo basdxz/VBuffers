@@ -1,8 +1,8 @@
-package com.github.basdxz.vbuffers.accessor.backing.impl;
+package com.github.basdxz.vbuffers.access.back.impl;
 
-import com.github.basdxz.vbuffers.accessor.backing.AccessorBackings;
-import com.github.basdxz.vbuffers.accessor.backing.GetterBacking;
-import com.github.basdxz.vbuffers.accessor.backing.SetterBacking;
+import com.github.basdxz.vbuffers.access.back.AccessBacks;
+import com.github.basdxz.vbuffers.access.back.GetterBack;
+import com.github.basdxz.vbuffers.access.back.SetterBack;
 import lombok.*;
 
 import java.lang.invoke.LambdaMetafactory;
@@ -16,29 +16,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TODO: Convert from singleton
-public class AccessorBackingProvider {
-    protected static final Map<Class<?>, SetterBacking<?>> setters = new HashMap<>();
-    protected static final Map<Class<?>, GetterBacking<?>> getters = new HashMap<>();
+public class AccessorBacks {
+    protected static final Map<Class<?>, SetterBack<?>> setters = new HashMap<>();
+    protected static final Map<Class<?>, GetterBack<?>> getters = new HashMap<>();
 
     static {
-        load(PrimitiveBackings.class);
-        load(JOMLBackings.class);
+        load(PrimitiveBacks.class);
+        load(JOMLBacks.class);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> SetterBacking<T> setter(Class<T> type) {
-        return (SetterBacking<T>) setters.get(type);
+    public static <T> SetterBack<T> setter(Class<T> type) {
+        return (SetterBack<T>) setters.get(type);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> GetterBacking<T> getter(Class<T> type) {
-        return (GetterBacking<T>) getters.get(type);
+    public static <T> GetterBack<T> getter(Class<T> type) {
+        return (GetterBack<T>) getters.get(type);
     }
 
-    public static void load(Class<? extends AccessorBackings> accessors) {
+    public static void load(Class<? extends AccessBacks> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
-              .forEach(AccessorBackingProvider::addAccessors);
+              .forEach(com.github.basdxz.vbuffers.access.back.impl.AccessorBacks::addAccessors);
     }
 
     public static void addAccessors(Method method) {
@@ -52,39 +52,39 @@ public class AccessorBackingProvider {
     }
 
     public static void addSetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(SetterBacking.Accessor.class);
+        val annotation = method.getAnnotation(SetterBack.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Setter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(SetterBacking.class, method).invoke();
+        val lambda = newLambdaFactory(SetterBack.class, method).invoke();
         for (val classType : classTypes)
-            setters.put(classType, (SetterBacking<?>) lambda);
+            setters.put(classType, (SetterBack<?>) lambda);
     }
 
     public static void addGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(GetterBacking.Accessor.class);
+        val annotation = method.getAnnotation(GetterBack.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(GetterBacking.class, method).invoke();
+        val lambda = newLambdaFactory(GetterBack.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (GetterBacking<?>) lambda);
+            getters.put(classType, (GetterBack<?>) lambda);
     }
 
     public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(GetterBacking.Immutable.Accessor.class);
+        val annotation = method.getAnnotation(GetterBack.Immutable.Accessor.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(GetterBacking.Immutable.class, method).invoke();
+        val lambda = newLambdaFactory(GetterBack.Immutable.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (GetterBacking.Immutable<?>) lambda);
+            getters.put(classType, (GetterBack.Immutable<?>) lambda);
     }
 
     public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {

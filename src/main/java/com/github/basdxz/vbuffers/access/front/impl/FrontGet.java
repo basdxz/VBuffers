@@ -1,6 +1,6 @@
-package com.github.basdxz.vbuffers.accessor.front.impl;
+package com.github.basdxz.vbuffers.access.front.impl;
 
-import com.github.basdxz.vbuffers.accessor.front.GetterFront;
+import com.github.basdxz.vbuffers.access.front.GetterFront;
 
 import java.lang.reflect.Method;
 

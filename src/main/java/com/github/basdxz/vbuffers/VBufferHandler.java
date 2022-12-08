@@ -1,8 +1,8 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.backing.GetterBacking;
-import com.github.basdxz.vbuffers.accessor.backing.SetterBacking;
-import com.github.basdxz.vbuffers.accessor.backing.impl.AccessorBackingProvider;
+import com.github.basdxz.vbuffers.access.back.GetterBack;
+import com.github.basdxz.vbuffers.access.back.SetterBack;
+import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,8 +31,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected final Class<LAYOUT> layout;
     protected final LAYOUT proxy;
     protected final Map<String, Integer> attributeOffsets;
-    protected final Map<String, SetterBacking<?>> setters;
-    protected final Map<String, GetterBacking<?>> getters;
+    protected final Map<String, SetterBack<?>> setters;
+    protected final Map<String, GetterBack<?>> getters;
     protected final int strideSizeBytes;
     protected final ByteBuffer backing;
     protected final int capacity;
@@ -48,8 +48,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
 
         val attributeOffsets = new HashMap<String, Integer>();
-        val setters = new HashMap<String, SetterBacking<?>>();
-        val getters = new HashMap<String, GetterBacking<?>>();
+        val setters = new HashMap<String, SetterBack<?>>();
+        val getters = new HashMap<String, GetterBack<?>>();
         // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
         var offsetBytes = 0;
 
@@ -59,8 +59,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
             val attributeSizeBytes = attribute.sizeBytes();
 
             attributeOffsets.put(attributeName, offsetBytes);
-            setters.put(attributeName, AccessorBackingProvider.setter(attributeTypeClass));
-            getters.put(attributeName, AccessorBackingProvider.getter(attributeTypeClass));
+            setters.put(attributeName, AccessorBacks.setter(attributeTypeClass));
+            getters.put(attributeName, AccessorBacks.getter(attributeTypeClass));
 
             offsetBytes += attributeSizeBytes;
         }
@@ -426,13 +426,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> SetterBacking<T> attributeSetter(String attributeName) {
-        return (SetterBacking<T>) setters.get(attributeName);
+    protected <T> SetterBack<T> attributeSetter(String attributeName) {
+        return (SetterBack<T>) setters.get(attributeName);
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> GetterBacking<T> attributeGetter(String attributeName) {
-        return (GetterBacking<T>) getters.get(attributeName);
+    protected <T> GetterBack<T> attributeGetter(String attributeName) {
+        return (GetterBack<T>) getters.get(attributeName);
     }
 
     protected int attributeOffset(String attributeName) {

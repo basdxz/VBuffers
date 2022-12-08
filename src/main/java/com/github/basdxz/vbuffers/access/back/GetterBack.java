@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.accessor.backing;
+package com.github.basdxz.vbuffers.access.back;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @FunctionalInterface
-public interface GetterBacking<T> {
+public interface GetterBack<T> {
     @Contract("_, _, null -> new; _, _, _ -> param3")
     T get(ByteBuffer buffer, int offsetBytes, @Nullable T output);
 
@@ -22,7 +22,7 @@ public interface GetterBacking<T> {
     }
 
     @FunctionalInterface
-    interface Immutable<T> extends GetterBacking<T> {
+    interface Immutable<T> extends GetterBack<T> {
         @Override
         default T get(ByteBuffer buffer, int offsetBytes, @Nullable T output) {
             return get(buffer, offsetBytes);
