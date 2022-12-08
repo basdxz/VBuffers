@@ -5,10 +5,10 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-@Layout({@Attribute(value = "position", type = Vector3f.class),
-         @Attribute(value = "normal", type = Vector3f.class),
-         @Attribute(value = "color", type = Vector4f.class),
-         @Attribute(value = "texture", type = Vector2f.class)})
+@Layout({@Attribute(value = "position", type = Vector3f.class, sizeBytes = 3 * Float.BYTES),
+         @Attribute(value = "normal", type = Vector3f.class, sizeBytes = 3 * Float.BYTES),
+         @Attribute(value = "color", type = Vector4f.class, sizeBytes = 4 * Float.BYTES),
+         @Attribute(value = "texture", type = Vector2f.class, sizeBytes = 2 * Float.BYTES)})
 public interface LayoutB extends VBuffer<LayoutB> {
     LayoutB position(Vector3f value);
 

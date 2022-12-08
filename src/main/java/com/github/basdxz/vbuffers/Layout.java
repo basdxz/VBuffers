@@ -21,7 +21,7 @@ public @interface Layout {
 
         Class<?> type();
 
-        int sizeBytes() default -1;
+        int sizeBytes();
 
         int offsetBytes() default -1;
 

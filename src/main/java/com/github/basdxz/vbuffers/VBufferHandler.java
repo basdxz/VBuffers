@@ -1,5 +1,8 @@
 package com.github.basdxz.vbuffers;
 
+import com.github.basdxz.vbuffers.accessor.VGetter;
+import com.github.basdxz.vbuffers.accessor.VSetter;
+import com.github.basdxz.vbuffers.accessor.impl.AccessorProvider;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +18,6 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.github.basdxz.vbuffers.AttributeType.DEFAULT_ATTRIBUTE_TYPES;
-
 public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
@@ -30,7 +31,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected final Class<LAYOUT> layout;
     protected final LAYOUT proxy;
     protected final Map<String, Integer> attributeOffsets;
-    protected final Map<String, AttributeType> attributeTypes;
+    protected final Map<String, VSetter<?>> setters;
+    protected final Map<String, VGetter<?>> getters;
     protected final int strideSizeBytes;
     protected final ByteBuffer backing;
     protected final int capacity;
@@ -46,29 +48,29 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
 
         val attributeOffsets = new HashMap<String, Integer>();
-        val attributeTypes = new HashMap<String, AttributeType>();
+        val setters = new HashMap<String, VSetter<?>>();
+        val getters = new HashMap<String, VGetter<?>>();
         // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
         var offsetBytes = 0;
 
         for (val attribute : layoutAnnotation.value()) {
             val attributeName = Objects.requireNonNull(attribute.value(), "Attribute name cannot be null");
             val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
-
-            // Attribute type lookup, the dirtiest part of this constructor
-            val attributeType = Objects.requireNonNull(DEFAULT_ATTRIBUTE_TYPES.get(attributeTypeClass),
-                                                       "Attribute type must be a supported type");
+            val attributeSizeBytes = attribute.sizeBytes();
 
             attributeOffsets.put(attributeName, offsetBytes);
-            attributeTypes.put(attributeName, attributeType);
+            setters.put(attributeName, AccessorProvider.setter(attributeTypeClass));
+            getters.put(attributeName, AccessorProvider.getter(attributeTypeClass));
 
-            offsetBytes += attributeType.sizeBytes();
+            offsetBytes += attributeSizeBytes;
         }
 
         this.layout = layout;
         this.proxy = initProxy();
         // Attribute maps are immutable as they are shared between multiple VBufferHandlers
         this.attributeOffsets = Collections.unmodifiableMap(attributeOffsets);
-        this.attributeTypes = Collections.unmodifiableMap(attributeTypes);
+        this.setters = Collections.unmodifiableMap(setters);
+        this.getters = Collections.unmodifiableMap(getters);
         this.strideSizeBytes = offsetBytes;
         this.backing = allocator.allocate(offsetBytes * capacity);
         this.capacity = capacity;
@@ -84,7 +86,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
-        this.attributeTypes = other.attributeTypes;
+        this.setters = other.setters;
+        this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
         this.backing = other.backing;
         this.capacity = other.capacity;
@@ -99,7 +102,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.attributeOffsets = other.attributeOffsets;
-        this.attributeTypes = other.attributeTypes;
+        this.setters = other.setters;
+        this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
         this.capacity = size;
         this.position = 0;
@@ -407,7 +411,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected void put(String attributeName, Object value) {
         ensureWritable();
         try {
-            attributeType(attributeName).put(backing, attributeOffset(attributeName), value);
+            attributeSetter(attributeName).put(backing, attributeOffset(attributeName), value);
         } catch (Exception e) {
             throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
         }
@@ -415,14 +419,21 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected Object get(String attributeName) {
         try {
-            return attributeType(attributeName).get(backing, attributeOffset(attributeName));
+            return attributeGetter(attributeName).get(backing, attributeOffset(attributeName), null);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
         }
     }
 
-    protected AttributeType attributeType(String attributeName) {
-        return attributeTypes.get(attributeName);
+
+    @SuppressWarnings("unchecked")
+    protected <T> VSetter<T> attributeSetter(String attributeName) {
+        return (VSetter<T>) setters.get(attributeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> VGetter<T> attributeGetter(String attributeName) {
+        return (VGetter<T>) getters.get(attributeName);
     }
 
     protected int attributeOffset(String attributeName) {

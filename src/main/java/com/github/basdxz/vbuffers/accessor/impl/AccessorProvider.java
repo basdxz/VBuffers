@@ -21,6 +21,7 @@ public class AccessorProvider {
 
     static {
         load(PrimitiveAccessors.class);
+        load(JOMLAccessors.class);
     }
 
     @SuppressWarnings("unchecked")
