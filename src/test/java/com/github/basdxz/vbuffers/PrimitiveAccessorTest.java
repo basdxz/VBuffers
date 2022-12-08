@@ -1,12 +1,16 @@
 package com.github.basdxz.vbuffers;
 
 import com.github.basdxz.vbuffers.accessor.impl.AccessorProvider;
+import lombok.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
 public class PrimitiveAccessorTest {
+    protected static final int BUFFER_SIZE_BYTES = 1024;
+    protected static final int OFFSET_BYTES = 456;
+
     protected static final byte TEST_BYTE = 0xA;
     protected static final char TEST_CHAR = 0xA;
     protected static final short TEST_SHORT = 0xAAA;
@@ -17,170 +21,194 @@ public class PrimitiveAccessorTest {
     protected static final boolean TEST_BOOLEAN = true;
 
     @Test
-    public void bytes() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Byte.BYTES);
+    public void primitiveByte() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(byte.class);
+        val getter = AccessorProvider.getter(byte.class);
 
-        var setter = AccessorProvider.setter(Byte.class);
-        var getter = AccessorProvider.getter(Byte.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_BYTE);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_BYTE);
-        Assertions.assertEquals(TEST_BYTE, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Byte.BYTES);
-
-        setter = AccessorProvider.setter(byte.class);
-        getter = AccessorProvider.getter(byte.class);
-
-        setter.put(buffer, 0, TEST_BYTE);
-        Assertions.assertEquals(TEST_BYTE, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_BYTE, result);
     }
 
     @Test
-    public void chars() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Character.BYTES);
+    public void boxedByte() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Byte.class);
+        val getter = AccessorProvider.getter(Byte.class);
 
-        var setter = AccessorProvider.setter(Character.class);
-        var getter = AccessorProvider.getter(Character.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_BYTE);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_CHAR);
-        Assertions.assertEquals(TEST_CHAR, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Character.BYTES);
-
-        setter = AccessorProvider.setter(char.class);
-        getter = AccessorProvider.getter(char.class);
-
-        setter.put(buffer, 0, TEST_CHAR);
-        Assertions.assertEquals(TEST_CHAR, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_BYTE, result);
     }
 
     @Test
-    public void shorts() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Short.BYTES);
+    public void primitiveBoolean() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(boolean.class);
+        val getter = AccessorProvider.getter(boolean.class);
 
-        var setter = AccessorProvider.setter(Short.class);
-        var getter = AccessorProvider.getter(Short.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_BOOLEAN);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_SHORT);
-        Assertions.assertEquals(TEST_SHORT, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Short.BYTES);
-
-        setter = AccessorProvider.setter(short.class);
-        getter = AccessorProvider.getter(short.class);
-
-        setter.put(buffer, 0, TEST_SHORT);
-        Assertions.assertEquals(TEST_SHORT, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_BOOLEAN, result);
     }
 
     @Test
-    public void integers() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Integer.BYTES);
+    public void boxedBoolean() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Boolean.class);
+        val getter = AccessorProvider.getter(Boolean.class);
 
-        var setter = AccessorProvider.setter(Integer.class);
-        var getter = AccessorProvider.getter(Integer.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_BOOLEAN);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_INT);
-        Assertions.assertEquals(TEST_INT, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Integer.BYTES);
-
-        setter = AccessorProvider.setter(Integer.class);
-        getter = AccessorProvider.getter(Integer.class);
-
-        setter.put(buffer, 0, TEST_INT);
-        Assertions.assertEquals(TEST_INT, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_BOOLEAN, result);
     }
 
     @Test
-    public void longs() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Long.BYTES);
+    public void primitiveChar() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(char.class);
+        val getter = AccessorProvider.getter(char.class);
 
-        var setter = AccessorProvider.setter(Long.class);
-        var getter = AccessorProvider.getter(Long.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_CHAR);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_LONG);
-        Assertions.assertEquals(TEST_LONG, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Long.BYTES);
-
-        setter = AccessorProvider.setter(long.class);
-        getter = AccessorProvider.getter(long.class);
-
-        setter.put(buffer, 0, TEST_LONG);
-        Assertions.assertEquals(TEST_LONG, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_CHAR, result);
     }
 
     @Test
-    public void floats() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Float.BYTES);
+    public void boxedChar() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Character.class);
+        val getter = AccessorProvider.getter(Character.class);
 
-        var setter = AccessorProvider.setter(Float.class);
-        var getter = AccessorProvider.getter(Float.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_CHAR);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_FLOAT);
-        Assertions.assertEquals(TEST_FLOAT, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Float.BYTES);
-
-        setter = AccessorProvider.setter(float.class);
-        getter = AccessorProvider.getter(float.class);
-
-        setter.put(buffer, 0, TEST_FLOAT);
-        Assertions.assertEquals(TEST_FLOAT, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_CHAR, result);
     }
 
     @Test
-    public void doubles() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Double.BYTES);
+    public void primitiveShort() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(short.class);
+        val getter = AccessorProvider.getter(short.class);
 
-        var setter = AccessorProvider.setter(Double.class);
-        var getter = AccessorProvider.getter(Double.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_SHORT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_DOUBLE);
-        Assertions.assertEquals(TEST_DOUBLE, getter.get(buffer, 0, null));
-
-        // Primitive
-        buffer = ByteBuffer.allocate(Double.BYTES);
-
-        setter = AccessorProvider.setter(double.class);
-        getter = AccessorProvider.getter(double.class);
-
-        setter.put(buffer, 0, TEST_DOUBLE);
-        Assertions.assertEquals(TEST_DOUBLE, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_SHORT, result);
     }
 
     @Test
-    public void booleans() {
-        // Boxed
-        var buffer = ByteBuffer.allocate(Byte.BYTES);
+    public void boxedShort() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Short.class);
+        val getter = AccessorProvider.getter(Short.class);
 
-        var setter = AccessorProvider.setter(Boolean.class);
-        var getter = AccessorProvider.getter(Boolean.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_SHORT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_BOOLEAN);
-        Assertions.assertEquals(TEST_BOOLEAN, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_SHORT, result);
+    }
 
-        // Primitive
-        buffer = ByteBuffer.allocate(Byte.BYTES);
+    @Test
+    public void primitiveInt() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(int.class);
+        val getter = AccessorProvider.getter(int.class);
 
-        setter = AccessorProvider.setter(boolean.class);
-        getter = AccessorProvider.getter(boolean.class);
+        setter.put(buffer, OFFSET_BYTES, TEST_INT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
 
-        setter.put(buffer, 0, TEST_BOOLEAN);
-        Assertions.assertEquals(TEST_BOOLEAN, getter.get(buffer, 0, null));
+        Assertions.assertEquals(TEST_INT, result);
+    }
+
+    @Test
+    public void boxedInt() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Integer.class);
+        val getter = AccessorProvider.getter(Integer.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_INT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_INT, result);
+    }
+
+    @Test
+    public void primitiveLong() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(long.class);
+        val getter = AccessorProvider.getter(long.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_LONG);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_LONG, result);
+    }
+
+    @Test
+    public void boxedLong() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Long.class);
+        val getter = AccessorProvider.getter(Long.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_LONG);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_LONG, result);
+    }
+
+    @Test
+    public void primitiveFloat() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(float.class);
+        val getter = AccessorProvider.getter(float.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_FLOAT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_FLOAT, result);
+    }
+
+    @Test
+    public void boxedFloat() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Float.class);
+        val getter = AccessorProvider.getter(Float.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_FLOAT);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_FLOAT, result);
+    }
+
+    @Test
+    public void primitiveDouble() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(double.class);
+        val getter = AccessorProvider.getter(double.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_DOUBLE);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_DOUBLE, result);
+    }
+
+    @Test
+    public void boxedDouble() {
+        val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
+        val setter = AccessorProvider.setter(Double.class);
+        val getter = AccessorProvider.getter(Double.class);
+
+        setter.put(buffer, OFFSET_BYTES, TEST_DOUBLE);
+        val result = getter.get(buffer, OFFSET_BYTES, null);
+
+        Assertions.assertEquals(TEST_DOUBLE, result);
     }
 }
