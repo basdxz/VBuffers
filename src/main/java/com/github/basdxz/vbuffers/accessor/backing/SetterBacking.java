@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.accessor;
+package com.github.basdxz.vbuffers.accessor.backing;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -8,7 +8,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @FunctionalInterface
-public interface SetterAccessor<T> {
+public interface SetterBacking<T> {
     void put(ByteBuffer buffer, int offsetBytes, T value);
 
     @Target(METHOD)
