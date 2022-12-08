@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers;
+package com.github.basdxz.vbuffers.attribute;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

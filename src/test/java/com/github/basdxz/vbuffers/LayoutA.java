@@ -1,6 +1,7 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.Layout.Attribute;
+import com.github.basdxz.vbuffers.attribute.Layout;
+import com.github.basdxz.vbuffers.attribute.Layout.Attribute;
 
 @Layout({@Attribute(name = "position", type = Integer.class),
          @Attribute(name = "normal", type = Integer.class),

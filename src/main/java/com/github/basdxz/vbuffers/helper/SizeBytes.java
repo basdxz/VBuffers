@@ -7,7 +7,7 @@ import org.joml.Vector4f;
 
 @UtilityClass
 public final class SizeBytes {
-    public static int sizeBytes(Class<?> type) {
+    public static int of(Class<?> type) {
         type = boxed(type);
         if (type == Byte.class)
             return Byte.BYTES;

@@ -1,8 +1,8 @@
 package com.github.basdxz.vbuffers.shaderdemo;
 
-import com.github.basdxz.vbuffers.Layout;
-import com.github.basdxz.vbuffers.Layout.Attribute;
 import com.github.basdxz.vbuffers.VBuffer;
+import com.github.basdxz.vbuffers.attribute.Layout;
+import com.github.basdxz.vbuffers.attribute.Layout.Attribute;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

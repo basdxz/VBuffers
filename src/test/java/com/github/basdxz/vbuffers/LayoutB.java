@@ -1,6 +1,7 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.Layout.Attribute;
+import com.github.basdxz.vbuffers.attribute.Layout;
+import com.github.basdxz.vbuffers.attribute.Layout.Attribute;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
