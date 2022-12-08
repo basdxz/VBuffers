@@ -6,8 +6,8 @@ import com.github.basdxz.vbuffers.VBuffer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-@Layout({@Attribute(value = "uv", type = Vector2f.class, sizeBytes = 2 * Float.BYTES),
-         @Attribute(value = "color", type = Vector3f.class, sizeBytes = 3 * Float.BYTES)})
+@Layout({@Attribute(name = "uv", type = Vector2f.class),
+         @Attribute(name = "color", type = Vector3f.class)})
 public interface ShaderLayout extends VBuffer<ShaderLayout> {
     ShaderLayout uv(Vector2f value);
 

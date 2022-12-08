@@ -10,21 +10,11 @@ import java.lang.annotation.Target;
 public @interface Layout {
     Attribute[] value();
 
-    int sizeBytes() default -1;
-
     @Target({})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Attribute {
-        String value();
-
-        String[] aliases() default {};
+        String name();
 
         Class<?> type();
-
-        int sizeBytes();
-
-        int offsetBytes() default -1;
-
-        int orderIndex() default -1;
     }
 }

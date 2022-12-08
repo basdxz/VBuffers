@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static com.github.basdxz.vbuffers.helper.SizeBytes.sizeBytes;
+
 public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
@@ -54,9 +56,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         var offsetBytes = 0;
 
         for (val attribute : layoutAnnotation.value()) {
-            val attributeName = Objects.requireNonNull(attribute.value(), "Attribute name cannot be null");
+            val attributeName = Objects.requireNonNull(attribute.name(), "Attribute name cannot be null");
             val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
-            val attributeSizeBytes = attribute.sizeBytes();
+            val attributeSizeBytes = sizeBytes(attributeTypeClass);
 
             attributeOffsets.put(attributeName, offsetBytes);
             setters.put(attributeName, AccessorBacks.setter(attributeTypeClass));
