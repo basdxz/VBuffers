@@ -1,29 +1,37 @@
 package com.github.basdxz.vbuffers;
 
 import com.github.basdxz.vbuffers.layout.Layout;
-import com.github.basdxz.vbuffers.layout.Layout.Attribute;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-@Layout({@Attribute(name = "position", type = Vector3f.class),
-         @Attribute(name = "normal", type = Vector3f.class),
-         @Attribute(name = "color", type = Vector4f.class),
-         @Attribute(name = "texture", type = Vector2f.class)})
+import static com.github.basdxz.vbuffers.LayoutB.*;
+import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
+import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
+
+@Layout({@Attribute(name = POSITION, type = Vector3f.class),
+         @Attribute(name = NORMAL, type = Vector3f.class),
+         @Attribute(name = COLOR, type = Vector4f.class),
+         @Attribute(name = TEXTURE, type = Vector2f.class)})
 public interface LayoutB extends VBuffer<LayoutB> {
-    LayoutB position(Vector3f value);
+    String POSITION = "position";
+    String NORMAL = "normal";
+    String COLOR = "color";
+    String TEXTURE = "texture";
 
-    Vector3f position();
+    @Chain LayoutB position(@In(POSITION) Vector3f value);
 
-    LayoutB normal(Vector3f value);
+    @Out(POSITION) Vector3f position();
 
-    Vector3f normal();
+    @Chain LayoutB normal(@In(NORMAL) Vector3f value);
 
-    LayoutB color(Vector4f value);
+    @Out(NORMAL) Vector3f normal();
 
-    Vector4f color();
+    @Chain LayoutB color(@In(COLOR) Vector4f value);
 
-    LayoutB texture(Vector2f value);
+    @Out(COLOR) Vector4f color();
 
-    Vector2f texture();
+    @Chain LayoutB texture(@In(TEXTURE) Vector2f value);
+
+    @Out(TEXTURE) Vector2f texture();
 }

@@ -4,10 +4,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.ByteBuffer;
 
 @FunctionalInterface
 public interface AccessFront {
-    Object accept(Object... args) throws Throwable;
+    Object accept(ByteBuffer back, int offsetBytes, Object... args) throws Throwable;
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
