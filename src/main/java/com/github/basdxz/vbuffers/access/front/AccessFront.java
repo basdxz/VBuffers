@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 @FunctionalInterface
 public interface AccessFront {
-    Object accept(ByteBuffer back, int offsetBytes, Object... args) throws Throwable;
+    Object access(ByteBuffer back, int offsetBytes, Object... args) throws Throwable;
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
