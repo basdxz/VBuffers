@@ -3,9 +3,9 @@ package com.github.basdxz.vbuffers;
 import com.github.basdxz.vbuffers.access.back.GetterBack;
 import com.github.basdxz.vbuffers.access.back.SetterBack;
 import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
-import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
-import com.github.basdxz.vbuffers.layout.impl.AttributeProvider;
+import com.github.basdxz.vbuffers.layout.Stride;
+import com.github.basdxz.vbuffers.layout.impl.BufferStride;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected final Class<LAYOUT> layout;
     protected final LAYOUT proxy;
-    protected final Map<String, Attribute> attributes;
+    protected final Stride stride;
     protected final Map<String, SetterBack<?>> setters;
     protected final Map<String, GetterBack<?>> getters;
     protected final int strideSizeBytes;
@@ -50,25 +50,19 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val layoutAnnotation = layout.getAnnotation(Layout.class);
         Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
 
+        val stride = new BufferStride(layout.getAnnotation(Layout.class));
+        val strideSizeBytes = stride.sizeBytes();
         val setters = new HashMap<String, SetterBack<?>>();
         val getters = new HashMap<String, GetterBack<?>>();
-        // The current offset in bytes, which will be the stride size in bytes once the attributes are processed
-
-        val attributes = AttributeProvider.fromLayout(layout);
-        val strideSizeBytes = attributes.values().stream().mapToInt(Attribute::sizeBytes).sum();
-
-        for (val attribute : layoutAnnotation.value()) {
-            val attributeName = Objects.requireNonNull(attribute.name(), "Attribute name cannot be null");
-            val attributeTypeClass = Objects.requireNonNull(attribute.type(), "Attribute type cannot be null");
-
-            setters.put(attributeName, AccessorBacks.setter(attributeTypeClass));
-            getters.put(attributeName, AccessorBacks.getter(attributeTypeClass));
+        for (val attribute : stride.attributeList()) {
+            setters.put(attribute.name(), AccessorBacks.setter(attribute.type()));
+            getters.put(attribute.name(), AccessorBacks.getter(attribute.type()));
         }
 
         this.layout = layout;
         this.proxy = initProxy();
+        this.stride = stride;
         // Attribute maps are immutable as they are shared between multiple VBufferHandlers
-        this.attributes = Collections.unmodifiableMap(attributes);
         this.setters = Collections.unmodifiableMap(setters);
         this.getters = Collections.unmodifiableMap(getters);
         this.strideSizeBytes = strideSizeBytes;
@@ -85,7 +79,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected VBufferHandler(VBufferHandler<LAYOUT> other) {
         this.layout = other.layout;
         this.proxy = initProxy();
-        this.attributes = other.attributes;
+        this.stride = other.stride;
         this.setters = other.setters;
         this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
@@ -101,7 +95,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
         this.layout = other.layout;
         this.proxy = initProxy();
-        this.attributes = other.attributes;
+        this.stride = other.stride;
         this.setters = other.setters;
         this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
@@ -436,7 +430,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected int attributeOffset(String attributeName) {
-        return attributes.get(attributeName).offsetBytes() + strideIndexToBytes(position);
+        return stride.attributeMap().get(attributeName).offsetBytes() + strideIndexToBytes(position);
     }
 
     protected int strideIndexToBytes(int strideIndex) {

@@ -6,14 +6,16 @@ import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;
 
 @Getter
-public class LayoutAttribute implements Attribute {
+public class BufferAttribute implements Attribute {
     private final String name;
+    private final Class<?> type;
     private final int sizeBytes;
     private final int offsetBytes;
 
-    public LayoutAttribute(Layout.Attribute annotation, int offsetBytes) {
+    public BufferAttribute(Layout.Attribute annotation, int offsetBytes) {
         this.name = annotation.name();
-        this.sizeBytes = SizeBytes.of(annotation.type());
+        this.type = annotation.type();
+        this.sizeBytes = SizeBytes.of(this.type);
         this.offsetBytes = offsetBytes;
     }
 }
