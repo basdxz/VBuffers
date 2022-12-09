@@ -1,13 +1,14 @@
-package com.github.basdxz.vbuffers;
+package com.github.basdxz.vbuffers.samples;
 
+import com.github.basdxz.vbuffers.VBuffer;
 import com.github.basdxz.vbuffers.layout.Layout;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static com.github.basdxz.vbuffers.LayoutB.*;
 import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
 import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
+import static com.github.basdxz.vbuffers.samples.LayoutB.*;
 
 @Layout({@Attribute(name = POSITION, type = Vector3f.class),
          @Attribute(name = NORMAL, type = Vector3f.class),
