@@ -14,19 +14,19 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AccessFrontFactory {
-    public static Map<Method, AccessFront> accessFronts(Object chainable, Stride stride, Class<?> layout) {
+    public static Map<Method, AccessFront> accessFronts(Stride stride, Class<?> layout) {
         val accessFronts = new HashMap<Method, AccessFront>();
         for (val method : layout.getMethods()) {
-            val accessFront = create(chainable, stride, method);
+            val accessFront = create(stride, method);
             accessFronts.put(method, accessFront);
         }
         return accessFronts;
     }
 
-    public static AccessFront create(Object chainable, Stride stride, Method method) {
+    public static AccessFront create(Stride stride, Method method) {
         val idxHandler = newIdxHandler(stride, method);
         val parameterHandlers = newParameterHandlers(stride, method);
-        val returnHandler = newReturnHandler(chainable, stride, method, parameterHandlers);
+        val returnHandler = newReturnHandler(stride, method, parameterHandlers);
         return new SimpleFront(idxHandler, returnHandler, parameterHandlers);
     }
 
@@ -56,14 +56,13 @@ public final class AccessFrontFactory {
         return parameterHandlers;
     }
 
-    private static ReturnHandler newReturnHandler(Object chainable,
-                                                  Stride stride,
+    private static ReturnHandler newReturnHandler(Stride stride,
                                                   Method method,
                                                   List<ParameterHandler> parameterHandlers) {
         val annotations = method.getAnnotatedReturnType().getAnnotations();
         for (val annotation : annotations) {
             if (annotation instanceof AccessFront.Chain)
-                return new ChainReturnHandler(chainable);
+                return new ChainReturnHandler();
             if (annotation instanceof AccessFront.In in) {
                 val inParameter = parameterHandlers.stream()
                                                    .filter(parameterHandler -> in.value().equals(parameterHandler.attribute().name()))

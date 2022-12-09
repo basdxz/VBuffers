@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import java.nio.ByteBuffer;
 
 public interface AccessFront {
-    Object access(ByteBuffer back, int offsetBytes, Object... args);
+    Object access(Object chainable, ByteBuffer back, int offsetBytes, Object... args);
 
     boolean writing();
 

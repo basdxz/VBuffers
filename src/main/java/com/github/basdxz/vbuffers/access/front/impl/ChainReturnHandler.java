@@ -7,10 +7,8 @@ import java.nio.ByteBuffer;
 
 @AllArgsConstructor
 public class ChainReturnHandler implements ReturnHandler {
-    protected final Object chainable;
-
     @Override
-    public Object handle(ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
         return chainable;
     }
 }

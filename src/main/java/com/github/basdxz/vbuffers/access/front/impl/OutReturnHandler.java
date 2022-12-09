@@ -24,7 +24,7 @@ public class OutReturnHandler implements ReturnHandler {
     }
 
     @Override
-    public Object handle(ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
         val outObject = outObject(args);
         return getterBack.get(back, offsetBytes + attribute.offsetBytes(), outObject);
     }

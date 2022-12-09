@@ -34,11 +34,11 @@ public class SimpleFront implements AccessFront {
     }
 
     @Override
-    public Object access(ByteBuffer back, int offsetBytes, Object... args) {
+    public Object access(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
         offsetBytes += strideOffsetBytes(args);
         for (val handler : parameterHandlers)
             handler.handle(back, offsetBytes, args);
-        return returnHandler.handle(back, offsetBytes, args);
+        return returnHandler.handle(chainable, back, offsetBytes, args);
     }
 
     protected int strideOffsetBytes(Object... args) {

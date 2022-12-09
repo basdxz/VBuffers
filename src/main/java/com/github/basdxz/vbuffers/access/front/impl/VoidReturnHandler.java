@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 public class VoidReturnHandler implements ReturnHandler {
     @Override
-    public Object handle(ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
         return null;
     }
 }

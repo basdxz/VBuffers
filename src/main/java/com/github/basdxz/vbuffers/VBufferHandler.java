@@ -1,8 +1,5 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.access.back.GetterBack;
-import com.github.basdxz.vbuffers.access.back.SetterBack;
-import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
 import com.github.basdxz.vbuffers.access.front.AccessFront;
 import com.github.basdxz.vbuffers.access.front.impl.AccessFrontFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
@@ -37,8 +34,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected final LAYOUT proxy;
     protected final Stride stride;
     protected final Map<Method, AccessFront> accessFronts;
-    //    protected final Map<String, SetterBack<?>> setters;
-//    protected final Map<String, GetterBack<?>> getters;
     protected final int strideSizeBytes;
     protected final ByteBuffer backing;
     protected final int capacity;
@@ -50,25 +45,14 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     // Normal Constructor
     protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
-        val stride = new BufferStride(layout.getAnnotation(Layout.class));
-        val strideSizeBytes = stride.sizeBytes();
-        val setters = new HashMap<String, SetterBack<?>>();
-        val getters = new HashMap<String, GetterBack<?>>();
-        for (val attribute : stride.attributeList()) {
-            setters.put(attribute.name(), AccessorBacks.setter(attribute.type()));
-            getters.put(attribute.name(), AccessorBacks.getter(attribute.type()));
-        }
-
         this.layout = layout;
         this.proxy = initProxy();
-        this.stride = stride;
-        // Attribute maps are immutable as they are shared between multiple VBufferHandlers
-        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
-//        this.setters = Collections.unmodifiableMap(setters);
-//        this.getters = Collections.unmodifiableMap(getters);
-        this.strideSizeBytes = strideSizeBytes;
+        this.stride = new BufferStride(layout.getAnnotation(Layout.class));
+        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(stride, layout));
+        this.strideSizeBytes = stride.sizeBytes();
         this.backing = allocator.allocate(strideSizeBytes * capacity);
         this.capacity = capacity;
+
         // Set Default pointer values
         this.position = 0;
         this.limit = capacity;
@@ -81,9 +65,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
-//        this.setters = other.setters;
-//        this.getters = other.getters;
+        this.accessFronts = other.accessFronts;
         this.strideSizeBytes = other.strideSizeBytes;
         this.backing = other.backing;
         this.capacity = other.capacity;
@@ -98,9 +80,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
-//        this.setters = other.setters;
-//        this.getters = other.getters;
+        this.accessFronts = other.accessFronts;
         this.strideSizeBytes = other.strideSizeBytes;
         this.capacity = size;
         this.position = 0;
@@ -398,35 +378,8 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val accessFront = accessFronts.get(method);
         if (accessFront.writing())
             ensureWritable();
-        return accessFront.access(backing, strideIndexToBytes(position), args);
+        return accessFront.access(proxy, backing, strideIndexToBytes(position), args);
     }
-
-//    protected void put(String attributeName, Object value) {
-//        ensureWritable();
-//        try {
-//            attributeSetter(attributeName).put(backing, attributeOffset(attributeName), value);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
-//        }
-//    }
-//
-//    protected Object get(String attributeName) {
-//        try {
-//            return attributeGetter(attributeName).get(backing, attributeOffset(attributeName), null);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
-//        }
-//    }
-
-//    @SuppressWarnings("unchecked")
-//    protected <T> SetterBack<T> attributeSetter(String attributeName) {
-//        return (SetterBack<T>) setters.get(attributeName);
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    protected <T> GetterBack<T> attributeGetter(String attributeName) {
-//        return (GetterBack<T>) getters.get(attributeName);
-//    }
 
     protected int attributeOffset(String attributeName) {
         return stride.attributeMap().get(attributeName).offsetBytes() + strideIndexToBytes(position);

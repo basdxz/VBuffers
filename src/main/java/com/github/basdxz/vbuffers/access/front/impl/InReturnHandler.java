@@ -12,7 +12,7 @@ public class InReturnHandler implements ReturnHandler {
     }
 
     @Override
-    public Object handle(ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
         return args[outParameterIndex];
     }
 }

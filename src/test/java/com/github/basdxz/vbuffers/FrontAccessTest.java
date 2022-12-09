@@ -20,13 +20,13 @@ public class FrontAccessTest {
         val setterMethod = clazz.getMethod("set", int.class);
         val gettterMethod = clazz.getMethod("get");
 
-        val setterFront = AccessFrontFactory.create(null, stride, setterMethod);
-        val getterFront = AccessFrontFactory.create(null, stride, gettterMethod);
+        val setterFront = AccessFrontFactory.create(stride, setterMethod);
+        val getterFront = AccessFrontFactory.create(stride, gettterMethod);
 
         val buffer = ByteBuffer.allocate(Integer.BYTES);
 
-        setterFront.access(buffer, 0, 5);
-        val result = getterFront.access(buffer, 0);
+        setterFront.access(null, buffer, 0, 5);
+        val result = getterFront.access(null, buffer, 0);
 
         Assertions.assertEquals(5, result);
     }
