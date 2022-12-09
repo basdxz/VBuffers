@@ -3,9 +3,9 @@ package com.github.basdxz.vbuffers;
 import com.github.basdxz.vbuffers.access.back.GetterBack;
 import com.github.basdxz.vbuffers.access.back.SetterBack;
 import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
-import com.github.basdxz.vbuffers.attribute.Attribute;
-import com.github.basdxz.vbuffers.attribute.Layout;
-import com.github.basdxz.vbuffers.attribute.impl.AttributeProvider;
+import com.github.basdxz.vbuffers.layout.Attribute;
+import com.github.basdxz.vbuffers.layout.Layout;
+import com.github.basdxz.vbuffers.layout.impl.AttributeProvider;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 

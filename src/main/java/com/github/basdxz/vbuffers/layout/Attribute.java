@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.attribute;
+package com.github.basdxz.vbuffers.layout;
 
 public interface Attribute {
     String name();

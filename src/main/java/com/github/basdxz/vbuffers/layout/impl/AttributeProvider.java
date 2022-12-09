@@ -1,9 +1,9 @@
-package com.github.basdxz.vbuffers.attribute.impl;
+package com.github.basdxz.vbuffers.layout.impl;
 
 import com.github.basdxz.vbuffers.VBuffer;
-import com.github.basdxz.vbuffers.attribute.Attribute;
-import com.github.basdxz.vbuffers.attribute.Layout;
 import com.github.basdxz.vbuffers.helper.SizeBytes;
+import com.github.basdxz.vbuffers.layout.Attribute;
+import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;
 
 import java.util.HashMap;

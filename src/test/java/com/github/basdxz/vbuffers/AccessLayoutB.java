@@ -1,17 +1,18 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.attribute.Layout;
+import com.github.basdxz.vbuffers.layout.Layout;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static com.github.basdxz.vbuffers.AccessLayoutB.*;
 import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
+import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
 
-@Layout({@Layout.Attribute(name = POSITION, type = Vector3f.class),
-         @Layout.Attribute(name = NORMAL, type = Vector3f.class),
-         @Layout.Attribute(name = COLOR, type = Vector4f.class),
-         @Layout.Attribute(name = TEXTURE, type = Vector2f.class)})
+@Layout({@Attribute(name = POSITION, type = Vector3f.class),
+         @Attribute(name = NORMAL, type = Vector3f.class),
+         @Attribute(name = COLOR, type = Vector4f.class),
+         @Attribute(name = TEXTURE, type = Vector2f.class)})
 public interface AccessLayoutB extends VBuffer<AccessLayoutB> {
     String POSITION = "position";
     String NORMAL = "normal";
