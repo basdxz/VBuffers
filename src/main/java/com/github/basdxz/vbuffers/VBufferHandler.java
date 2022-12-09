@@ -3,6 +3,8 @@ package com.github.basdxz.vbuffers;
 import com.github.basdxz.vbuffers.access.back.GetterBack;
 import com.github.basdxz.vbuffers.access.back.SetterBack;
 import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
+import com.github.basdxz.vbuffers.access.front.AccessFront;
+import com.github.basdxz.vbuffers.access.front.impl.AccessFrontFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
 import com.github.basdxz.vbuffers.layout.impl.BufferStride;
@@ -34,8 +36,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected final Class<LAYOUT> layout;
     protected final LAYOUT proxy;
     protected final Stride stride;
-    protected final Map<String, SetterBack<?>> setters;
-    protected final Map<String, GetterBack<?>> getters;
+    protected final Map<Method, AccessFront> accessFronts;
+    //    protected final Map<String, SetterBack<?>> setters;
+//    protected final Map<String, GetterBack<?>> getters;
     protected final int strideSizeBytes;
     protected final ByteBuffer backing;
     protected final int capacity;
@@ -60,8 +63,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.proxy = initProxy();
         this.stride = stride;
         // Attribute maps are immutable as they are shared between multiple VBufferHandlers
-        this.setters = Collections.unmodifiableMap(setters);
-        this.getters = Collections.unmodifiableMap(getters);
+        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
+//        this.setters = Collections.unmodifiableMap(setters);
+//        this.getters = Collections.unmodifiableMap(getters);
         this.strideSizeBytes = strideSizeBytes;
         this.backing = allocator.allocate(strideSizeBytes * capacity);
         this.capacity = capacity;
@@ -77,8 +81,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.setters = other.setters;
-        this.getters = other.getters;
+        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
+//        this.setters = other.setters;
+//        this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
         this.backing = other.backing;
         this.capacity = other.capacity;
@@ -93,8 +98,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = other.layout;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.setters = other.setters;
-        this.getters = other.getters;
+        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(proxy, stride, layout));
+//        this.setters = other.setters;
+//        this.getters = other.getters;
         this.strideSizeBytes = other.strideSizeBytes;
         this.capacity = size;
         this.position = 0;
@@ -389,42 +395,38 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
         if (!v$hasRemaining())
             throw new BufferUnderflowException();
-        val attributeName = method.getName();
-
-        // If the args not null, assume this is a setter with a single argument
-        if (args != null) {
-            put(attributeName, args[0]);
-            return proxy;
-        }
-        return get(attributeName);
+        val accessFront = accessFronts.get(method);
+        if (accessFront.writing())
+            ensureWritable();
+        return accessFront.access(backing, strideIndexToBytes(position), args);
     }
 
-    protected void put(String attributeName, Object value) {
-        ensureWritable();
-        try {
-            attributeSetter(attributeName).put(backing, attributeOffset(attributeName), value);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
-        }
-    }
+//    protected void put(String attributeName, Object value) {
+//        ensureWritable();
+//        try {
+//            attributeSetter(attributeName).put(backing, attributeOffset(attributeName), value);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to set attribute %s to value: %s".formatted(attributeName, value.toString()), e);
+//        }
+//    }
+//
+//    protected Object get(String attributeName) {
+//        try {
+//            return attributeGetter(attributeName).get(backing, attributeOffset(attributeName), null);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
+//        }
+//    }
 
-    protected Object get(String attributeName) {
-        try {
-            return attributeGetter(attributeName).get(backing, attributeOffset(attributeName), null);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get attribute %s".formatted(attributeName), e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> SetterBack<T> attributeSetter(String attributeName) {
-        return (SetterBack<T>) setters.get(attributeName);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T> GetterBack<T> attributeGetter(String attributeName) {
-        return (GetterBack<T>) getters.get(attributeName);
-    }
+//    @SuppressWarnings("unchecked")
+//    protected <T> SetterBack<T> attributeSetter(String attributeName) {
+//        return (SetterBack<T>) setters.get(attributeName);
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    protected <T> GetterBack<T> attributeGetter(String attributeName) {
+//        return (GetterBack<T>) getters.get(attributeName);
+//    }
 
     protected int attributeOffset(String attributeName) {
         return stride.attributeMap().get(attributeName).offsetBytes() + strideIndexToBytes(position);

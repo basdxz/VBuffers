@@ -6,9 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.nio.ByteBuffer;
 
-@FunctionalInterface
 public interface AccessFront {
-    Object access(ByteBuffer back, int offsetBytes, Object... args) throws Throwable;
+    Object access(ByteBuffer back, int offsetBytes, Object... args);
+
+    boolean writing();
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)

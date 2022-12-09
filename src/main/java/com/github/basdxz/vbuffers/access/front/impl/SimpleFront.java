@@ -12,6 +12,8 @@ public class SimpleFront implements AccessFront {
     protected final IdxHandler idxHandler;
     protected final ReturnHandler returnHandler;
     protected final List<ParameterHandler> parameterHandlers;
+    @Getter
+    protected final boolean writing;
 
     public SimpleFront(IdxHandler idxHandler, ReturnHandler returnHandler, List<ParameterHandler> parameterHandlers) {
         this.idxHandler = idxHandler;
@@ -28,10 +30,11 @@ public class SimpleFront implements AccessFront {
             if (matchingParameterHandler.isPresent())
                 throw new IllegalArgumentException("Multiple parameter handlers with the same attribute " + attribute.name());
         }
+        this.writing = parameterHandlers.stream().anyMatch(parameterHandler -> parameterHandler instanceof InParameterHandler);
     }
 
     @Override
-    public Object access(ByteBuffer back, int offsetBytes, Object... args) throws Throwable {
+    public Object access(ByteBuffer back, int offsetBytes, Object... args) {
         offsetBytes += strideOffsetBytes(args);
         for (val handler : parameterHandlers)
             handler.handle(back, offsetBytes, args);

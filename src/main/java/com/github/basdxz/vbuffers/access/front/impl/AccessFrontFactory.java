@@ -8,10 +8,21 @@ import lombok.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AccessFrontFactory {
+    public static Map<Method, AccessFront> accessFronts(Object chainable, Stride stride, Class<?> layout) {
+        val accessFronts = new HashMap<Method, AccessFront>();
+        for (val method : layout.getMethods()) {
+            val accessFront = create(chainable, stride, method);
+            accessFronts.put(method, accessFront);
+        }
+        return accessFronts;
+    }
+
     public static AccessFront create(Object chainable, Stride stride, Method method) {
         val idxHandler = newIdxHandler(stride, method);
         val parameterHandlers = newParameterHandlers(stride, method);

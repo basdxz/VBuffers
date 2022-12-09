@@ -9,5 +9,5 @@ public interface ParameterHandler {
 
     int parameterIndex();
 
-    void handle(ByteBuffer back, int offsetBytes, Object... args) throws Throwable;
+    void handle(ByteBuffer back, int offsetBytes, Object... args);
 }
