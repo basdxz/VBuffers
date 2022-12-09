@@ -1,0 +1,36 @@
+package com.github.basdxz.vbuffers;
+
+import com.github.basdxz.vbuffers.attribute.Layout;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+
+import static com.github.basdxz.vbuffers.AccessLayoutB.*;
+import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
+
+@Layout({@Layout.Attribute(name = POSITION, type = Vector3f.class),
+         @Layout.Attribute(name = NORMAL, type = Vector3f.class),
+         @Layout.Attribute(name = COLOR, type = Vector4f.class),
+         @Layout.Attribute(name = TEXTURE, type = Vector2f.class)})
+public interface AccessLayoutB extends VBuffer<AccessLayoutB> {
+    String POSITION = "position";
+    String NORMAL = "normal";
+    String COLOR = "color";
+    String TEXTURE = "texture";
+
+    @Chain AccessLayoutB position(@In(POSITION) Vector3f value);
+
+    @Out(POSITION) Vector3f position();
+
+    @Chain AccessLayoutB normal(@In(NORMAL) Vector3f value);
+
+    @Out(NORMAL) Vector3f normal();
+
+    @Chain AccessLayoutB color(@In(COLOR) Vector4f value);
+
+    @Out(COLOR) Vector4f color();
+
+    @Chain AccessLayoutB texture(@In(TEXTURE) Vector2f value);
+
+    @Out(TEXTURE) Vector2f texture();
+}

@@ -1,48 +1,46 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.access.front.GetterFront;
-import com.github.basdxz.vbuffers.access.front.SetterFront;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
+
+import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
 
 public interface FrontAccessSample {
-    @SetterFront.Access
-    void set0(int input);
+    // Setters
+    void set0(@In("x") Vector2f input);
 
-    @SetterFront.Access
-    void set1(int input, int offsetStrides);
+    void set1(@In("x") Vector2f input, @Idx int offsetStrides);
 
-    @SetterFront.Access
-    FrontAccessSample set2(int input);
+    @Chain FrontAccessSample set2(@In("x") Vector2f input);
 
-    @SetterFront.Access
-    FrontAccessSample set3(int input, int offsetStrides);
+    @Chain FrontAccessSample set3(@In("x") Vector2f input, @Idx int offsetStrides);
 
-    @SetterFront.Access
-    int set4(int input);
+    @In("x") Vector2f set4(@In("x") Vector2f input);
 
-    @SetterFront.Access
-    int set5(int input, int offsetStrides);
+    @In("x") Vector2f set5(@In("x") Vector2f input, @Idx int offsetStrides);
 
-    @GetterFront.Access
-    void get0(int output);
+    void setVertex(@Idx int offsetStrides,
+                   @In("position") Vector4fc position,
+                   @In("normal") Vector4fc normal,
+                   @In("color") Vector3fc color,
+                   @In("texture") Vector2fc texture);
 
-    @GetterFront.Access
-    void get1(int output, int offsetStrides);
+    // Getters
+    void get0(@Out("x") Vector2f output);
 
-    @GetterFront.Access
-    FrontAccessSample get2(int output);
+    void get1(@Out("x") Vector2f output, @Idx int offsetStrides);
 
-    @GetterFront.Access
-    FrontAccessSample get3(int output, int offsetStrides);
+    @Chain FrontAccessSample get2(@Out("x") Vector2f output);
 
-    @GetterFront.Access
-    int get4();
+    @Chain FrontAccessSample get3(@Out("x") Vector2f output, @Idx int offsetStrides);
 
-    @GetterFront.Access
-    int get5(int offsetStrides);
+    @Out("x") Vector2f get4();
 
-    @GetterFront.Access
-    int get6(int output);
+    @Out("x") Vector2f get5(@Idx int offsetStrides);
 
-    @GetterFront.Access
-    int get7(int output, int offsetStrides);
+    @Out("x") Vector2f get6(@Out("x") Vector2f output);
+
+    @Out("x") Vector2f get7(@Out("x") Vector2f output, @Idx int offsetStrides);
 }
