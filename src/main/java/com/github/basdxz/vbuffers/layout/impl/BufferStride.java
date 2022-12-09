@@ -17,6 +17,8 @@ public class BufferStride implements Stride {
         val attributes = layout.value();
         if (attributes.length == 0)
             throw new IllegalArgumentException("Layout must have at least one attribute");
+
+        // Becomes the total size at the end of the loop
         var offsetBytes = 0;
         val attributeList = new ArrayList<Attribute>(attributes.length);
         val attributeMap = new HashMap<String, Attribute>(attributes.length);
@@ -26,6 +28,7 @@ public class BufferStride implements Stride {
             attributeMap.put(attribute.name(), bufferAttribute);
             offsetBytes += bufferAttribute.sizeBytes();
         }
+
         this.attributeList = Collections.unmodifiableList(attributeList);
         this.attributeMap = Collections.unmodifiableMap(attributeMap);
         this.sizeBytes = offsetBytes;
