@@ -47,9 +47,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     // Normal Constructor
     protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
-        val layoutAnnotation = layout.getAnnotation(Layout.class);
-        Objects.requireNonNull(layoutAnnotation, "Layout interface must have a @Layout annotation");
-
         val stride = new BufferStride(layout.getAnnotation(Layout.class));
         val strideSizeBytes = stride.sizeBytes();
         val setters = new HashMap<String, SetterBack<?>>();
