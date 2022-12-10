@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-import static com.github.basdxz.vbuffers.helper.BytesConverter.*;
+import static com.github.basdxz.vbuffers.helper.ByteHelper.*;
 
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

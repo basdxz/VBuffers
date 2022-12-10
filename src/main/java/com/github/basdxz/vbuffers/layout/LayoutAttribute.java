@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers.layout;
 
-import com.github.basdxz.vbuffers.helper.SizeBytes;
+import com.github.basdxz.vbuffers.helper.ByteHelper;
 import lombok.*;
 
 @Getter
@@ -13,7 +13,7 @@ public class LayoutAttribute implements Attribute {
     public LayoutAttribute(Layout.Attribute annotation, int offsetBytes) {
         this.name = annotation.name();
         this.type = annotation.type();
-        this.sizeBytes = SizeBytes.of(this.type);
+        this.sizeBytes = ByteHelper.sizeBytes(this.type);
         this.offsetBytes = offsetBytes;
     }
 }
