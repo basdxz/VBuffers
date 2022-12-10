@@ -2,10 +2,6 @@ package com.github.basdxz.vbuffers.binding;
 
 import lombok.*;
 
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -13,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.basdxz.vbuffers.binding.Bindings.*;
+import static com.github.basdxz.vbuffers.helper.LambdaHelper.newLambdaMetaFactory;
 
 // TODO: Convert from singleton
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,82 +38,49 @@ public final class BindingProvider {
               .forEach(BindingProvider::addAccessors);
     }
 
-    public static void addAccessors(Method method) {
+    private static void addAccessors(Method method) {
         try {
             addSetterIfAnnotated(method);
             addGetterIfAnnotated(method);
-            addImutableGetterIfAnnotated(method);
+            addAllocatingGetterIfAnnotated(method);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to add accessors for method: " + method.getName(), t);
         }
     }
 
-    public static void addSetterIfAnnotated(Method method) throws Throwable {
+    private static void addSetterIfAnnotated(Method method) throws Throwable {
         val annotation = method.getAnnotation(Put.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Setter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(SetterBinding.class, method).invoke();
+        val lambda = newLambdaMetaFactory(SetterBinding.class, method).invoke();
         for (val classType : classTypes)
             setters.put(classType, (SetterBinding<?>) lambda);
     }
 
-    public static void addGetterIfAnnotated(Method method) throws Throwable {
+    private static void addGetterIfAnnotated(Method method) throws Throwable {
         val annotation = method.getAnnotation(Get.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(GetterBinding.class, method).invoke();
+        val lambda = newLambdaMetaFactory(GetterBinding.class, method).invoke();
         for (val classType : classTypes)
             getters.put(classType, (GetterBinding<?>) lambda);
     }
 
-    public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
+    private static void addAllocatingGetterIfAnnotated(Method method) throws Throwable {
         val annotation = method.getAnnotation(NewGet.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(GetterBinding.Allocating.class, method).invoke();
+        val lambda = newLambdaMetaFactory(GetterBinding.Allocating.class, method).invoke();
         for (val classType : classTypes)
             getters.put(classType, (GetterBinding.Allocating<?>) lambda);
-    }
-
-    public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {
-        try {
-            // Get the method handle for the functional interface
-            if (functionalInterface.getAnnotation(FunctionalInterface.class) == null)
-                throw new IllegalArgumentException(functionalInterface.getName() + " is not a functional interface");
-            val interfaceMethod = Arrays.stream(functionalInterface.getDeclaredMethods())
-                                        .filter(method1 -> !method1.isDefault())
-                                        .findFirst()
-                                        .orElseThrow();
-            val interfaceMethodName = interfaceMethod.getName();
-            val factoryType = MethodType.methodType(functionalInterface);
-            val interfaceMethodType = MethodType.methodType(interfaceMethod.getReturnType(), interfaceMethod.getParameterTypes());
-
-            // Get the method handle for the static method
-            val lookup = MethodHandles.lookup();
-            val implementation = lookup.unreflect(staticMethod);
-            val dynamicMethodType = implementation.type();
-
-            return LambdaMetafactory
-                    .metafactory(lookup,
-                                 interfaceMethodName,
-                                 factoryType,
-                                 interfaceMethodType,
-                                 implementation,
-                                 dynamicMethodType)
-                    .getTarget();
-        } catch (Throwable throwable) {
-            throw new RuntimeException("Failed to bind method: %s to functional interface: %s"
-                                               .formatted(staticMethod.getName(), functionalInterface.getName()),
-                                       throwable);
-        }
     }
 }
