@@ -9,12 +9,15 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
+import static com.github.basdxz.vbuffers.shaderdemo.SeascapeDemo.ballerFragmentShader;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class ShaderDemo {
-    private static final int CANVAS_WIDTH = 1000;
-    private static final int CANVAS_HEIGHT = 1000;
-    private static final int POINT_COUNT = CANVAS_WIDTH * CANVAS_HEIGHT;
+    public static final int CANVAS_WIDTH = 1000;
+    public static final int CANVAS_HEIGHT = 1000;
+    public static final int POINT_COUNT = CANVAS_WIDTH * CANVAS_HEIGHT;
+
+    public static Vector2f iResolution = new Vector2f(CANVAS_WIDTH, CANVAS_HEIGHT);
 
     public static void main(String[] args) {
         // Create shader buffer
@@ -39,11 +42,12 @@ public class ShaderDemo {
     }
 
     private static void applyUV(@NonNull ShaderLayout buffer, int x, int y) {
-        buffer.uv(new Vector2f(x / (float) CANVAS_WIDTH, y / (float) CANVAS_HEIGHT));
+        buffer.uv(new Vector2f(x, y));
     }
 
     private static void render(ShaderLayout stride) {
-        stride.color(fragmentShader(stride.uv()));
+//        stride.color(fragmentShader(stride.uv()));
+        stride.color(ballerFragmentShader(stride.uv()));
     }
 
     private static Vector3f fragmentShader(Vector2f uv) {
