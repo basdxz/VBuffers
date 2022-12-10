@@ -1,6 +1,6 @@
-package com.github.basdxz.vbuffers.accessor.back.bind.impl;
+package com.github.basdxz.vbuffers.binding.impl;
 
-import com.github.basdxz.vbuffers.accessor.back.bind.BackingAccessorBindings;
+import com.github.basdxz.vbuffers.binding.Bindings;
 import lombok.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 //TODO: Complete this for all JOML types
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JOMLBindings implements BackingAccessorBindings {
+public final class JOMLBindings implements Bindings {
     @VSetter(Vector2f.class)
     public static void putVector2f(ByteBuffer buffer, int offsetBytes, Vector2f value) {
         value.get(offsetBytes, buffer);

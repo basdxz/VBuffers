@@ -1,13 +1,13 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.back.impl.BackingAccessors;
+import com.github.basdxz.vbuffers.binding.impl.BackingAccessors;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class PrimitiveBackingAccessorBindingsTest {
+public class PrimitiveBindingsTest {
     protected static final int BUFFER_SIZE_BYTES = 1024;
     protected static final int OFFSET_BYTES = 456;
 

@@ -1,6 +1,6 @@
-package com.github.basdxz.vbuffers.accessor.back.bind.impl;
+package com.github.basdxz.vbuffers.binding.impl;
 
-import com.github.basdxz.vbuffers.accessor.back.bind.BackingAccessorBindings;
+import com.github.basdxz.vbuffers.binding.Bindings;
 import lombok.*;
 
 import java.nio.ByteBuffer;
@@ -9,7 +9,7 @@ import static com.github.basdxz.vbuffers.helper.BytesConverter.*;
 
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PrimitiveBindings implements BackingAccessorBindings {
+public final class PrimitiveBindings implements Bindings {
     @VSetter({byte.class, Byte.class})
     public static void putByte(ByteBuffer buffer, int offsetBytes, Byte value) {
         buffer.put(offsetBytes, value);
