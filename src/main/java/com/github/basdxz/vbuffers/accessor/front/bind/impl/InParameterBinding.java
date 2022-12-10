@@ -20,7 +20,7 @@ public class InParameterBinding implements ParameterBinding {
     @SuppressWarnings("unchecked")
     public InParameterBinding(Stride stride, Layout.In annotation, int parameterIndex) {
         this.parameterIndex = parameterIndex;
-        this.attribute = stride.attributeMap().get(annotation.value());
+        this.attribute = stride.attributes().get(annotation.value());
         this.setter = (BackingSetter<Object>) BackingAccessors.setter(this.attribute.type());
     }
 

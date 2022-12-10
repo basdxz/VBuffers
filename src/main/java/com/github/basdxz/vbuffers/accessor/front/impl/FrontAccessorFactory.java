@@ -16,9 +16,9 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FrontAccessorFactory {
-    public static Map<Method, FrontAccessor> accessFronts(Stride stride, Class<?> layout) {
+    public static Map<Method, FrontAccessor> accessFronts(Stride stride) {
         val accessFronts = new HashMap<Method, FrontAccessor>();
-        for (val method : layout.getDeclaredMethods()) {// Currently does not account properly for hierarchy
+        for (val method : stride.methods()) {// Currently does not account properly for hierarchy
             val accessFront = create(stride, method);
             accessFronts.put(method, accessFront);
         }

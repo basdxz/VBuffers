@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
+public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
                                                              Spliterator.DISTINCT |
@@ -48,9 +48,9 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
-        this.stride = new LayoutStride(layout.getAnnotation(Layout.Stride.class));
+        this.stride = new LayoutStride(layout);
         this.backingBuffer = allocator.apply(this.stride.sizeBytes() * capacity);
-        this.methodAccessors = Collections.unmodifiableMap(FrontAccessorFactory.accessFronts(this.stride, layout));
+        this.methodAccessors = Collections.unmodifiableMap(FrontAccessorFactory.accessFronts(this.stride));
 
         // Set Default pointer values
         this.position = 0;
@@ -110,13 +110,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     // Static constructor
-    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT
+    public static <LAYOUT extends Layout<LAYOUT>> LAYOUT
     newBuffer(@NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator) {
         return newBuffer(layout, allocator, 1);
     }
 
     // Static constructor
-    public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(
+    public static <LAYOUT extends Layout<LAYOUT>> LAYOUT newBuffer(
             @NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         return new VBufferHandler<>(layout, allocator, capacity).proxy;
     }
@@ -383,7 +383,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     protected int attributeOffset(String attributeName) {
-        return stride.attributeMap().get(attributeName).offsetBytes() + strideIndexToBytes(position);
+        return stride.attributes().get(attributeName).offsetBytes() + strideIndexToBytes(position);
     }
 
     protected int strideIndexToBytes(int strideIndex) {

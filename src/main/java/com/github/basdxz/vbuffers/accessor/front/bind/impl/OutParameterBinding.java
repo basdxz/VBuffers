@@ -21,7 +21,7 @@ public class OutParameterBinding implements ParameterBinding {
     @SuppressWarnings("unchecked")
     public OutParameterBinding(Stride stride, Layout.Out annotation, int parameterIndex) {
         this.parameterIndex = parameterIndex;
-        this.attribute = stride.attributeMap().get(annotation.value());
+        this.attribute = stride.attributes().get(annotation.value());
         this.getter = (BackingGetter<Object>) BackingAccessors.setter(this.attribute.type());
         if (getter instanceof BackingGetter.Immutable)
             throw new IllegalArgumentException("Cannot use immutable getter for out parameter");

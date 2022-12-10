@@ -18,7 +18,7 @@ public class OutReturnBinding implements ReturnBinding {
     @SuppressWarnings("unchecked")
     public OutReturnBinding(Stride stride, Layout.Out annotation, OutParameterBinding outParameterHandler) {
         val name = annotation.value();
-        this.attribute = stride.attributeMap().get(name);
+        this.attribute = stride.attributes().get(name);
         this.backingGetter = (BackingGetter<Object>) BackingAccessors.getter(this.attribute.type());
         this.outParameterIndex = outParameterHandler == null ? -1 : outParameterHandler.parameterIndex();
     }

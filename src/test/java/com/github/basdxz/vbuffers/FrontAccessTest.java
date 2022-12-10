@@ -1,7 +1,6 @@
 package com.github.basdxz.vbuffers;
 
 import com.github.basdxz.vbuffers.accessor.front.impl.FrontAccessorFactory;
-import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.impl.LayoutStride;
 import com.github.basdxz.vbuffers.samples.FrontAccessSimpleSample;
 import lombok.*;
@@ -15,7 +14,7 @@ public class FrontAccessTest {
     public void test() throws Throwable {
         val clazz = FrontAccessSimpleSample.class;
 
-        val stride = new LayoutStride(clazz.getAnnotation(Layout.Stride.class));
+        val stride = new LayoutStride(clazz);
 
         val setterMethod = clazz.getMethod("set", int.class);
         val gettterMethod = clazz.getMethod("get");

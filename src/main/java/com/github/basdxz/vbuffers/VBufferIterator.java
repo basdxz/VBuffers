@@ -1,11 +1,12 @@
 package com.github.basdxz.vbuffers;
 
+import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;
 
 import java.util.Iterator;
 
 @AllArgsConstructor
-public class VBufferIterator<LAYOUT extends VBuffer<LAYOUT>> implements Iterator<LAYOUT> {
+public class VBufferIterator<LAYOUT extends Layout<LAYOUT>> implements Iterator<LAYOUT> {
     protected final VBufferHandler<LAYOUT> bufferHandler;
 
     @Override
