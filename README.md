@@ -18,12 +18,11 @@
 
 #### Layout
 
-| Name                 | Priority  | Impl | Test | Docs | Bench |
-|----------------------|-----------|------|------|------|-------|
-| Definition           | Essential | ✴️   | ❌    | ❌    | ❌     |
-| Size Constraints     | High      | ❌    | ❌    | ❌    | ❌     |
-| Custom Alignment     | High      | ❌    | ❌    | ❌    | ❌     |
-| Annotation Inference | Neat      | ❌    | ❌    | ❌    | ❌     |
+| Name             | Priority  | Impl | Test | Docs | Bench |
+|------------------|-----------|------|------|------|-------|
+| Definition       | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Size Constraints | High      | ❌    | ❌    | ❌    | ❌     |
+| Custom Alignment | High      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
@@ -32,11 +31,10 @@
 | Name                         | Priority  | Impl | Test | Docs | Bench |
 |------------------------------|-----------|------|------|------|-------|
 | Definition                   | Essential | ✴️   | ❌    | ❌    | ❌     |
-| Mutator/Accessor Annotations | High      | ❌    | ❌    | ❌    | ❌     |
+| Mutator/Accessor Annotations | High      | ✴️   | ❌    | ❌    | ❌     |
 | Name Aliasing                | High      | ❌    | ❌    | ❌    | ❌     |
 | Type Aliasing                | Neat      | ❌    | ❌    | ❌    | ❌     |
 | Different I/O Class Types    | Neat      | ❌    | ❌    | ❌    | ❌     |
-| Mutator/Accessor Templates   | Neat      | ❌    | ❌    | ❌    | ❌     |
 
 <br>
 
@@ -57,8 +55,8 @@
 
 | Name                | Priority  | Impl | Test | Docs | Bench |
 |---------------------|-----------|------|------|------|-------|
-| Definition          | Essential | ❌    | ❌    | ❌    | ❌     |
 | ByteBuffer/Java NIO | Essential | ✴️   | ✴️   | ❌    | ❌     |
+| Abstract Definition | High      | ❌    | ❌    | ❌    | ❌     |
 | MemorySegment       | High      | ❌    | ❌    | ❌    | ❌     |
 | Java Unsafe         | Neat      | ❌    | ❌    | ❌    | ❌     |
 | Disk/Filesystem     | Neat      | ❌    | ❌    | ❌    | ❌     |
@@ -79,7 +77,7 @@ ASM will take longer to implement but will be much faster and more efficient.
 
 <br>
 
-#### ByteBuffer-esq API
+#### NIO Based API
 
 | Name           | Priority | Impl | Test | Docs | Bench |
 |----------------|----------|------|------|------|-------|
