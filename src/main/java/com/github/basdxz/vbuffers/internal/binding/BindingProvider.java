@@ -54,7 +54,7 @@ public final class BindingProvider {
     }
 
     public static void addSetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VSetter.class);
+        val annotation = method.getAnnotation(Put.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
@@ -66,7 +66,7 @@ public final class BindingProvider {
     }
 
     public static void addGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VGetter.class);
+        val annotation = method.getAnnotation(Get.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
@@ -78,7 +78,7 @@ public final class BindingProvider {
     }
 
     public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(VImmutableGetter.class);
+        val annotation = method.getAnnotation(ImGet.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();

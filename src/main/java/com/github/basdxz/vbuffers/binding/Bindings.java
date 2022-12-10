@@ -6,23 +6,22 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-// These only have a 'V' prefix to avoid collisions with Lombok's @Getter and @Setter annotations.
 public interface Bindings {
     @Target(METHOD)
     @Retention(RUNTIME)
-    @interface VSetter {
+    @interface Put {
         Class<?>[] value();
     }
 
     @Target(METHOD)
     @Retention(RUNTIME)
-    @interface VGetter {
+    @interface Get {
         Class<?>[] value();
     }
 
     @Target(METHOD)
     @Retention(RUNTIME)
-    @interface VImmutableGetter {
+    @interface ImGet {
         Class<?>[] value();
     }
 }
