@@ -2,8 +2,6 @@ package com.github.basdxz.vbuffers.sample;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 
-import static com.github.basdxz.vbuffers.layout.Layout.Attr;
-import static com.github.basdxz.vbuffers.old.samples.LayoutA.Stride;
 import static com.github.basdxz.vbuffers.sample.XYZBuffer.*;
 
 @Stride({@Attr(name = x, type = Integer.class),
