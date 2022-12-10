@@ -1,8 +1,10 @@
-package com.github.basdxz.vbuffers.access.front.impl;
+package com.github.basdxz.vbuffers.accessor.front.impl;
 
-import com.github.basdxz.vbuffers.access.front.AccessFront;
-import com.github.basdxz.vbuffers.access.front.ParameterHandler;
-import com.github.basdxz.vbuffers.access.front.ReturnHandler;
+import com.github.basdxz.vbuffers.accessor.front.FrontAccessor;
+import com.github.basdxz.vbuffers.accessor.front.handler.ParameterHandler;
+import com.github.basdxz.vbuffers.accessor.front.handler.ReturnHandler;
+import com.github.basdxz.vbuffers.accessor.front.handler.impl.*;
+import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
 
@@ -13,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AccessFrontFactory {
-    public static Map<Method, AccessFront> accessFronts(Stride stride, Class<?> layout) {
-        val accessFronts = new HashMap<Method, AccessFront>();
+public final class FrontAccessorFactory {
+    public static Map<Method, FrontAccessor> accessFronts(Stride stride, Class<?> layout) {
+        val accessFronts = new HashMap<Method, FrontAccessor>();
         for (val method : layout.getMethods()) {
             val accessFront = create(stride, method);
             accessFronts.put(method, accessFront);
@@ -23,11 +25,11 @@ public final class AccessFrontFactory {
         return accessFronts;
     }
 
-    public static AccessFront create(Stride stride, Method method) {
+    public static FrontAccessor create(Stride stride, Method method) {
         val idxHandler = newIdxHandler(stride, method);
         val parameterHandlers = newParameterHandlers(stride, method);
         val returnHandler = newReturnHandler(stride, method, parameterHandlers);
-        return new SimpleFront(idxHandler, returnHandler, parameterHandlers);
+        return new FrontAccessorHandler(idxHandler, returnHandler, parameterHandlers);
     }
 
     private static IdxHandler newIdxHandler(Stride stride, Method method) {
@@ -35,7 +37,7 @@ public final class AccessFrontFactory {
         for (var i = 0; i < parameters.length; i++) {
             val annotations = parameters[i].getAnnotatedType().getAnnotations();
             for (val annotation : annotations)
-                if (annotation instanceof AccessFront.Idx)
+                if (annotation instanceof Layout.Idx)
                     return new IdxHandler(i, stride.sizeBytes());
         }
         return null;
@@ -47,9 +49,9 @@ public final class AccessFrontFactory {
         for (var i = 0; i < parameters.length; i++) {
             val annotations = parameters[i].getAnnotatedType().getAnnotations();
             for (val annotation : annotations) {
-                if (annotation instanceof AccessFront.In inAnnotation)
+                if (annotation instanceof Layout.In inAnnotation)
                     parameterHandlers.add(new InParameterHandler(stride, inAnnotation, i));
-                if (annotation instanceof AccessFront.Out outAnnotation)
+                if (annotation instanceof Layout.Out outAnnotation)
                     parameterHandlers.add(new OutParameterHandler(stride, outAnnotation, i));
             }
         }
@@ -61,9 +63,9 @@ public final class AccessFrontFactory {
                                                   List<ParameterHandler> parameterHandlers) {
         val annotations = method.getAnnotatedReturnType().getAnnotations();
         for (val annotation : annotations) {
-            if (annotation instanceof AccessFront.Chain)
+            if (annotation instanceof Layout.Chain)
                 return new ChainReturnHandler();
-            if (annotation instanceof AccessFront.In in) {
+            if (annotation instanceof Layout.In in) {
                 val inParameter = parameterHandlers.stream()
                                                    .filter(parameterHandler -> in.value().equals(parameterHandler.attribute().name()))
                                                    .filter(parameterHandler -> parameterHandler instanceof InParameterHandler)
@@ -73,13 +75,13 @@ public final class AccessFrontFactory {
                     throw new IllegalArgumentException("No in parameter with name " + in.value() + " found");
                 return new InReturnHandler(inParameter.get());
             }
-            if (annotation instanceof AccessFront.Out out) {
+            if (annotation instanceof Layout.Out out) {
                 val outParameter = parameterHandlers.stream()
                                                     .filter(parameterHandler -> out.value().equals(parameterHandler.attribute().name()))
                                                     .filter(parameterHandler -> parameterHandler instanceof OutParameterHandler)
                                                     .map(parameterHandler -> (OutParameterHandler) parameterHandler)
                                                     .findFirst();
-                return new OutReturnHandler(stride, (AccessFront.Out) annotation, outParameter.orElse(null));
+                return new OutReturnHandler(stride, (Layout.Out) annotation, outParameter.orElse(null));
             }
         }
         return new VoidReturnHandler();

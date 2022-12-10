@@ -8,13 +8,13 @@ import lombok.*;
 import java.util.*;
 
 @Getter
-public class BufferStride implements Stride {
+public class LayoutStride implements Stride {
     protected final List<Attribute> attributeList;
     protected final Map<String, Attribute> attributeMap;
     protected final int sizeBytes;
 
-    public BufferStride(Layout layout) {
-        val attributes = layout.value();
+    public LayoutStride(Layout.Stride annotation) {
+        val attributes = annotation.value();
         if (attributes.length == 0)
             throw new IllegalArgumentException("Layout must have at least one attribute");
 
@@ -23,12 +23,13 @@ public class BufferStride implements Stride {
         val attributeList = new ArrayList<Attribute>(attributes.length);
         val attributeMap = new HashMap<String, Attribute>(attributes.length);
         for (val attribute : attributes) {
-            val bufferAttribute = new BufferAttribute(attribute, offsetBytes);
+            val bufferAttribute = new LayoutAttribute(attribute, offsetBytes);
             attributeList.add(bufferAttribute);
             attributeMap.put(attribute.name(), bufferAttribute);
             offsetBytes += bufferAttribute.sizeBytes();
         }
 
+        // Made unmodifiable as both are exposed via getters
         this.attributeList = Collections.unmodifiableList(attributeList);
         this.attributeMap = Collections.unmodifiableMap(attributeMap);
         this.sizeBytes = offsetBytes;

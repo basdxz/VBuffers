@@ -5,7 +5,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 
-import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
+import static com.github.basdxz.vbuffers.layout.Layout.*;
 
 public interface FrontAccessSample {
     // Setters

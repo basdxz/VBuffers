@@ -1,17 +1,14 @@
 package com.github.basdxz.vbuffers.samples;
 
-import com.github.basdxz.vbuffers.VBuffer;
 import com.github.basdxz.vbuffers.layout.Layout;
-import com.github.basdxz.vbuffers.layout.Layout.Attribute;
 
-import static com.github.basdxz.vbuffers.access.front.AccessFront.*;
 import static com.github.basdxz.vbuffers.samples.LayoutA.*;
 
-@Layout({@Attribute(name = POSITION, type = Integer.class),
+@Stride({@Attribute(name = POSITION, type = Integer.class),
          @Attribute(name = NORMAL, type = Integer.class),
          @Attribute(name = COLOR, type = Integer.class),
          @Attribute(name = TEXTURE, type = Integer.class)})
-public interface LayoutA extends VBuffer<LayoutA> {
+public interface LayoutA extends Layout<LayoutA> {
     String POSITION = "position";
     String NORMAL = "normal";
     String COLOR = "color";

@@ -1,10 +1,10 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.access.front.AccessFront;
-import com.github.basdxz.vbuffers.access.front.impl.AccessFrontFactory;
+import com.github.basdxz.vbuffers.accessor.front.FrontAccessor;
+import com.github.basdxz.vbuffers.accessor.front.impl.FrontAccessorFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
-import com.github.basdxz.vbuffers.layout.impl.BufferStride;
+import com.github.basdxz.vbuffers.layout.impl.LayoutStride;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,12 +31,11 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
                                                              Spliterator.SUBSIZED;
 
     protected final Class<LAYOUT> layout;
+    protected final int capacity;
     protected final LAYOUT proxy;
     protected final Stride stride;
-    protected final Map<Method, AccessFront> accessFronts;
-    protected final int strideSizeBytes;
-    protected final ByteBuffer backing;
-    protected final int capacity;
+    protected final ByteBuffer backingBuffer;
+    protected final Map<Method, FrontAccessor> methodAccessors;
 
     protected int position;
     protected int limit;
@@ -46,12 +45,11 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     // Normal Constructor
     protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
         this.layout = layout;
-        this.proxy = initProxy();
-        this.stride = new BufferStride(layout.getAnnotation(Layout.class));
-        this.accessFronts = Collections.unmodifiableMap(AccessFrontFactory.accessFronts(stride, layout));
-        this.strideSizeBytes = stride.sizeBytes();
-        this.backing = allocator.allocate(strideSizeBytes * capacity);
         this.capacity = capacity;
+        this.proxy = initProxy();
+        this.stride = new LayoutStride(layout.getAnnotation(Layout.Stride.class));
+        this.backingBuffer = allocator.allocate(this.stride.sizeBytes() * capacity);
+        this.methodAccessors = Collections.unmodifiableMap(FrontAccessorFactory.accessFronts(this.stride, layout));
 
         // Set Default pointer values
         this.position = 0;
@@ -63,12 +61,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     // Copy constructor
     protected VBufferHandler(VBufferHandler<LAYOUT> other) {
         this.layout = other.layout;
+        this.capacity = other.capacity;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.accessFronts = other.accessFronts;
-        this.strideSizeBytes = other.strideSizeBytes;
-        this.backing = other.backing;
-        this.capacity = other.capacity;
+        this.backingBuffer = other.backingBuffer;
+        this.methodAccessors = other.methodAccessors;
+
+        // Copy pointer values
         this.position = other.position;
         this.limit = other.limit;
         this.mark = other.mark;
@@ -76,20 +75,21 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     }
 
     // Slice Copy constructor
-    protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int size) {
+    protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int capacity) {
         this.layout = other.layout;
+        this.capacity = capacity;
         this.proxy = initProxy();
         this.stride = other.stride;
-        this.accessFronts = other.accessFronts;
-        this.strideSizeBytes = other.strideSizeBytes;
-        this.capacity = size;
+        this.methodAccessors = other.methodAccessors;
+
+        // Set Default pointer values
         this.position = 0;
-        this.limit = size;
+        this.limit = capacity;
         this.mark = -1;
         this.readOnly = other.readOnly;
 
         // Get a slice of the backing buffer from the other handler and set it as the backing buffer
-        this.backing = other.backing.slice(strideIndexToBytes(startIndex), strideIndexToBytes(size));
+        this.backingBuffer = other.backingBuffer.slice(strideIndexToBytes(startIndex), strideIndexToBytes(capacity));
     }
 
     @SuppressWarnings("unchecked")
@@ -128,7 +128,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     @Override
     public ByteBuffer v$backing() {
-        return backing;
+        return backingBuffer;
     }
 
     @Override
@@ -235,7 +235,7 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
         val sourceOffsetBytes = strideIndexToBytes(sourceIndex);
         val targetOffsetBytes = strideIndexToBytes(targetIndex);
         val lengthBytes = strideIndexToBytes(length);
-        backing.put(targetOffsetBytes, backing, sourceOffsetBytes, lengthBytes);
+        backingBuffer.put(targetOffsetBytes, backingBuffer, sourceOffsetBytes, lengthBytes);
         return proxy;
     }
 
@@ -375,10 +375,10 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
         if (!v$hasRemaining())
             throw new BufferUnderflowException();
-        val accessFront = accessFronts.get(method);
+        val accessFront = methodAccessors.get(method);
         if (accessFront.writing())
             ensureWritable();
-        return accessFront.access(proxy, backing, strideIndexToBytes(position), args);
+        return accessFront.access(proxy, backingBuffer, strideIndexToBytes(position), args);
     }
 
     protected int attributeOffset(String attributeName) {
@@ -387,6 +387,6 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     protected int strideIndexToBytes(int strideIndex) {
         // Convert the stride index to stride bytes
-        return strideIndex * strideSizeBytes;
+        return strideIndex * stride.sizeBytes();
     }
 }

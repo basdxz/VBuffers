@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.access.front;
+package com.github.basdxz.vbuffers.accessor.front.handler;
 
 import com.github.basdxz.vbuffers.layout.Attribute;
 

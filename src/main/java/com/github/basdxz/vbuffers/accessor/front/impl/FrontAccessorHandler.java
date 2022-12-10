@@ -1,21 +1,23 @@
-package com.github.basdxz.vbuffers.access.front.impl;
+package com.github.basdxz.vbuffers.accessor.front.impl;
 
-import com.github.basdxz.vbuffers.access.front.AccessFront;
-import com.github.basdxz.vbuffers.access.front.ParameterHandler;
-import com.github.basdxz.vbuffers.access.front.ReturnHandler;
+import com.github.basdxz.vbuffers.accessor.front.FrontAccessor;
+import com.github.basdxz.vbuffers.accessor.front.handler.ParameterHandler;
+import com.github.basdxz.vbuffers.accessor.front.handler.ReturnHandler;
+import com.github.basdxz.vbuffers.accessor.front.handler.impl.IdxHandler;
+import com.github.basdxz.vbuffers.accessor.front.handler.impl.InParameterHandler;
 import lombok.*;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public class SimpleFront implements AccessFront {
+public class FrontAccessorHandler implements FrontAccessor {
     protected final IdxHandler idxHandler;
     protected final ReturnHandler returnHandler;
     protected final List<ParameterHandler> parameterHandlers;
     @Getter
     protected final boolean writing;
 
-    public SimpleFront(IdxHandler idxHandler, ReturnHandler returnHandler, List<ParameterHandler> parameterHandlers) {
+    public FrontAccessorHandler(IdxHandler idxHandler, ReturnHandler returnHandler, List<ParameterHandler> parameterHandlers) {
         this.idxHandler = idxHandler;
         this.returnHandler = returnHandler;
         this.parameterHandlers = parameterHandlers;

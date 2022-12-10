@@ -1,10 +1,10 @@
-package com.github.basdxz.vbuffers.access.front.impl;
+package com.github.basdxz.vbuffers.accessor.front.handler.impl;
 
-import com.github.basdxz.vbuffers.access.back.SetterBack;
-import com.github.basdxz.vbuffers.access.back.impl.AccessorBacks;
-import com.github.basdxz.vbuffers.access.front.AccessFront;
-import com.github.basdxz.vbuffers.access.front.ParameterHandler;
+import com.github.basdxz.vbuffers.accessor.back.BackingSetter;
+import com.github.basdxz.vbuffers.accessor.back.impl.BackingAccessorFactory;
+import com.github.basdxz.vbuffers.accessor.front.handler.ParameterHandler;
 import com.github.basdxz.vbuffers.layout.Attribute;
+import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
 
@@ -15,13 +15,13 @@ public class InParameterHandler implements ParameterHandler {
     protected final int parameterIndex;
     @Getter
     protected final Attribute attribute;
-    protected final SetterBack<Object> setter;
+    protected final BackingSetter<Object> setter;
 
     @SuppressWarnings("unchecked")
-    public InParameterHandler(Stride stride, AccessFront.In annotation, int parameterIndex) {
+    public InParameterHandler(Stride stride, Layout.In annotation, int parameterIndex) {
         this.parameterIndex = parameterIndex;
         this.attribute = stride.attributeMap().get(annotation.value());
-        this.setter = (SetterBack<Object>) AccessorBacks.setter(this.attribute.type());
+        this.setter = (BackingSetter<Object>) BackingAccessorFactory.setter(this.attribute.type());
     }
 
     @Override
