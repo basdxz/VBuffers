@@ -2,6 +2,7 @@ package com.github.basdxz.vbuffers.accessor;
 
 import com.github.basdxz.vbuffers.accessor.io.*;
 import com.github.basdxz.vbuffers.layout.Layout;
+import com.github.basdxz.vbuffers.layout.LayoutInfo;
 import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
 
@@ -13,10 +14,10 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AccessorFactory {
-    public static Map<Method, Accessor> accessFronts(Stride stride) {
+    public static Map<Method, Accessor> accessFronts(LayoutInfo layoutInfo) {
         val accessFronts = new HashMap<Method, Accessor>();
-        for (val method : stride.methods()) {// Currently does not account properly for hierarchy
-            val accessFront = create(stride, method);
+        for (val method : layoutInfo.methods()) {// Currently does not account properly for hierarchy
+            val accessFront = create(layoutInfo.stride(), method);
             accessFronts.put(method, accessFront);
         }
         return accessFronts;

@@ -1,7 +1,8 @@
 package com.github.basdxz.vbuffers.old;
 
 import com.github.basdxz.vbuffers.accessor.AccessorFactory;
-import com.github.basdxz.vbuffers.layout.LayoutStride;
+import com.github.basdxz.vbuffers.layout.Layout;
+import com.github.basdxz.vbuffers.layout.Stride;
 import com.github.basdxz.vbuffers.old.samples.FrontAccessSimpleSample;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +15,7 @@ public class FrontAccessTest {
     public void test() throws Throwable {
         val clazz = FrontAccessSimpleSample.class;
 
-        val stride = new LayoutStride(clazz);
+        val stride = new Stride(clazz.getAnnotation(Layout.Stride.class));
 
         val setterMethod = clazz.getMethod("set", int.class);
         val gettterMethod = clazz.getMethod("get");

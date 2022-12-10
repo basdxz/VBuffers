@@ -3,8 +3,7 @@ package com.github.basdxz.vbuffers.instance;
 import com.github.basdxz.vbuffers.accessor.Accessor;
 import com.github.basdxz.vbuffers.accessor.AccessorFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
-import com.github.basdxz.vbuffers.layout.LayoutStride;
-import com.github.basdxz.vbuffers.layout.Stride;
+import com.github.basdxz.vbuffers.layout.LayoutInfo;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +33,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
     private final Class<LAYOUT> layout;
     private final int capacity;
     private final LAYOUT proxy;
-    private final Stride stride;
+    private final LayoutInfo layoutInfo;
     private final ByteBuffer backingBuffer;
     private final Map<Method, Accessor> methodAccessors;
 
@@ -48,9 +47,9 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
-        this.stride = new LayoutStride(layout);
-        this.backingBuffer = allocator.apply(this.stride.sizeBytes() * capacity);
-        this.methodAccessors = Collections.unmodifiableMap(AccessorFactory.accessFronts(this.stride));
+        this.layoutInfo = new LayoutInfo(layout);
+        this.backingBuffer = allocator.apply(this.layoutInfo.stride().sizeBytes() * capacity);
+        this.methodAccessors = Collections.unmodifiableMap(AccessorFactory.accessFronts(this.layoutInfo));
 
         // Set Default pointer values
         this.position = 0;
@@ -64,7 +63,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
         this.layout = other.layout;
         this.capacity = other.capacity;
         this.proxy = initProxy();
-        this.stride = other.stride;
+        this.layoutInfo = other.layoutInfo;
         this.backingBuffer = other.backingBuffer;
         this.methodAccessors = other.methodAccessors;
 
@@ -80,7 +79,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
         this.layout = other.layout;
         this.capacity = capacity;
         this.proxy = initProxy();
-        this.stride = other.stride;
+        this.layoutInfo = other.layoutInfo;
         this.methodAccessors = other.methodAccessors;
 
         // Set Default pointer values
@@ -382,11 +381,11 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
     }
 
     private int attributeOffset(String attributeName) {
-        return stride.attributes().get(attributeName).offsetBytes() + strideIndexToBytes(position);
+        return layoutInfo.stride().attributes().get(attributeName).offsetBytes() + strideIndexToBytes(position);
     }
 
     private int strideIndexToBytes(int strideIndex) {
         // Convert the stride index to stride bytes
-        return strideIndex * stride.sizeBytes();
+        return strideIndex * layoutInfo.stride().sizeBytes();
     }
 }
