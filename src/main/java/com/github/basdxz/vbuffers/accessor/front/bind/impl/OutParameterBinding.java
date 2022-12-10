@@ -2,7 +2,7 @@ package com.github.basdxz.vbuffers.accessor.front.bind.impl;
 
 import com.github.basdxz.vbuffers.accessor.front.bind.ParameterBinding;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.binding.impl.BackingAccessors;
+import com.github.basdxz.vbuffers.binding.impl.BindingProvider;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
@@ -22,7 +22,7 @@ public class OutParameterBinding implements ParameterBinding {
     public OutParameterBinding(Stride stride, Layout.Out annotation, int parameterIndex) {
         this.parameterIndex = parameterIndex;
         this.attribute = stride.attributes().get(annotation.value());
-        this.getter = (GetterBinding<Object>) BackingAccessors.setter(this.attribute.type());
+        this.getter = (GetterBinding<Object>) BindingProvider.setter(this.attribute.type());
         if (getter instanceof GetterBinding.Immutable)
             throw new IllegalArgumentException("Cannot use immutable getter for out parameter");
     }

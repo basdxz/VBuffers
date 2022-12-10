@@ -18,7 +18,7 @@ import java.util.Map;
 import static com.github.basdxz.vbuffers.binding.Bindings.*;
 
 // TODO: Convert from singleton
-public final class BackingAccessors {
+public final class BindingProvider {
     private static final Map<Class<?>, SetterBinding<?>> setters = new HashMap<>();
     private static final Map<Class<?>, GetterBinding<?>> getters = new HashMap<>();
 
@@ -40,7 +40,7 @@ public final class BackingAccessors {
     public static void load(Class<? extends Bindings> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
-              .forEach(BackingAccessors::addAccessors);
+              .forEach(BindingProvider::addAccessors);
     }
 
     public static void addAccessors(Method method) {

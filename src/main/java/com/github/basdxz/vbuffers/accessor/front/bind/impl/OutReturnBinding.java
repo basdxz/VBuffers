@@ -2,7 +2,7 @@ package com.github.basdxz.vbuffers.accessor.front.bind.impl;
 
 import com.github.basdxz.vbuffers.accessor.front.bind.ReturnBinding;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.binding.impl.BackingAccessors;
+import com.github.basdxz.vbuffers.binding.impl.BindingProvider;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
@@ -19,7 +19,7 @@ public class OutReturnBinding implements ReturnBinding {
     public OutReturnBinding(Stride stride, Layout.Out annotation, OutParameterBinding outParameterHandler) {
         val name = annotation.value();
         this.attribute = stride.attributes().get(name);
-        this.getterBinding = (GetterBinding<Object>) BackingAccessors.getter(this.attribute.type());
+        this.getterBinding = (GetterBinding<Object>) BindingProvider.getter(this.attribute.type());
         this.outParameterIndex = outParameterHandler == null ? -1 : outParameterHandler.parameterIndex();
     }
 
