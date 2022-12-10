@@ -1,6 +1,8 @@
-package com.github.basdxz.vbuffers.layout;
+package com.github.basdxz.vbuffers.internal.layout;
 
-import com.github.basdxz.vbuffers.helper.ByteHelper;
+import com.github.basdxz.vbuffers.internal.helper.ByteHelper;
+import com.github.basdxz.vbuffers.layout.Attribute;
+import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;
 
 @Getter

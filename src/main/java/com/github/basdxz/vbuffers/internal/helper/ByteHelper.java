@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.helper;
+package com.github.basdxz.vbuffers.internal.helper;
 
 import lombok.experimental.*;
 import org.joml.Vector2f;
