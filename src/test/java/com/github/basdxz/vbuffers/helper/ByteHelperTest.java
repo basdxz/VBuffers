@@ -147,4 +147,28 @@ public class ByteHelperTest {
         byte[] bytes = new byte[]{0x43, 0x11, (byte) 0x8B, 0x54, (byte) 0xF2, 0x6E, (byte) 0xBC, 0x1C};
         assertEquals(1234567891234567L, ByteHelper.bytesToDouble(bytes, 0));
     }
+
+    @Test
+    public void boxedSizeBytes() {
+        assertEquals(Byte.BYTES, ByteHelper.sizeBytes(Byte.class));
+        assertEquals(Byte.BYTES, ByteHelper.sizeBytes(Boolean.class));
+        assertEquals(Short.BYTES, ByteHelper.sizeBytes(Short.class));
+        assertEquals(Character.BYTES, ByteHelper.sizeBytes(Character.class));
+        assertEquals(Integer.BYTES, ByteHelper.sizeBytes(Integer.class));
+        assertEquals(Long.BYTES, ByteHelper.sizeBytes(Long.class));
+        assertEquals(Float.BYTES, ByteHelper.sizeBytes(Float.class));
+        assertEquals(Double.BYTES, ByteHelper.sizeBytes(Double.class));
+    }
+
+    @Test
+    public void primitiveSizeBytes() {
+        assertEquals(Byte.BYTES, ByteHelper.sizeBytes(byte.class));
+        assertEquals(Byte.BYTES, ByteHelper.sizeBytes(boolean.class));
+        assertEquals(Short.BYTES, ByteHelper.sizeBytes(short.class));
+        assertEquals(Character.BYTES, ByteHelper.sizeBytes(char.class));
+        assertEquals(Integer.BYTES, ByteHelper.sizeBytes(int.class));
+        assertEquals(Long.BYTES, ByteHelper.sizeBytes(long.class));
+        assertEquals(Float.BYTES, ByteHelper.sizeBytes(float.class));
+        assertEquals(Double.BYTES, ByteHelper.sizeBytes(double.class));
+    }
 }

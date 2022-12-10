@@ -94,10 +94,10 @@ public final class ByteHelper {
         type = primitiveToBoxed(type);
         if (type == Byte.class)
             return Byte.BYTES;
+        if (type == Boolean.class)
+            return Byte.BYTES;
         if (type == Character.class)
             return Character.BYTES;
-        if (type == Boolean.class)
-            return 1;
         if (type == Short.class)
             return Short.BYTES;
         if (type == Integer.class)
@@ -118,10 +118,10 @@ public final class ByteHelper {
     }
 
     private static Class<?> primitiveToBoxed(Class<?> type) {
-        if (type == boolean.class)
-            return Boolean.class;
-        else if (type == byte.class)
+        if (type == byte.class)
             return Byte.class;
+        else if (type == boolean.class)
+            return Boolean.class;
         else if (type == char.class)
             return Character.class;
         else if (type == short.class)
