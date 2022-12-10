@@ -18,7 +18,7 @@ import java.util.Map;
 public final class FrontAccessorFactory {
     public static Map<Method, FrontAccessor> accessFronts(Stride stride, Class<?> layout) {
         val accessFronts = new HashMap<Method, FrontAccessor>();
-        for (val method : layout.getMethods()) {
+        for (val method : layout.getDeclaredMethods()) {// Currently does not account properly for hierarchy
             val accessFront = create(stride, method);
             accessFronts.put(method, accessFront);
         }
@@ -47,13 +47,24 @@ public final class FrontAccessorFactory {
         val parameterHandlers = new ArrayList<ParameterBinding>();
         val parameters = method.getParameters();
         for (var i = 0; i < parameters.length; i++) {
+            var isAnnotated = false;
             val annotations = parameters[i].getAnnotatedType().getAnnotations();
             for (val annotation : annotations) {
-                if (annotation instanceof Layout.In inAnnotation)
+                if (annotation instanceof Layout.In inAnnotation) {
+                    if (isAnnotated)
+                        throw new IllegalArgumentException("Parameter " + i + " of method " + method.getName() + " is annotated multiple times");
+                    isAnnotated = true;
                     parameterHandlers.add(new InParameterBinding(stride, inAnnotation, i));
-                if (annotation instanceof Layout.Out outAnnotation)
+                }
+                if (annotation instanceof Layout.Out outAnnotation) {
+                    if (isAnnotated)
+                        throw new IllegalArgumentException("Parameter " + i + " of method " + method.getName() + " is annotated multiple times");
+                    isAnnotated = true;
                     parameterHandlers.add(new OutParameterBinding(stride, outAnnotation, i));
+                }
             }
+            if (!isAnnotated)
+                throw new IllegalArgumentException("Parameter " + i + " of method " + method.getName() + " is not annotated");
         }
         return parameterHandlers;
     }
@@ -61,11 +72,17 @@ public final class FrontAccessorFactory {
     private static ReturnBinding newReturnHandler(Stride stride,
                                                   Method method,
                                                   List<ParameterBinding> parameterBindings) {
+        ReturnBinding returnBinding = null;
         val annotations = method.getAnnotatedReturnType().getAnnotations();
         for (val annotation : annotations) {
-            if (annotation instanceof Layout.Chain)
-                return new ChainReturnBinding();
+            if (annotation instanceof Layout.Chain) {
+                if (returnBinding != null)
+                    throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
+                returnBinding = new ChainReturnBinding();
+            }
             if (annotation instanceof Layout.In in) {
+                if (returnBinding != null)
+                    throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
                 val inParameter = parameterBindings.stream()
                                                    .filter(parameterBinding -> in.value().equals(parameterBinding.attribute().name()))
                                                    .filter(parameterBinding -> parameterBinding instanceof InParameterBinding)
@@ -73,17 +90,25 @@ public final class FrontAccessorFactory {
                                                    .findFirst();
                 if (inParameter.isEmpty())
                     throw new IllegalArgumentException("No in parameter with name " + in.value() + " found");
-                return new InReturnBinding(inParameter.get());
+                returnBinding = new InReturnBinding(inParameter.get());
             }
             if (annotation instanceof Layout.Out out) {
+                if (returnBinding != null)
+                    throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
                 val outParameter = parameterBindings.stream()
                                                     .filter(parameterBinding -> out.value().equals(parameterBinding.attribute().name()))
                                                     .filter(parameterBinding -> parameterBinding instanceof OutParameterBinding)
                                                     .map(parameterBinding -> (OutParameterBinding) parameterBinding)
                                                     .findFirst();
-                return new OutReturnBinding(stride, (Layout.Out) annotation, outParameter.orElse(null));
+                returnBinding = new OutReturnBinding(stride, (Layout.Out) annotation, outParameter.orElse(null));
             }
         }
-        return new VoidReturnBinding();
+
+        if (returnBinding == null) {
+            if (method.getReturnType() == void.class)
+                return new VoidReturnBinding();
+            throw new IllegalArgumentException("Return of method " + method.getName() + " is not annotated");
+        }
+        return returnBinding;
     }
 }
