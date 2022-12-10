@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.internal.feature.BufferHandler;
+import com.github.basdxz.vbuffers.internal.buffer.BufferHandler;
 import com.github.basdxz.vbuffers.samples.LayoutA;
 import com.github.basdxz.vbuffers.samples.LayoutB;
 import lombok.*;

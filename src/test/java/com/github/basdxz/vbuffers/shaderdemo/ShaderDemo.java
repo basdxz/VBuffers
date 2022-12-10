@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers.shaderdemo;
 
-import com.github.basdxz.vbuffers.internal.feature.BufferHandler;
+import com.github.basdxz.vbuffers.internal.buffer.BufferHandler;
 import lombok.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;

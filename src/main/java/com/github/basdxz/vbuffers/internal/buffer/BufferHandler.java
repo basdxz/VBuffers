@@ -1,7 +1,7 @@
-package com.github.basdxz.vbuffers.internal.feature;
+package com.github.basdxz.vbuffers.internal.buffer;
 
 import com.github.basdxz.vbuffers.accessor.Accessor;
-import com.github.basdxz.vbuffers.feature.Buffer;
+import com.github.basdxz.vbuffers.buffer.SuperBuffer;
 import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
 import com.github.basdxz.vbuffers.internal.layout.LayoutStride;
 import com.github.basdxz.vbuffers.layout.Layout;
@@ -22,7 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Buffer<LAYOUT>, InvocationHandler {
+public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer<LAYOUT>, InvocationHandler {
     protected static final ClassLoader CLASS_LOADER = BufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
                                                              Spliterator.DISTINCT |
@@ -354,7 +354,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Buffer<LAYO
         val methodName = method.getName();
 
         // Internal methods all start with our prefix, there is also a special case for the iterator method...
-        if (!methodName.startsWith(Buffer.INTERNAL_METHOD_PREFIX) && !methodName.equals("iterator"))
+        if (!methodName.startsWith(INTERNAL_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
 
         // Call the method from this class

@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.internal.feature;
+package com.github.basdxz.vbuffers.internal.buffer;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;

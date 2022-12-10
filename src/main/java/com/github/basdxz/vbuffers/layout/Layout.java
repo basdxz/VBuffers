@@ -1,13 +1,13 @@
 package com.github.basdxz.vbuffers.layout;
 
-import com.github.basdxz.vbuffers.feature.Buffer;
+import com.github.basdxz.vbuffers.buffer.SuperBuffer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public interface Layout<LAYOUT extends Buffer<LAYOUT>> extends Buffer<LAYOUT> {
+public interface Layout<LAYOUT extends SuperBuffer<LAYOUT>> extends SuperBuffer<LAYOUT> {
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Stride {
