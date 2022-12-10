@@ -11,12 +11,12 @@ public interface Layout<LAYOUT extends ExtendedBuffer<LAYOUT>> extends ExtendedB
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Stride {
-        Attribute[] value();
+        Attr[] value();
     }
 
     @Target({})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Attribute {
+    @interface Attr {
         String name();
 
         Class<?> type();

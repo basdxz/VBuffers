@@ -10,7 +10,7 @@ public class Attribute {
     protected final int sizeBytes;
     protected final int offsetBytes;
 
-    public Attribute(Layout.Attribute annotation, int offsetBytes) {
+    public Attribute(Layout.Attr annotation, int offsetBytes) {
         this.name = annotation.name();
         this.type = annotation.type();
         this.sizeBytes = ByteHelper.sizeBytes(this.type);

@@ -5,14 +5,14 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
+import static com.github.basdxz.vbuffers.layout.Layout.Attr;
 import static com.github.basdxz.vbuffers.layout.Layout.Stride;
 import static com.github.basdxz.vbuffers.old.samples.LayoutB.*;
 
-@Stride({@Attribute(name = POSITION, type = Vector3f.class),
-         @Attribute(name = NORMAL, type = Vector3f.class),
-         @Attribute(name = COLOR, type = Vector4f.class),
-         @Attribute(name = TEXTURE, type = Vector2f.class)})
+@Stride({@Attr(name = POSITION, type = Vector3f.class),
+         @Attr(name = NORMAL, type = Vector3f.class),
+         @Attr(name = COLOR, type = Vector4f.class),
+         @Attr(name = TEXTURE, type = Vector2f.class)})
 public interface LayoutB extends Layout<LayoutB> {
     String POSITION = "position";
     String NORMAL = "normal";
