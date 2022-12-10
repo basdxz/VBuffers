@@ -26,7 +26,7 @@ public final class OutParameter implements Parameter {
     }
 
     @Override
-    public void handle(ByteBuffer back, int offsetBytes, Object... args) {
-        getter.get(back, offsetBytes + attribute.offsetBytes(), args[parameterIndex]);
+    public void handle(ByteBuffer backingBuffer, int offsetBytes, Object... args) {
+        getter.get(backingBuffer, offsetBytes + attribute.offsetBytes(), args[parameterIndex]);
     }
 }

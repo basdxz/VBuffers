@@ -15,11 +15,11 @@ public interface ShaderLayout extends Layout<ShaderLayout> {
     String UV = "uv";
     String COLOR = "color";
 
-    @Chain ShaderLayout uv(@In(UV) Vector2f value);
+    @This ShaderLayout uv(@In(UV) Vector2f value);
 
     @Out(UV) Vector2f uv();
 
-    @Chain ShaderLayout color(@In(COLOR) Vector3f value);
+    @This ShaderLayout color(@In(COLOR) Vector3f value);
 
     @Out(COLOR) Vector3f color();
 }

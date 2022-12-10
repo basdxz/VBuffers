@@ -4,10 +4,10 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-@NoArgsConstructor
-public final class VoidReturn implements Return {
+@AllArgsConstructor
+public final class ThisReturn implements Return {
     @Override
     public Object handle(Object thiz, ByteBuffer backingBuffer, int offsetBytes, Object... args) {
-        return null;
+        return thiz;
     }
 }

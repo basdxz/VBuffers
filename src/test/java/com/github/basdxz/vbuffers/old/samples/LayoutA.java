@@ -16,19 +16,19 @@ public interface LayoutA extends Layout<LayoutA> {
     String COLOR = "color";
     String TEXTURE = "texture";
 
-    @Chain LayoutA position(@In(POSITION) int value);
+    @This LayoutA position(@In(POSITION) int value);
 
     @Out(POSITION) int position();
 
-    @Chain LayoutA normal(@In(NORMAL) int value);
+    @This LayoutA normal(@In(NORMAL) int value);
 
     @Out(NORMAL) int normal();
 
-    @Chain LayoutA color(@In(COLOR) int value);
+    @This LayoutA color(@In(COLOR) int value);
 
     @Out(COLOR) int color();
 
-    @Chain LayoutA texture(@In(TEXTURE) int value);
+    @This LayoutA texture(@In(TEXTURE) int value);
 
     @Out(TEXTURE) int texture();
 }

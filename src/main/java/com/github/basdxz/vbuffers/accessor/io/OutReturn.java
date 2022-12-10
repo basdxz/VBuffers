@@ -23,9 +23,9 @@ public final class OutReturn implements Return {
     }
 
     @Override
-    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object thiz, ByteBuffer backingBuffer, int offsetBytes, Object... args) {
         val outObject = outObject(args);
-        return getterBinding.get(back, offsetBytes + attribute.offsetBytes(), outObject);
+        return getterBinding.get(backingBuffer, offsetBytes + attribute.offsetBytes(), outObject);
     }
 
     private Object outObject(Object... args) {

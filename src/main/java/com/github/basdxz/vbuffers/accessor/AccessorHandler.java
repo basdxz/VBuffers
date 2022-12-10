@@ -35,11 +35,11 @@ final class AccessorHandler implements Accessor {
     }
 
     @Override
-    public Object access(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
+    public Object access(Object thiz, ByteBuffer backingBuffer, int offsetBytes, Object... args) {
         offsetBytes += strideOffsetBytes(args);
         for (val handler : parameters)
-            handler.handle(back, offsetBytes, args);
-        return ret.handle(chainable, back, offsetBytes, args);
+            handler.handle(backingBuffer, offsetBytes, args);
+        return ret.handle(thiz, backingBuffer, offsetBytes, args);
     }
 
     protected int strideOffsetBytes(Object... args) {

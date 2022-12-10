@@ -24,7 +24,7 @@ public final class InParameter implements Parameter {
     }
 
     @Override
-    public void handle(ByteBuffer back, int offsetBytes, Object... args) {
-        setter.put(back, offsetBytes + attribute.offsetBytes(), args[parameterIndex]);
+    public void handle(ByteBuffer backingBuffer, int offsetBytes, Object... args) {
+        setter.put(backingBuffer, offsetBytes + attribute.offsetBytes(), args[parameterIndex]);
     }
 }

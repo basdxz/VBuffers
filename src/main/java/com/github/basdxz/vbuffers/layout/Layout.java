@@ -41,6 +41,6 @@ public interface Layout<LAYOUT extends ExtendedBuffer<LAYOUT>> extends ExtendedB
 
     @Target(ElementType.TYPE_USE)
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Chain {
+    @interface This {
     }
 }

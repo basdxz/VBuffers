@@ -14,15 +14,15 @@ public interface XYZBuffer extends Layout<XYZBuffer> {
     String y = "y";
     String z = "z";
 
-    @Chain XYZBuffer x(@In(x) int value);
+    @This XYZBuffer x(@In(x) int value);
 
     @Out(x) int x();
 
-    @Chain XYZBuffer y(@In(y) int value);
+    @This XYZBuffer y(@In(y) int value);
 
     @Out(y) int y();
 
-    @Chain XYZBuffer z(@In(z) int value);
+    @This XYZBuffer z(@In(z) int value);
 
     @Out(z) int z();
 }

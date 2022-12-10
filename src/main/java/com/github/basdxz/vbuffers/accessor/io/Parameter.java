@@ -9,5 +9,5 @@ public sealed interface Parameter permits InParameter, OutParameter {
 
     int parameterIndex();
 
-    void handle(ByteBuffer back, int offsetBytes, Object... args);
+    void handle(ByteBuffer backingBuffer, int offsetBytes, Object... args);
 }

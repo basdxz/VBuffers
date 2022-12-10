@@ -73,10 +73,10 @@ public final class AccessorFactory {
         Return ret = null;
         val annotations = method.getAnnotatedReturnType().getAnnotations();
         for (val annotation : annotations) {
-            if (annotation instanceof Layout.Chain) {
+            if (annotation instanceof Layout.This) {
                 if (ret != null)
                     throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
-                ret = new ChainReturn();
+                ret = new ThisReturn();
             }
             if (annotation instanceof Layout.In in) {
                 if (ret != null)

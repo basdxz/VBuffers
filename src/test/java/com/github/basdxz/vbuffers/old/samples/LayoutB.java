@@ -19,19 +19,19 @@ public interface LayoutB extends Layout<LayoutB> {
     String COLOR = "color";
     String TEXTURE = "texture";
 
-    @Chain LayoutB position(@In(POSITION) Vector3f value);
+    @This LayoutB position(@In(POSITION) Vector3f value);
 
     @Out(POSITION) Vector3f position();
 
-    @Chain LayoutB normal(@In(NORMAL) Vector3f value);
+    @This LayoutB normal(@In(NORMAL) Vector3f value);
 
     @Out(NORMAL) Vector3f normal();
 
-    @Chain LayoutB color(@In(COLOR) Vector4f value);
+    @This LayoutB color(@In(COLOR) Vector4f value);
 
     @Out(COLOR) Vector4f color();
 
-    @Chain LayoutB texture(@In(TEXTURE) Vector2f value);
+    @This LayoutB texture(@In(TEXTURE) Vector2f value);
 
     @Out(TEXTURE) Vector2f texture();
 }

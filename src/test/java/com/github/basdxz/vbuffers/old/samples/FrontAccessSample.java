@@ -13,9 +13,9 @@ public interface FrontAccessSample {
 
     void set1(@In("x") Vector2f input, @Idx int offsetStrides);
 
-    @Chain FrontAccessSample set2(@In("x") Vector2f input);
+    @This FrontAccessSample set2(@In("x") Vector2f input);
 
-    @Chain FrontAccessSample set3(@In("x") Vector2f input, @Idx int offsetStrides);
+    @This FrontAccessSample set3(@In("x") Vector2f input, @Idx int offsetStrides);
 
     @In("x") Vector2f set4(@In("x") Vector2f input);
 
@@ -32,9 +32,9 @@ public interface FrontAccessSample {
 
     void get1(@Out("x") Vector2f output, @Idx int offsetStrides);
 
-    @Chain FrontAccessSample get2(@Out("x") Vector2f output);
+    @This FrontAccessSample get2(@Out("x") Vector2f output);
 
-    @Chain FrontAccessSample get3(@Out("x") Vector2f output, @Idx int offsetStrides);
+    @This FrontAccessSample get3(@Out("x") Vector2f output, @Idx int offsetStrides);
 
     @Out("x") Vector2f get4();
 

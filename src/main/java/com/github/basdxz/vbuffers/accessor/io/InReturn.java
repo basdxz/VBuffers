@@ -10,7 +10,7 @@ public final class InReturn implements Return {
     }
 
     @Override
-    public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
+    public Object handle(Object thiz, ByteBuffer backingBuffer, int offsetBytes, Object... args) {
         return args[outParameterIndex];
     }
 }
