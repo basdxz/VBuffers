@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.shaderdemo;
+package com.github.basdxz.vbuffers.old.shaderdemo;
 
 import lombok.*;
 import org.joml.*;

@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.shaderdemo;
+package com.github.basdxz.vbuffers.old.shaderdemo;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Layout.Stride;
@@ -6,8 +6,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
-import static com.github.basdxz.vbuffers.shaderdemo.ShaderLayout.COLOR;
-import static com.github.basdxz.vbuffers.shaderdemo.ShaderLayout.UV;
+import static com.github.basdxz.vbuffers.old.shaderdemo.ShaderLayout.COLOR;
+import static com.github.basdxz.vbuffers.old.shaderdemo.ShaderLayout.UV;
 
 @Stride({@Attribute(name = UV, type = Vector2f.class),
          @Attribute(name = COLOR, type = Vector3f.class)})

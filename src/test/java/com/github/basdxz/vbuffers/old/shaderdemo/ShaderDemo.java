@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.shaderdemo;
+package com.github.basdxz.vbuffers.old.shaderdemo;
 
 import com.github.basdxz.vbuffers.buffer.BufferHandler;
 import lombok.*;
@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
-import static com.github.basdxz.vbuffers.shaderdemo.SeascapeDemo.ballerFragmentShader;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class ShaderDemo {
@@ -47,7 +46,7 @@ public class ShaderDemo {
 
     private static void render(ShaderLayout stride) {
 //        stride.color(fragmentShader(stride.uv()));
-        stride.color(ballerFragmentShader(stride.uv()));
+        stride.color(SeascapeDemo.ballerFragmentShader(stride.uv()));
     }
 
     private static Vector3f fragmentShader(Vector2f uv) {

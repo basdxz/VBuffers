@@ -1,10 +1,10 @@
-package com.github.basdxz.vbuffers.samples;
+package com.github.basdxz.vbuffers.old.samples;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout.Stride;
 
-import static com.github.basdxz.vbuffers.samples.FrontAccessSimpleSample.X;
+import static com.github.basdxz.vbuffers.old.samples.FrontAccessSimpleSample.X;
 
 @Stride(@Attribute(name = X, type = Integer.class))
 public interface FrontAccessSimpleSample extends Layout<FrontAccessSimpleSample> {

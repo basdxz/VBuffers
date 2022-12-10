@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.samples;
+package com.github.basdxz.vbuffers.old.samples;
 
 import org.joml.Vector2f;
 import org.joml.Vector2fc;

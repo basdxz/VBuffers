@@ -1,16 +1,16 @@
-package com.github.basdxz.vbuffers.samples;
+package com.github.basdxz.vbuffers.old.samples;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static com.github.basdxz.vbuffers.samples.LayoutB.*;
+import static com.github.basdxz.vbuffers.old.samples.LayoutB.*;
 
-@Stride({@Attribute(name = POSITION, type = Vector3f.class),
-         @Attribute(name = NORMAL, type = Vector3f.class),
-         @Attribute(name = COLOR, type = Vector4f.class),
-         @Attribute(name = TEXTURE, type = Vector2f.class)})
+@Layout.Stride({@Layout.Attribute(name = POSITION, type = Vector3f.class),
+                @Layout.Attribute(name = NORMAL, type = Vector3f.class),
+                @Layout.Attribute(name = COLOR, type = Vector4f.class),
+                @Layout.Attribute(name = TEXTURE, type = Vector2f.class)})
 public interface LayoutB extends Layout<LayoutB> {
     String POSITION = "position";
     String NORMAL = "normal";

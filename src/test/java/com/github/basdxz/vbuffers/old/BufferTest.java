@@ -1,8 +1,8 @@
-package com.github.basdxz.vbuffers;
+package com.github.basdxz.vbuffers.old;
 
 import com.github.basdxz.vbuffers.buffer.BufferHandler;
-import com.github.basdxz.vbuffers.samples.LayoutA;
-import com.github.basdxz.vbuffers.samples.LayoutB;
+import com.github.basdxz.vbuffers.old.samples.LayoutA;
+import com.github.basdxz.vbuffers.old.samples.LayoutB;
 import lombok.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
