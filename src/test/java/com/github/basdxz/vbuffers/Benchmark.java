@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.internal.feature.VBufferHandler;
+import com.github.basdxz.vbuffers.internal.feature.BufferHandler;
 import com.github.basdxz.vbuffers.samples.LayoutA;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +64,7 @@ public class Benchmark {
     }
 
     private static LayoutA demoNewBuffer() {
-        return VBufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
+        return BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, BUFFER_SIZE_C);
     }
 
     @NotNull

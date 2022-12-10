@@ -1,7 +1,7 @@
 package com.github.basdxz.vbuffers.internal.feature;
 
 import com.github.basdxz.vbuffers.accessor.Accessor;
-import com.github.basdxz.vbuffers.feature.VBuffer;
+import com.github.basdxz.vbuffers.feature.Buffer;
 import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.LayoutStride;
@@ -22,8 +22,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LAYOUT>, InvocationHandler {
-    protected static final ClassLoader CLASS_LOADER = VBufferHandler.class.getClassLoader();
+public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Buffer<LAYOUT>, InvocationHandler {
+    protected static final ClassLoader CLASS_LOADER = BufferHandler.class.getClassLoader();
     protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
                                                              Spliterator.DISTINCT |
                                                              Spliterator.SIZED |
@@ -45,7 +45,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
     protected boolean readOnly;
 
     // Normal Constructor
-    protected VBufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
+    protected BufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -61,7 +61,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
     }
 
     // Copy constructor
-    protected VBufferHandler(VBufferHandler<LAYOUT> other) {
+    protected BufferHandler(BufferHandler<LAYOUT> other) {
         this.layout = other.layout;
         this.capacity = other.capacity;
         this.proxy = initProxy();
@@ -77,7 +77,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
     }
 
     // Slice Copy constructor
-    protected VBufferHandler(VBufferHandler<LAYOUT> other, int startIndex, int capacity) {
+    protected BufferHandler(BufferHandler<LAYOUT> other, int startIndex, int capacity) {
         this.layout = other.layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -100,14 +100,14 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
-    protected VBufferHandler<LAYOUT> newCopy() {
+    protected BufferHandler<LAYOUT> newCopy() {
         // Create a deep copy of this VBufferHandler
-        return new VBufferHandler<>(this);
+        return new BufferHandler<>(this);
     }
 
-    protected VBufferHandler<LAYOUT> newCopyOfRemainingStrides() {
+    protected BufferHandler<LAYOUT> newCopyOfRemainingStrides() {
         // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining strides
-        return new VBufferHandler<>(this, position, v$remaining());
+        return new BufferHandler<>(this, position, v$remaining());
     }
 
     // Static constructor
@@ -119,7 +119,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
     // Static constructor
     public static <LAYOUT extends Layout<LAYOUT>> LAYOUT newBuffer(
             @NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
-        return new VBufferHandler<>(layout, allocator, capacity).proxy;
+        return new BufferHandler<>(layout, allocator, capacity).proxy;
     }
 
     @NotNull
@@ -303,7 +303,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
 
     @Override
     public LAYOUT v$strideView(int index) {
-        return new VBufferHandler<>(this, index, 1).proxy;
+        return new BufferHandler<>(this, index, 1).proxy;
     }
 
     @Override
@@ -313,7 +313,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
 
     @Override
     public LAYOUT v$sliceView(int startIndex, int length) {
-        return new VBufferHandler<>(this, startIndex, length).proxy;
+        return new BufferHandler<>(this, startIndex, length).proxy;
     }
 
     @Override
@@ -340,7 +340,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
 
     @Override
     public Iterator<LAYOUT> v$iterator() {
-        return new VBufferIterator<>(newCopyOfRemainingStrides());
+        return new BufferIterator<>(newCopyOfRemainingStrides());
     }
 
     @Override
@@ -354,12 +354,11 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
         val methodName = method.getName();
 
         // Internal methods all start with our prefix, there is also a special case for the iterator method...
-        if (!methodName.startsWith(VBuffer.INTERNAL_METHOD_PREFIX) && !methodName.equals("iterator"))
+        if (!methodName.startsWith(Buffer.INTERNAL_METHOD_PREFIX) && !methodName.equals("iterator"))
             return Optional.empty();
 
         // Call the method from this class
         try {
-            // If the method is a VBuffer method, call it
             // Internal method never return null or void
             return Optional.of(method.invoke(this, args));
         } catch (IllegalAccessException | InvocationTargetException e) {

@@ -6,8 +6,8 @@ import lombok.*;
 import java.util.Iterator;
 
 @AllArgsConstructor
-public class VBufferIterator<LAYOUT extends Layout<LAYOUT>> implements Iterator<LAYOUT> {
-    protected final VBufferHandler<LAYOUT> bufferHandler;
+public class BufferIterator<LAYOUT extends Layout<LAYOUT>> implements Iterator<LAYOUT> {
+    protected final BufferHandler<LAYOUT> bufferHandler;
 
     @Override
     public boolean hasNext() {
