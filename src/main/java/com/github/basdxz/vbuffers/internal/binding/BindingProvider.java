@@ -18,6 +18,7 @@ import java.util.Map;
 import static com.github.basdxz.vbuffers.binding.Bindings.*;
 
 // TODO: Convert from singleton
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BindingProvider {
     private static final Map<Class<?>, SetterBinding<?>> setters = new HashMap<>();
     private static final Map<Class<?>, GetterBinding<?>> getters = new HashMap<>();

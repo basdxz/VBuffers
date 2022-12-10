@@ -13,13 +13,13 @@ public interface ViewableBuffer<LAYOUT extends ViewableBuffer<LAYOUT>> extends B
     @Contract(value = "-> new", pure = true)
     LAYOUT v$strideView();
 
-    @Contract(value = "_-> new", pure = true)
+    @Contract(value = "_ -> new", pure = true)
     LAYOUT v$strideView(int index);
 
     @Contract(value = "-> new", pure = true)
     LAYOUT v$sliceView();
 
-    @Contract(value = "_,_-> new", pure = true)
+    @Contract(value = "_, _-> new", pure = true)
     LAYOUT v$sliceView(int startIndex, int length);
 
     @Contract(value = "-> new", pure = true)

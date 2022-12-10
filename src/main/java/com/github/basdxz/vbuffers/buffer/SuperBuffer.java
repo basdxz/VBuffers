@@ -20,13 +20,13 @@ public interface SuperBuffer<LAYOUT extends SuperBuffer<LAYOUT>> extends Viewabl
     @Contract("-> this")
     LAYOUT v$next();
 
-    @Contract("_-> this")
+    @Contract("_ -> this")
     LAYOUT v$position(int newPosition);
 
     @Contract(pure = true)
     int v$limit();
 
-    @Contract("_-> this")
+    @Contract("_ -> this")
     LAYOUT v$limit(int limit);
 
     @Contract("-> this")
@@ -47,12 +47,13 @@ public interface SuperBuffer<LAYOUT extends SuperBuffer<LAYOUT>> extends Viewabl
     @Contract("-> this")
     LAYOUT v$compact();
 
-    @Contract("_,_,_-> this")
+    @Contract("_, _, _-> this")
     LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length);
 
-    @Contract("_,_-> this")
+    @Contract("_, _-> this")
     LAYOUT v$copyStride(int targetIndex, int sourceIndex);
 
+    @Contract("_ -> this")
     LAYOUT v$put(LAYOUT source);
 
     @Contract(pure = true)
