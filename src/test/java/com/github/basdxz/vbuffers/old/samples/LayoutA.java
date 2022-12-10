@@ -2,12 +2,14 @@ package com.github.basdxz.vbuffers.old.samples;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 
+import static com.github.basdxz.vbuffers.layout.Layout.Attribute;
+import static com.github.basdxz.vbuffers.layout.Layout.Stride;
 import static com.github.basdxz.vbuffers.old.samples.LayoutA.*;
 
-@Layout.Stride({@Layout.Attribute(name = POSITION, type = Integer.class),
-                @Layout.Attribute(name = NORMAL, type = Integer.class),
-                @Layout.Attribute(name = COLOR, type = Integer.class),
-                @Layout.Attribute(name = TEXTURE, type = Integer.class)})
+@Stride({@Attribute(name = POSITION, type = Integer.class),
+         @Attribute(name = NORMAL, type = Integer.class),
+         @Attribute(name = COLOR, type = Integer.class),
+         @Attribute(name = TEXTURE, type = Integer.class)})
 public interface LayoutA extends Layout<LayoutA> {
     String POSITION = "position";
     String NORMAL = "normal";
