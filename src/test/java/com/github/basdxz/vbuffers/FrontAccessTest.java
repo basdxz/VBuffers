@@ -1,7 +1,7 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.front.impl.FrontAccessorFactory;
-import com.github.basdxz.vbuffers.layout.impl.LayoutStride;
+import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
+import com.github.basdxz.vbuffers.layout.LayoutStride;
 import com.github.basdxz.vbuffers.samples.FrontAccessSimpleSample;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;
@@ -19,8 +19,8 @@ public class FrontAccessTest {
         val setterMethod = clazz.getMethod("set", int.class);
         val gettterMethod = clazz.getMethod("get");
 
-        val setterFront = FrontAccessorFactory.create(stride, setterMethod);
-        val getterFront = FrontAccessorFactory.create(stride, gettterMethod);
+        val setterFront = AccessorFactory.create(stride, setterMethod);
+        val getterFront = AccessorFactory.create(stride, gettterMethod);
 
         val buffer = ByteBuffer.allocate(Integer.BYTES);
 

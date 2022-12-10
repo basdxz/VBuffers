@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.binding.impl.BindingProvider;
+import com.github.basdxz.vbuffers.internal.binding.BindingProvider;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

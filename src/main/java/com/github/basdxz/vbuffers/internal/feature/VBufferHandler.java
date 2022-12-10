@@ -1,10 +1,11 @@
-package com.github.basdxz.vbuffers;
+package com.github.basdxz.vbuffers.internal.feature;
 
-import com.github.basdxz.vbuffers.accessor.front.FrontAccessor;
-import com.github.basdxz.vbuffers.accessor.front.impl.FrontAccessorFactory;
+import com.github.basdxz.vbuffers.accessor.Accessor;
+import com.github.basdxz.vbuffers.feature.VBuffer;
+import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
+import com.github.basdxz.vbuffers.layout.LayoutStride;
 import com.github.basdxz.vbuffers.layout.Stride;
-import com.github.basdxz.vbuffers.layout.impl.LayoutStride;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +37,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
     protected final LAYOUT proxy;
     protected final Stride stride;
     protected final ByteBuffer backingBuffer;
-    protected final Map<Method, FrontAccessor> methodAccessors;
+    protected final Map<Method, Accessor> methodAccessors;
 
     protected int position;
     protected int limit;
@@ -50,7 +51,7 @@ public class VBufferHandler<LAYOUT extends Layout<LAYOUT>> implements VBuffer<LA
         this.proxy = initProxy();
         this.stride = new LayoutStride(layout);
         this.backingBuffer = allocator.apply(this.stride.sizeBytes() * capacity);
-        this.methodAccessors = Collections.unmodifiableMap(FrontAccessorFactory.accessFronts(this.stride));
+        this.methodAccessors = Collections.unmodifiableMap(AccessorFactory.accessFronts(this.stride));
 
         // Set Default pointer values
         this.position = 0;

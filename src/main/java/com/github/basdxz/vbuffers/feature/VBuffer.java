@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers;
+package com.github.basdxz.vbuffers.feature;
 
 import org.jetbrains.annotations.Contract;
 

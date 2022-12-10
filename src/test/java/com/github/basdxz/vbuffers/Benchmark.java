@@ -1,5 +1,6 @@
 package com.github.basdxz.vbuffers;
 
+import com.github.basdxz.vbuffers.internal.feature.VBufferHandler;
 import com.github.basdxz.vbuffers.samples.LayoutA;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;

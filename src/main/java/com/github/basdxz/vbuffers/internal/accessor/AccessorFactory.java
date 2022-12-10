@@ -1,9 +1,6 @@
-package com.github.basdxz.vbuffers.accessor.front.impl;
+package com.github.basdxz.vbuffers.internal.accessor;
 
-import com.github.basdxz.vbuffers.accessor.front.FrontAccessor;
-import com.github.basdxz.vbuffers.accessor.front.bind.ParameterBinding;
-import com.github.basdxz.vbuffers.accessor.front.bind.ReturnBinding;
-import com.github.basdxz.vbuffers.accessor.front.bind.impl.*;
+import com.github.basdxz.vbuffers.accessor.Accessor;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
@@ -15,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FrontAccessorFactory {
-    public static Map<Method, FrontAccessor> accessFronts(Stride stride) {
-        val accessFronts = new HashMap<Method, FrontAccessor>();
+public final class AccessorFactory {
+    public static Map<Method, Accessor> accessFronts(Stride stride) {
+        val accessFronts = new HashMap<Method, Accessor>();
         for (val method : stride.methods()) {// Currently does not account properly for hierarchy
             val accessFront = create(stride, method);
             accessFronts.put(method, accessFront);
@@ -25,26 +22,26 @@ public final class FrontAccessorFactory {
         return accessFronts;
     }
 
-    public static FrontAccessor create(Stride stride, Method method) {
+    public static Accessor create(Stride stride, Method method) {
         val idxHandler = newIdxHandler(stride, method);
         val parameterHandlers = newParameterHandlers(stride, method);
         val returnHandler = newReturnHandler(stride, method, parameterHandlers);
-        return new FrontAccessorHandler(idxHandler, returnHandler, parameterHandlers);
+        return new AccessorHandler(idxHandler, returnHandler, parameterHandlers);
     }
 
-    private static IdxBinding newIdxHandler(Stride stride, Method method) {
+    private static AccessorIdxBinding newIdxHandler(Stride stride, Method method) {
         val parameters = method.getParameters();
         for (var i = 0; i < parameters.length; i++) {
             val annotations = parameters[i].getAnnotatedType().getAnnotations();
             for (val annotation : annotations)
                 if (annotation instanceof Layout.Idx)
-                    return new IdxBinding(i, stride.sizeBytes());
+                    return new AccessorIdxBinding(i, stride.sizeBytes());
         }
         return null;
     }
 
-    private static List<ParameterBinding> newParameterHandlers(Stride stride, Method method) {
-        val parameterHandlers = new ArrayList<ParameterBinding>();
+    private static List<AccessorParameter> newParameterHandlers(Stride stride, Method method) {
+        val parameterHandlers = new ArrayList<AccessorParameter>();
         val parameters = method.getParameters();
         for (var i = 0; i < parameters.length; i++) {
             var isAnnotated = false;
@@ -54,13 +51,13 @@ public final class FrontAccessorFactory {
                     if (isAnnotated)
                         throw new IllegalArgumentException("Parameter " + i + " of method " + method.getName() + " is annotated multiple times");
                     isAnnotated = true;
-                    parameterHandlers.add(new InParameterBinding(stride, inAnnotation, i));
+                    parameterHandlers.add(new AccessorInParameter(stride, inAnnotation, i));
                 }
                 if (annotation instanceof Layout.Out outAnnotation) {
                     if (isAnnotated)
                         throw new IllegalArgumentException("Parameter " + i + " of method " + method.getName() + " is annotated multiple times");
                     isAnnotated = true;
-                    parameterHandlers.add(new OutParameterBinding(stride, outAnnotation, i));
+                    parameterHandlers.add(new AccessorOutParameter(stride, outAnnotation, i));
                 }
             }
             if (!isAnnotated)
@@ -69,46 +66,46 @@ public final class FrontAccessorFactory {
         return parameterHandlers;
     }
 
-    private static ReturnBinding newReturnHandler(Stride stride,
-                                                  Method method,
-                                                  List<ParameterBinding> parameterBindings) {
-        ReturnBinding returnBinding = null;
+    private static AccessorReturn newReturnHandler(Stride stride,
+                                                   Method method,
+                                                   List<AccessorParameter> accessorParameters) {
+        AccessorReturn accessorReturn = null;
         val annotations = method.getAnnotatedReturnType().getAnnotations();
         for (val annotation : annotations) {
             if (annotation instanceof Layout.Chain) {
-                if (returnBinding != null)
+                if (accessorReturn != null)
                     throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
-                returnBinding = new ChainReturnBinding();
+                accessorReturn = new AccessorChainReturn();
             }
             if (annotation instanceof Layout.In in) {
-                if (returnBinding != null)
+                if (accessorReturn != null)
                     throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
-                val inParameter = parameterBindings.stream()
-                                                   .filter(parameterBinding -> in.value().equals(parameterBinding.attribute().name()))
-                                                   .filter(parameterBinding -> parameterBinding instanceof InParameterBinding)
-                                                   .map(parameterBinding -> (InParameterBinding) parameterBinding)
-                                                   .findFirst();
+                val inParameter = accessorParameters.stream()
+                                                    .filter(accessorParameter -> in.value().equals(accessorParameter.attribute().name()))
+                                                    .filter(accessorParameter -> accessorParameter instanceof AccessorInParameter)
+                                                    .map(accessorParameter -> (AccessorInParameter) accessorParameter)
+                                                    .findFirst();
                 if (inParameter.isEmpty())
                     throw new IllegalArgumentException("No in parameter with name " + in.value() + " found");
-                returnBinding = new InReturnBinding(inParameter.get());
+                accessorReturn = new AccessorInReturn(inParameter.get());
             }
             if (annotation instanceof Layout.Out out) {
-                if (returnBinding != null)
+                if (accessorReturn != null)
                     throw new IllegalArgumentException("Return of method " + method.getName() + " is annotated multiple times");
-                val outParameter = parameterBindings.stream()
-                                                    .filter(parameterBinding -> out.value().equals(parameterBinding.attribute().name()))
-                                                    .filter(parameterBinding -> parameterBinding instanceof OutParameterBinding)
-                                                    .map(parameterBinding -> (OutParameterBinding) parameterBinding)
-                                                    .findFirst();
-                returnBinding = new OutReturnBinding(stride, (Layout.Out) annotation, outParameter.orElse(null));
+                val outParameter = accessorParameters.stream()
+                                                     .filter(accessorParameter -> out.value().equals(accessorParameter.attribute().name()))
+                                                     .filter(accessorParameter -> accessorParameter instanceof AccessorOutParameter)
+                                                     .map(accessorParameter -> (AccessorOutParameter) accessorParameter)
+                                                     .findFirst();
+                accessorReturn = new AccessorOutReturn(stride, (Layout.Out) annotation, outParameter.orElse(null));
             }
         }
 
-        if (returnBinding == null) {
+        if (accessorReturn == null) {
             if (method.getReturnType() == void.class)
-                return new VoidReturnBinding();
+                return new AccessorVoidReturn();
             throw new IllegalArgumentException("Return of method " + method.getName() + " is not annotated");
         }
-        return returnBinding;
+        return accessorReturn;
     }
 }

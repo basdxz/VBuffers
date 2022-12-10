@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers.layout;
 
-import com.github.basdxz.vbuffers.VBuffer;
+import com.github.basdxz.vbuffers.feature.VBuffer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,8 +1,7 @@
-package com.github.basdxz.vbuffers.accessor.front.bind.impl;
+package com.github.basdxz.vbuffers.internal.accessor;
 
-import com.github.basdxz.vbuffers.accessor.front.bind.ParameterBinding;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.binding.impl.BindingProvider;
+import com.github.basdxz.vbuffers.internal.binding.BindingProvider;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
@@ -11,15 +10,15 @@ import lombok.*;
 import java.nio.ByteBuffer;
 
 @AllArgsConstructor
-public class OutParameterBinding implements ParameterBinding {
+final class AccessorOutParameter implements AccessorParameter {
     @Getter
-    protected final int parameterIndex;
+    private final int parameterIndex;
     @Getter
-    protected final Attribute attribute;
-    protected final GetterBinding<Object> getter;
+    private final Attribute attribute;
+    private final GetterBinding<Object> getter;
 
     @SuppressWarnings("unchecked")
-    public OutParameterBinding(Stride stride, Layout.Out annotation, int parameterIndex) {
+    AccessorOutParameter(Stride stride, Layout.Out annotation, int parameterIndex) {
         this.parameterIndex = parameterIndex;
         this.attribute = stride.attributes().get(annotation.value());
         this.getter = (GetterBinding<Object>) BindingProvider.setter(this.attribute.type());

@@ -1,7 +1,7 @@
-package com.github.basdxz.vbuffers.accessor.front.bind;
+package com.github.basdxz.vbuffers.internal.accessor;
 
 import java.nio.ByteBuffer;
 
-public interface ReturnBinding {
+interface AccessorReturn {
     Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args);
 }

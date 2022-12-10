@@ -1,8 +1,7 @@
-package com.github.basdxz.vbuffers.accessor.front.bind.impl;
+package com.github.basdxz.vbuffers.internal.accessor;
 
-import com.github.basdxz.vbuffers.accessor.front.bind.ReturnBinding;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.binding.impl.BindingProvider;
+import com.github.basdxz.vbuffers.internal.binding.BindingProvider;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
@@ -10,13 +9,13 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-public class OutReturnBinding implements ReturnBinding {
-    protected final Attribute attribute;
-    protected final GetterBinding<Object> getterBinding;
-    protected final int outParameterIndex;
+final class AccessorOutReturn implements AccessorReturn {
+    private final Attribute attribute;
+    private final GetterBinding<Object> getterBinding;
+    private final int outParameterIndex;
 
     @SuppressWarnings("unchecked")
-    public OutReturnBinding(Stride stride, Layout.Out annotation, OutParameterBinding outParameterHandler) {
+    AccessorOutReturn(Stride stride, Layout.Out annotation, AccessorOutParameter outParameterHandler) {
         val name = annotation.value();
         this.attribute = stride.attributes().get(name);
         this.getterBinding = (GetterBinding<Object>) BindingProvider.getter(this.attribute.type());
@@ -29,7 +28,7 @@ public class OutReturnBinding implements ReturnBinding {
         return getterBinding.get(back, offsetBytes + attribute.offsetBytes(), outObject);
     }
 
-    protected Object outObject(Object... args) {
+    private Object outObject(Object... args) {
         if (outParameterIndex == -1)
             return null;
         return args[outParameterIndex];

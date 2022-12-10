@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.binding.impl;
+package com.github.basdxz.vbuffers.internal.binding;
 
 import com.github.basdxz.vbuffers.binding.Bindings;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
