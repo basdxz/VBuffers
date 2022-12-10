@@ -9,13 +9,13 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-final class AccessorOutReturn implements AccessorReturn {
+final class OutReturn implements AccessorReturn {
     private final Attribute attribute;
     private final GetterBinding<Object> getterBinding;
     private final int outParameterIndex;
 
     @SuppressWarnings("unchecked")
-    AccessorOutReturn(Stride stride, Layout.Out annotation, AccessorOutParameter outParameterHandler) {
+    OutReturn(Stride stride, Layout.Out annotation, OutParameter outParameterHandler) {
         val name = annotation.value();
         this.attribute = stride.attributes().get(name);
         this.getterBinding = (GetterBinding<Object>) BindingProvider.getter(this.attribute.type());

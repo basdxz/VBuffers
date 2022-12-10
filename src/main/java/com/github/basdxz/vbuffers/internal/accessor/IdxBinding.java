@@ -3,7 +3,7 @@ package com.github.basdxz.vbuffers.internal.accessor;
 import lombok.*;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-final class AccessorIdxBinding {
+final class IdxBinding {
     private final int argumentIndex;
     private final int strideBytes;
 

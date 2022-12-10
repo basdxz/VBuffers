@@ -4,10 +4,10 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-final class AccessorChainReturn implements AccessorReturn {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+final class VoidReturn implements AccessorReturn {
     @Override
     public Object handle(Object chainable, ByteBuffer back, int offsetBytes, Object... args) {
-        return chainable;
+        return null;
     }
 }

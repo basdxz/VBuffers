@@ -7,13 +7,13 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 final class AccessorHandler implements Accessor {
-    private final AccessorIdxBinding idxBinding;
+    private final IdxBinding idxBinding;
     private final AccessorReturn accessorReturn;
     private final List<AccessorParameter> accessorParameters;
     @Getter
     private final boolean writing;
 
-    AccessorHandler(AccessorIdxBinding idxBinding, AccessorReturn accessorReturn, List<AccessorParameter> accessorParameters) {
+    AccessorHandler(IdxBinding idxBinding, AccessorReturn accessorReturn, List<AccessorParameter> accessorParameters) {
         this.idxBinding = idxBinding;
         this.accessorReturn = accessorReturn;
         this.accessorParameters = accessorParameters;
@@ -28,7 +28,7 @@ final class AccessorHandler implements Accessor {
             if (matchingParameterHandler.isPresent())
                 throw new IllegalArgumentException("Multiple parameter handlers with the same attribute " + attribute.name());
         }
-        this.writing = accessorParameters.stream().anyMatch(accessorParameter -> accessorParameter instanceof AccessorInParameter);
+        this.writing = accessorParameters.stream().anyMatch(accessorParameter -> accessorParameter instanceof InParameter);
     }
 
     @Override
