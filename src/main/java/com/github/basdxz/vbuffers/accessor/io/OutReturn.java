@@ -1,7 +1,7 @@
-package com.github.basdxz.vbuffers.internal.accessor;
+package com.github.basdxz.vbuffers.accessor.io;
 
+import com.github.basdxz.vbuffers.binding.BindingProvider;
 import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.internal.binding.BindingProvider;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.Stride;
@@ -9,13 +9,13 @@ import lombok.*;
 
 import java.nio.ByteBuffer;
 
-final class OutReturn implements AccessorReturn {
+public final class OutReturn implements Return {
     private final Attribute attribute;
     private final GetterBinding<Object> getterBinding;
     private final int outParameterIndex;
 
     @SuppressWarnings("unchecked")
-    OutReturn(Stride stride, Layout.Out annotation, OutParameter outParameterHandler) {
+    public OutReturn(Stride stride, Layout.Out annotation, OutParameter outParameterHandler) {
         val name = annotation.value();
         this.attribute = stride.attributes().get(name);
         this.getterBinding = (GetterBinding<Object>) BindingProvider.getter(this.attribute.type());

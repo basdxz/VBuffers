@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.internal.buffer;
+package com.github.basdxz.vbuffers.buffer;
 
 import com.github.basdxz.vbuffers.layout.Layout;
 import lombok.*;
@@ -6,8 +6,8 @@ import lombok.*;
 import java.util.Iterator;
 
 @AllArgsConstructor
-public class BufferIterator<LAYOUT extends Layout<LAYOUT>> implements Iterator<LAYOUT> {
-    protected final BufferHandler<LAYOUT> bufferHandler;
+public final class BufferIterator<LAYOUT extends Layout<LAYOUT>> implements Iterator<LAYOUT> {
+    private final SuperBuffer<LAYOUT> bufferHandler;
 
     @Override
     public boolean hasNext() {

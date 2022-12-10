@@ -1,10 +1,10 @@
-package com.github.basdxz.vbuffers.internal.accessor;
+package com.github.basdxz.vbuffers.accessor.io;
 
 import com.github.basdxz.vbuffers.layout.Attribute;
 
 import java.nio.ByteBuffer;
 
-interface AccessorParameter {
+public sealed interface Parameter permits InParameter, OutParameter {
     Attribute attribute();
 
     int parameterIndex();

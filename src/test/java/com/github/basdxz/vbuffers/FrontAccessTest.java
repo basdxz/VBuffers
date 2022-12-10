@@ -1,7 +1,7 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
-import com.github.basdxz.vbuffers.internal.layout.LayoutStride;
+import com.github.basdxz.vbuffers.accessor.AccessorFactory;
+import com.github.basdxz.vbuffers.layout.LayoutStride;
 import com.github.basdxz.vbuffers.samples.FrontAccessSimpleSample;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;

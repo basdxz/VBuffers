@@ -11,7 +11,7 @@ public interface GetterBinding<T> {
     T get(ByteBuffer buffer, int offsetBytes, @Nullable T output);
 
     @FunctionalInterface
-    interface Immutable<T> extends GetterBinding<T> {
+    interface Allocating<T> extends GetterBinding<T> {
         @Override
         default T get(ByteBuffer buffer, int offsetBytes, @Nullable T output) {
             return get(buffer, offsetBytes);

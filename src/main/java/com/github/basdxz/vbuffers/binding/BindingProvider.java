@@ -1,8 +1,5 @@
-package com.github.basdxz.vbuffers.internal.binding;
+package com.github.basdxz.vbuffers.binding;
 
-import com.github.basdxz.vbuffers.binding.Bindings;
-import com.github.basdxz.vbuffers.binding.GetterBinding;
-import com.github.basdxz.vbuffers.binding.SetterBinding;
 import lombok.*;
 
 import java.lang.invoke.LambdaMetafactory;
@@ -79,15 +76,15 @@ public final class BindingProvider {
     }
 
     public static void addImutableGetterIfAnnotated(Method method) throws Throwable {
-        val annotation = method.getAnnotation(ImGet.class);
+        val annotation = method.getAnnotation(NewGet.class);
         if (annotation == null)
             return;
         val classTypes = annotation.value();
         if (classTypes.length == 0)
             throw new IllegalArgumentException("Getter method " + method.getName() + " has no class types");
-        val lambda = newLambdaFactory(GetterBinding.Immutable.class, method).invoke();
+        val lambda = newLambdaFactory(GetterBinding.Allocating.class, method).invoke();
         for (val classType : classTypes)
-            getters.put(classType, (GetterBinding.Immutable<?>) lambda);
+            getters.put(classType, (GetterBinding.Allocating<?>) lambda);
     }
 
     public static MethodHandle newLambdaFactory(Class<?> functionalInterface, Method staticMethod) {

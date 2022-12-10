@@ -1,9 +1,9 @@
-package com.github.basdxz.vbuffers.internal.accessor;
+package com.github.basdxz.vbuffers.accessor.io;
 
 import lombok.*;
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-final class IdxBinding {
+@AllArgsConstructor
+public final class IdxBinding {
     private final int argumentIndex;
     private final int strideBytes;
 

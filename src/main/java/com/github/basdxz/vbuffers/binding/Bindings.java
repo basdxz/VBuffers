@@ -21,7 +21,7 @@ public interface Bindings {
 
     @Target(METHOD)
     @Retention(RUNTIME)
-    @interface ImGet {
+    @interface NewGet {
         Class<?>[] value();
     }
 }

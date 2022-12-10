@@ -1,11 +1,11 @@
-package com.github.basdxz.vbuffers.internal.accessor;
+package com.github.basdxz.vbuffers.accessor.io;
 
 import java.nio.ByteBuffer;
 
-final class InReturn implements AccessorReturn {
+public final class InReturn implements Return {
     private final int outParameterIndex;
 
-    InReturn(InParameter inParameter) {
+    public InReturn(InParameter inParameter) {
         this.outParameterIndex = inParameter.parameterIndex();
     }
 

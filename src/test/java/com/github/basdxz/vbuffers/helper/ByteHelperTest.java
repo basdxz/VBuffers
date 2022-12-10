@@ -1,6 +1,5 @@
 package com.github.basdxz.vbuffers.helper;
 
-import com.github.basdxz.vbuffers.internal.helper.ByteHelper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

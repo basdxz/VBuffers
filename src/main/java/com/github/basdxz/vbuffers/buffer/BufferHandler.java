@@ -1,10 +1,9 @@
-package com.github.basdxz.vbuffers.internal.buffer;
+package com.github.basdxz.vbuffers.buffer;
 
 import com.github.basdxz.vbuffers.accessor.Accessor;
-import com.github.basdxz.vbuffers.buffer.SuperBuffer;
-import com.github.basdxz.vbuffers.internal.accessor.AccessorFactory;
-import com.github.basdxz.vbuffers.internal.layout.LayoutStride;
+import com.github.basdxz.vbuffers.accessor.AccessorFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
+import com.github.basdxz.vbuffers.layout.LayoutStride;
 import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -22,30 +21,30 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer<LAYOUT>, InvocationHandler {
-    protected static final ClassLoader CLASS_LOADER = BufferHandler.class.getClassLoader();
-    protected static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
-                                                             Spliterator.DISTINCT |
-                                                             Spliterator.SIZED |
-                                                             Spliterator.NONNULL |
-                                                             Spliterator.IMMUTABLE |
-                                                             Spliterator.CONCURRENT |
-                                                             Spliterator.SUBSIZED;
+public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer<LAYOUT>, InvocationHandler {
+    private static final ClassLoader CLASS_LOADER = BufferHandler.class.getClassLoader();
+    private static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
+                                                           Spliterator.DISTINCT |
+                                                           Spliterator.SIZED |
+                                                           Spliterator.NONNULL |
+                                                           Spliterator.IMMUTABLE |
+                                                           Spliterator.CONCURRENT |
+                                                           Spliterator.SUBSIZED;
 
-    protected final Class<LAYOUT> layout;
-    protected final int capacity;
-    protected final LAYOUT proxy;
-    protected final Stride stride;
-    protected final ByteBuffer backingBuffer;
-    protected final Map<Method, Accessor> methodAccessors;
+    private final Class<LAYOUT> layout;
+    private final int capacity;
+    private final LAYOUT proxy;
+    private final Stride stride;
+    private final ByteBuffer backingBuffer;
+    private final Map<Method, Accessor> methodAccessors;
 
-    protected int position;
-    protected int limit;
-    protected int mark;
-    protected boolean readOnly;
+    private int position;
+    private int limit;
+    private int mark;
+    private boolean readOnly;
 
     // Normal Constructor
-    protected BufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
+    private BufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -61,7 +60,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
     }
 
     // Copy constructor
-    protected BufferHandler(BufferHandler<LAYOUT> other) {
+    private BufferHandler(BufferHandler<LAYOUT> other) {
         this.layout = other.layout;
         this.capacity = other.capacity;
         this.proxy = initProxy();
@@ -77,7 +76,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
     }
 
     // Slice Copy constructor
-    protected BufferHandler(BufferHandler<LAYOUT> other, int startIndex, int capacity) {
+    private BufferHandler(BufferHandler<LAYOUT> other, int startIndex, int capacity) {
         this.layout = other.layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -95,17 +94,17 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
     }
 
     @SuppressWarnings("unchecked")
-    protected LAYOUT initProxy() {
+    private LAYOUT initProxy() {
         // Create a new proxy for the handler, must be called after layout is set
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
-    protected BufferHandler<LAYOUT> newCopy() {
+    private BufferHandler<LAYOUT> newCopy() {
         // Create a deep copy of this VBufferHandler
         return new BufferHandler<>(this);
     }
 
-    protected BufferHandler<LAYOUT> newCopyOfRemainingStrides() {
+    private BufferHandler<LAYOUT> newCopyOfRemainingStrides() {
         // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining strides
         return new BufferHandler<>(this, position, v$remaining());
     }
@@ -269,7 +268,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
         return proxy;
     }
 
-    protected void ensureWritable() {
+    private void ensureWritable() {
         if (readOnly)
             throw new ReadOnlyBufferException();
     }
@@ -350,7 +349,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
                 .orElseGet(() -> handleAttributeMethod(proxy, method, args));
     }
 
-    protected Optional<Object> handleInternalMethod(Method method, Object[] args) {
+    private Optional<Object> handleInternalMethod(Method method, Object[] args) {
         val methodName = method.getName();
 
         // Internal methods all start with our prefix, there is also a special case for the iterator method...
@@ -373,7 +372,7 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
         }
     }
 
-    protected Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
+    private Object handleAttributeMethod(Object proxy, Method method, Object[] args) {
         if (!v$hasRemaining())
             throw new BufferUnderflowException();
         val accessFront = methodAccessors.get(method);
@@ -382,11 +381,11 @@ public class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer
         return accessFront.access(proxy, backingBuffer, strideIndexToBytes(position), args);
     }
 
-    protected int attributeOffset(String attributeName) {
+    private int attributeOffset(String attributeName) {
         return stride.attributes().get(attributeName).offsetBytes() + strideIndexToBytes(position);
     }
 
-    protected int strideIndexToBytes(int strideIndex) {
+    private int strideIndexToBytes(int strideIndex) {
         // Convert the stride index to stride bytes
         return strideIndex * stride.sizeBytes();
     }

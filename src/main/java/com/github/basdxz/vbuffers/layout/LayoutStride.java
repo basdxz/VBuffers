@@ -1,8 +1,5 @@
-package com.github.basdxz.vbuffers.internal.layout;
+package com.github.basdxz.vbuffers.layout;
 
-import com.github.basdxz.vbuffers.layout.Attribute;
-import com.github.basdxz.vbuffers.layout.Layout;
-import com.github.basdxz.vbuffers.layout.Stride;
 import lombok.*;
 
 import java.lang.reflect.Method;
