@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers.old;
 
-import com.github.basdxz.vbuffers.buffer.BufferHandler;
+import com.github.basdxz.vbuffers.instance.BufferInstance;
 import com.github.basdxz.vbuffers.old.samples.LayoutA;
 import com.github.basdxz.vbuffers.old.samples.LayoutB;
 import lombok.*;
@@ -32,7 +32,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Simple I/O")
     public void singleReadWrite() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocate);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocate);
         for (val value : SAMPLE_VALUES) {
             val position = value + 55;
             val normal = value - 73;
@@ -55,7 +55,7 @@ public final class BufferTest {
     @DisplayName("Simple I/O with ByteBuffer interop")
     public void directBackingReadWrite() {
         val intBackingBox = new IntBuffer[1];
-        val buffer = BufferHandler.newBuffer(LayoutA.class, capacity -> {
+        val buffer = BufferInstance.newBuffer(LayoutA.class, capacity -> {
             val allocation = ByteBuffer.allocate(capacity);
             intBackingBox[0] = allocation.asIntBuffer();
             return allocation;
@@ -83,7 +83,7 @@ public final class BufferTest {
     @Test
     @DisplayName("JOML interop")
     public void basicJOMLVectors() {
-        val buffer = BufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
+        val buffer = BufferInstance.newBuffer(LayoutB.class, ByteBuffer::allocateDirect);
 
         val position = new Vector3f(55F, 994F, -1515F);
         val normal = new Vector3f(35F, 300F, -105F);
@@ -104,7 +104,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Multiple strides per buffer")
     public void readWriteStrides() {
-        val buffer = BufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_D);
+        val buffer = BufferInstance.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_D);
         val positions = IntStream.range(0, SIZE_D)
                                  .mapToObj(Vector3f::new)
                                  .toList();
@@ -148,7 +148,7 @@ public final class BufferTest {
     @DisplayName("ByteBuffer-like API for flip and compact")
     public void flipAndCompact() {
         val middleOfB = SIZE_B / 2;
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
 
         // Write 1s
         for (var i = 0; i < SIZE_A; i++) {
@@ -220,7 +220,7 @@ public final class BufferTest {
     @Test
     @DisplayName("ByteBuffer-like API for duplicate views")
     public void duplicate() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
         // Fill buffer
         for (var i = 0; i < SIZE_A; i++) {
@@ -246,7 +246,7 @@ public final class BufferTest {
     @Test
     @DisplayName("ByteBuffer-like API for slice views")
     public void slice() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
         // Fill buffer
         for (var i = 0; i < SIZE_A; i++) {
@@ -271,7 +271,7 @@ public final class BufferTest {
     @Test
     @DisplayName("ByteBuffer-like API for read only views")
     public void readOnly() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
         // Fill buffer
         for (var i = 0; i < SIZE_A; i++) {
@@ -306,7 +306,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Iterators")
     public void iteration() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
         // Fill buffer
         var value = 0;
@@ -332,7 +332,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Streams")
     public void streams() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
 
         // Create immutable list of integers
         val testValues = IntStream.range(0, SIZE_D).boxed().toList();
@@ -363,7 +363,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Parallel Streams")
     public void parallelStreams() {
-        val buffer = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
+        val buffer = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_D);
         val testValues = IntStream.range(0, SIZE_D).boxed().toList();
 
         // Fill buffer in parallel
@@ -395,7 +395,7 @@ public final class BufferTest {
     @Test
     @DisplayName("Internal stride copying")
     public void internalCopy() {
-        val buffer = BufferHandler.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_A);
+        val buffer = BufferInstance.newBuffer(LayoutB.class, ByteBuffer::allocateDirect, SIZE_A);
 
         val position = new Vector3f(55F, 994F, -1515F);
         val normal = new Vector3f(35F, 300F, -105F);
@@ -423,8 +423,8 @@ public final class BufferTest {
     @Test
     @DisplayName("ByteBuffer-like API for read only views")
     public void bufferToBufferCopy() {
-        val bufferA = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
-        val bufferB = BufferHandler.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val bufferA = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
+        val bufferB = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
 
         // Fill buffer A
         for (var i = 0; i < SIZE_A; i++) {

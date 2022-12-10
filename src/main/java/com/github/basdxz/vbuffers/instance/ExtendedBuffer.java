@@ -1,13 +1,13 @@
-package com.github.basdxz.vbuffers.buffer;
+package com.github.basdxz.vbuffers.instance;
 
 import org.jetbrains.annotations.Contract;
 
 import java.nio.ByteBuffer;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface SuperBuffer<LAYOUT extends SuperBuffer<LAYOUT>> extends ViewableBuffer<LAYOUT>,
-                                                                         IterableBuffer<LAYOUT>,
-                                                                         StreamableBuffer<LAYOUT> {
+public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends Viewable<LAYOUT>,
+                                                                               Iterable<LAYOUT>,
+                                                                               Streamable<LAYOUT> {
     @Contract(pure = true)
     ByteBuffer v$backing();
 

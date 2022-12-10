@@ -1,9 +1,9 @@
-package com.github.basdxz.vbuffers.buffer;
+package com.github.basdxz.vbuffers.instance;
 
 import org.jetbrains.annotations.Contract;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface ViewableBuffer<LAYOUT extends ViewableBuffer<LAYOUT>> extends Buffer<LAYOUT> {
+public interface Viewable<LAYOUT extends Viewable<LAYOUT>> extends Buffer<LAYOUT> {
     @Contract(value = "-> new", pure = true)
     LAYOUT v$duplicateView();
 

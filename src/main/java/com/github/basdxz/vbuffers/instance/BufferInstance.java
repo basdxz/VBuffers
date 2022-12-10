@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.buffer;
+package com.github.basdxz.vbuffers.instance;
 
 import com.github.basdxz.vbuffers.accessor.Accessor;
 import com.github.basdxz.vbuffers.accessor.AccessorFactory;
@@ -21,8 +21,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements SuperBuffer<LAYOUT>, InvocationHandler {
-    private static final ClassLoader CLASS_LOADER = BufferHandler.class.getClassLoader();
+public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements ExtendedBuffer<LAYOUT>, InvocationHandler {
+    private static final ClassLoader CLASS_LOADER = BufferInstance.class.getClassLoader();
     private static final int SPLITERATOR_CHARACTERISTICS = Spliterator.ORDERED |
                                                            Spliterator.DISTINCT |
                                                            Spliterator.SIZED |
@@ -44,7 +44,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
     private boolean readOnly;
 
     // Normal Constructor
-    private BufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
+    private BufferInstance(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -60,7 +60,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
     }
 
     // Copy constructor
-    private BufferHandler(BufferHandler<LAYOUT> other) {
+    private BufferInstance(BufferInstance<LAYOUT> other) {
         this.layout = other.layout;
         this.capacity = other.capacity;
         this.proxy = initProxy();
@@ -76,7 +76,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
     }
 
     // Slice Copy constructor
-    private BufferHandler(BufferHandler<LAYOUT> other, int startIndex, int capacity) {
+    private BufferInstance(BufferInstance<LAYOUT> other, int startIndex, int capacity) {
         this.layout = other.layout;
         this.capacity = capacity;
         this.proxy = initProxy();
@@ -99,14 +99,14 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
         return (LAYOUT) Proxy.newProxyInstance(CLASS_LOADER, new Class[]{layout}, this);
     }
 
-    private BufferHandler<LAYOUT> newCopy() {
+    private BufferInstance<LAYOUT> newCopy() {
         // Create a deep copy of this VBufferHandler
-        return new BufferHandler<>(this);
+        return new BufferInstance<>(this);
     }
 
-    private BufferHandler<LAYOUT> newCopyOfRemainingStrides() {
+    private BufferInstance<LAYOUT> newCopyOfRemainingStrides() {
         // Create a deep copy of this VBufferHandler, but slice it to only contain the remaining strides
-        return new BufferHandler<>(this, position, v$remaining());
+        return new BufferInstance<>(this, position, v$remaining());
     }
 
     // Static constructor
@@ -118,7 +118,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
     // Static constructor
     public static <LAYOUT extends Layout<LAYOUT>> LAYOUT newBuffer(
             @NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
-        return new BufferHandler<>(layout, allocator, capacity).proxy;
+        return new BufferInstance<>(layout, allocator, capacity).proxy;
     }
 
     @NotNull
@@ -302,7 +302,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
 
     @Override
     public LAYOUT v$strideView(int index) {
-        return new BufferHandler<>(this, index, 1).proxy;
+        return new BufferInstance<>(this, index, 1).proxy;
     }
 
     @Override
@@ -312,7 +312,7 @@ public final class BufferHandler<LAYOUT extends Layout<LAYOUT>> implements Super
 
     @Override
     public LAYOUT v$sliceView(int startIndex, int length) {
-        return new BufferHandler<>(this, startIndex, length).proxy;
+        return new BufferInstance<>(this, startIndex, length).proxy;
     }
 
     @Override

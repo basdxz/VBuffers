@@ -1,6 +1,6 @@
 package com.github.basdxz.vbuffers.old.shaderdemo;
 
-import com.github.basdxz.vbuffers.buffer.BufferHandler;
+import com.github.basdxz.vbuffers.instance.BufferInstance;
 import lombok.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -20,7 +20,7 @@ public class ShaderDemo {
 
     public static void main(String[] args) {
         // Create shader buffer
-        val buffer = BufferHandler.newBuffer(ShaderLayout.class, ByteBuffer::allocateDirect, POINT_COUNT);
+        val buffer = BufferInstance.newBuffer(ShaderLayout.class, ByteBuffer::allocateDirect, POINT_COUNT);
 
         // Apply UVs to the buffer
         for (var y = 0; y < CANVAS_HEIGHT; y++) {
