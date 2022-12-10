@@ -1,10 +1,10 @@
-package com.github.basdxz.vbuffers.accessor.front.handler;
+package com.github.basdxz.vbuffers.accessor.front.bind;
 
 import com.github.basdxz.vbuffers.layout.Attribute;
 
 import java.nio.ByteBuffer;
 
-public interface ParameterHandler {
+public interface ParameterBinding {
     Attribute attribute();
 
     int parameterIndex();

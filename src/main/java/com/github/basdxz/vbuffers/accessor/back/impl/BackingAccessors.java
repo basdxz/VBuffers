@@ -1,8 +1,10 @@
 package com.github.basdxz.vbuffers.accessor.back.impl;
 
-import com.github.basdxz.vbuffers.accessor.back.BackingAccessors;
 import com.github.basdxz.vbuffers.accessor.back.BackingGetter;
 import com.github.basdxz.vbuffers.accessor.back.BackingSetter;
+import com.github.basdxz.vbuffers.accessor.back.bind.BackingAccessorBindings;
+import com.github.basdxz.vbuffers.accessor.back.bind.impl.JOMLBindings;
+import com.github.basdxz.vbuffers.accessor.back.bind.impl.PrimitiveBindings;
 import lombok.*;
 
 import java.lang.invoke.LambdaMetafactory;
@@ -15,16 +17,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.basdxz.vbuffers.accessor.back.BackingAccessors.*;
+import static com.github.basdxz.vbuffers.accessor.back.bind.BackingAccessorBindings.*;
 
 // TODO: Convert from singleton
-public class BackingAccessorFactory {
-    protected static final Map<Class<?>, BackingSetter<?>> setters = new HashMap<>();
-    protected static final Map<Class<?>, BackingGetter<?>> getters = new HashMap<>();
+public final class BackingAccessors {
+    private static final Map<Class<?>, BackingSetter<?>> setters = new HashMap<>();
+    private static final Map<Class<?>, BackingGetter<?>> getters = new HashMap<>();
 
     static {
-        load(PrimitiveBackingAccessors.class);
-        load(JOMLBackingAccessors.class);
+        load(PrimitiveBindings.class);
+        load(JOMLBindings.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -37,10 +39,10 @@ public class BackingAccessorFactory {
         return (BackingGetter<T>) getters.get(type);
     }
 
-    public static void load(Class<? extends BackingAccessors> accessors) {
+    public static void load(Class<? extends BackingAccessorBindings> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
-              .forEach(BackingAccessorFactory::addAccessors);
+              .forEach(BackingAccessors::addAccessors);
     }
 
     public static void addAccessors(Method method) {

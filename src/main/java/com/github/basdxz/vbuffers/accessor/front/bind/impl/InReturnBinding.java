@@ -1,13 +1,13 @@
-package com.github.basdxz.vbuffers.accessor.front.handler.impl;
+package com.github.basdxz.vbuffers.accessor.front.bind.impl;
 
-import com.github.basdxz.vbuffers.accessor.front.handler.ReturnHandler;
+import com.github.basdxz.vbuffers.accessor.front.bind.ReturnBinding;
 
 import java.nio.ByteBuffer;
 
-public class InReturnHandler implements ReturnHandler {
+public class InReturnBinding implements ReturnBinding {
     protected final int outParameterIndex;
 
-    public InReturnHandler(InParameterHandler inParameter) {
+    public InReturnBinding(InParameterBinding inParameter) {
         this.outParameterIndex = inParameter.parameterIndex();
     }
 

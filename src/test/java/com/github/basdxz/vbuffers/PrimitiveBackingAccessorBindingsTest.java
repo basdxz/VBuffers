@@ -1,13 +1,13 @@
 package com.github.basdxz.vbuffers;
 
-import com.github.basdxz.vbuffers.accessor.back.impl.BackingAccessorFactory;
+import com.github.basdxz.vbuffers.accessor.back.impl.BackingAccessors;
 import lombok.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class PrimitiveBackingAccessorsTest {
+public class PrimitiveBackingAccessorBindingsTest {
     protected static final int BUFFER_SIZE_BYTES = 1024;
     protected static final int OFFSET_BYTES = 456;
 
@@ -23,8 +23,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveByte() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(byte.class);
-        val getter = BackingAccessorFactory.getter(byte.class);
+        val setter = BackingAccessors.setter(byte.class);
+        val getter = BackingAccessors.getter(byte.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_BYTE);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -35,8 +35,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedByte() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Byte.class);
-        val getter = BackingAccessorFactory.getter(Byte.class);
+        val setter = BackingAccessors.setter(Byte.class);
+        val getter = BackingAccessors.getter(Byte.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_BYTE);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -47,8 +47,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveBoolean() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(boolean.class);
-        val getter = BackingAccessorFactory.getter(boolean.class);
+        val setter = BackingAccessors.setter(boolean.class);
+        val getter = BackingAccessors.getter(boolean.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_BOOLEAN);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -59,8 +59,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedBoolean() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Boolean.class);
-        val getter = BackingAccessorFactory.getter(Boolean.class);
+        val setter = BackingAccessors.setter(Boolean.class);
+        val getter = BackingAccessors.getter(Boolean.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_BOOLEAN);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -71,8 +71,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveChar() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(char.class);
-        val getter = BackingAccessorFactory.getter(char.class);
+        val setter = BackingAccessors.setter(char.class);
+        val getter = BackingAccessors.getter(char.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_CHAR);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -83,8 +83,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedChar() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Character.class);
-        val getter = BackingAccessorFactory.getter(Character.class);
+        val setter = BackingAccessors.setter(Character.class);
+        val getter = BackingAccessors.getter(Character.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_CHAR);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -95,8 +95,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveShort() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(short.class);
-        val getter = BackingAccessorFactory.getter(short.class);
+        val setter = BackingAccessors.setter(short.class);
+        val getter = BackingAccessors.getter(short.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_SHORT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -107,8 +107,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedShort() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Short.class);
-        val getter = BackingAccessorFactory.getter(Short.class);
+        val setter = BackingAccessors.setter(Short.class);
+        val getter = BackingAccessors.getter(Short.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_SHORT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -119,8 +119,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveInt() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(int.class);
-        val getter = BackingAccessorFactory.getter(int.class);
+        val setter = BackingAccessors.setter(int.class);
+        val getter = BackingAccessors.getter(int.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_INT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -131,8 +131,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedInt() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Integer.class);
-        val getter = BackingAccessorFactory.getter(Integer.class);
+        val setter = BackingAccessors.setter(Integer.class);
+        val getter = BackingAccessors.getter(Integer.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_INT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -143,8 +143,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveLong() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(long.class);
-        val getter = BackingAccessorFactory.getter(long.class);
+        val setter = BackingAccessors.setter(long.class);
+        val getter = BackingAccessors.getter(long.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_LONG);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -155,8 +155,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedLong() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Long.class);
-        val getter = BackingAccessorFactory.getter(Long.class);
+        val setter = BackingAccessors.setter(Long.class);
+        val getter = BackingAccessors.getter(Long.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_LONG);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -167,8 +167,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveFloat() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(float.class);
-        val getter = BackingAccessorFactory.getter(float.class);
+        val setter = BackingAccessors.setter(float.class);
+        val getter = BackingAccessors.getter(float.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_FLOAT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -179,8 +179,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedFloat() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Float.class);
-        val getter = BackingAccessorFactory.getter(Float.class);
+        val setter = BackingAccessors.setter(Float.class);
+        val getter = BackingAccessors.getter(Float.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_FLOAT);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -191,8 +191,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void primitiveDouble() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(double.class);
-        val getter = BackingAccessorFactory.getter(double.class);
+        val setter = BackingAccessors.setter(double.class);
+        val getter = BackingAccessors.getter(double.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_DOUBLE);
         val result = getter.get(buffer, OFFSET_BYTES, null);
@@ -203,8 +203,8 @@ public class PrimitiveBackingAccessorsTest {
     @Test
     public void boxedDouble() {
         val buffer = ByteBuffer.allocate(BUFFER_SIZE_BYTES);
-        val setter = BackingAccessorFactory.setter(Double.class);
-        val getter = BackingAccessorFactory.getter(Double.class);
+        val setter = BackingAccessors.setter(Double.class);
+        val getter = BackingAccessors.getter(Double.class);
 
         setter.put(buffer, OFFSET_BYTES, TEST_DOUBLE);
         val result = getter.get(buffer, OFFSET_BYTES, null);

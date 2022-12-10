@@ -1,9 +1,9 @@
-package com.github.basdxz.vbuffers.accessor.front.handler.impl;
+package com.github.basdxz.vbuffers.accessor.front.bind.impl;
 
 import lombok.*;
 
 @AllArgsConstructor
-public class IdxHandler {
+public class IdxBinding {
     protected final int argumentIndex;
     protected final int strideBytes;
 

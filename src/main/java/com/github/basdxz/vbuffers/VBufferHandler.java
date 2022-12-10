@@ -17,6 +17,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -43,12 +44,12 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
     protected boolean readOnly;
 
     // Normal Constructor
-    protected VBufferHandler(Class<LAYOUT> layout, Allocator allocator, int capacity) {
+    protected VBufferHandler(Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
         this.stride = new LayoutStride(layout.getAnnotation(Layout.Stride.class));
-        this.backingBuffer = allocator.allocate(this.stride.sizeBytes() * capacity);
+        this.backingBuffer = allocator.apply(this.stride.sizeBytes() * capacity);
         this.methodAccessors = Collections.unmodifiableMap(FrontAccessorFactory.accessFronts(this.stride, layout));
 
         // Set Default pointer values
@@ -110,13 +111,13 @@ public class VBufferHandler<LAYOUT extends VBuffer<LAYOUT>> implements VBuffer<L
 
     // Static constructor
     public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT
-    newBuffer(@NonNull Class<LAYOUT> layout, Allocator allocator) {
+    newBuffer(@NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator) {
         return newBuffer(layout, allocator, 1);
     }
 
     // Static constructor
     public static <LAYOUT extends VBuffer<LAYOUT>> LAYOUT newBuffer(
-            @NonNull Class<LAYOUT> layout, Allocator allocator, int capacity) {
+            @NonNull Class<LAYOUT> layout, Function<Integer, ByteBuffer> allocator, int capacity) {
         return new VBufferHandler<>(layout, allocator, capacity).proxy;
     }
 
