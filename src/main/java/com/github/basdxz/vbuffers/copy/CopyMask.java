@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.backing;
+package com.github.basdxz.vbuffers.copy;
 
 import lombok.*;
 

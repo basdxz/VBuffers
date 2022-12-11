@@ -1,6 +1,8 @@
 package com.github.basdxz.vbuffers.instance;
 
+import com.github.basdxz.vbuffers.copy.CopyMask;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 
@@ -53,6 +55,9 @@ public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends B
 
     @Contract("_, _-> this")
     LAYOUT v$copyStride(int targetIndex, int sourceIndex);
+
+    @Contract("_, _ -> this")
+    LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask);
 
     @Contract("_ -> this")
     LAYOUT v$put(LAYOUT source);

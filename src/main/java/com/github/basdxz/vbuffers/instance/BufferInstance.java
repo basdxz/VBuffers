@@ -2,10 +2,13 @@ package com.github.basdxz.vbuffers.instance;
 
 import com.github.basdxz.vbuffers.accessor.Accessor;
 import com.github.basdxz.vbuffers.accessor.AccessorFactory;
+import com.github.basdxz.vbuffers.copy.CopyMask;
+import com.github.basdxz.vbuffers.copy.CopyStrategyFactory;
 import com.github.basdxz.vbuffers.layout.Layout;
 import com.github.basdxz.vbuffers.layout.LayoutInfo;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -246,6 +249,11 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
 
     @Override
     public LAYOUT v$put(LAYOUT source) {
+        return v$put(source, null);
+    }
+
+    @Override
+    public LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask) {
         ensureWritable();
         if (!source.v$hasRemaining())
             return proxy;
@@ -254,21 +262,14 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
         val strideLength = source.v$remaining();
         if (target.v$remaining() < strideLength)
             throw new BufferOverflowException();
-        val lengthBytes = strideIndexToBytes(strideLength);
 
-        val sourceBacking = source.v$backing();
         val sourcePosition = source.v$position();
-        val sourceOffsetBytes = strideIndexToBytes(sourcePosition);
-
-        val targetBacking = target.v$backing();
         val targetPosition = target.v$position();
-        val targetOffsetBytes = strideIndexToBytes(targetPosition);
 
         // Copy the remaining buffer, incrementing the positions
-        targetBacking.put(targetOffsetBytes, sourceBacking, sourceOffsetBytes, lengthBytes);
+        CopyStrategyFactory.create(source, target, mask).copyRange(sourcePosition, targetPosition, strideLength);
         source.v$position(sourcePosition + strideLength);
         target.v$position(targetPosition + strideLength);
-
         return proxy;
     }
 
