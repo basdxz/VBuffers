@@ -6,19 +6,19 @@ import static com.github.basdxz.vbuffers.sample.TestConstants.*;
 import static com.github.basdxz.vbuffers.sample.XYZBuffer.Attr;
 import static com.github.basdxz.vbuffers.sample.XYZBuffer.Stride;
 
-@Stride({@Attr(name = X, type = Integer.class),
+@Stride({@Attr(name = Z, type = Integer.class),
          @Attr(name = Y, type = Integer.class),
-         @Attr(name = Z, type = Integer.class)})
-public interface XYZBuffer extends Layout<XYZBuffer> {
-    @This XYZBuffer x(@In(X) int value);
+         @Attr(name = X, type = Integer.class)})
+public interface ZYXBuffer extends Layout<ZYXBuffer> {
+    @This ZYXBuffer z(@In(Z) int value);
 
-    @Out(X) int x();
+    @Out(Z) int z();
 
-    @This XYZBuffer y(@In(Y) int value);
+    @This ZYXBuffer y(@In(Y) int value);
 
     @Out(Y) int y();
 
-    @This XYZBuffer z(@In(Z) int value);
+    @This ZYXBuffer x(@In(X) int value);
 
-    @Out(Z) int z();
+    @Out(X) int x();
 }

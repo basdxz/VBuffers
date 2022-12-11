@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.github.basdxz.vbuffers.sample.TestConstants.*;
+
 @DisplayName("Attribute")
 class AttributeTest {
 
@@ -24,17 +26,17 @@ class AttributeTest {
         val zAttribute = new Attribute(zAttAnnotation, 8);
 
         // Validate the attributes
-        Assertions.assertEquals(XYZBuffer.x, xAttribute.name());
+        Assertions.assertEquals(X, xAttribute.name());
         Assertions.assertEquals(Integer.class, xAttribute.type());
         Assertions.assertEquals(4, xAttribute.sizeBytes());
         Assertions.assertEquals(0, xAttribute.offsetBytes());
 
-        Assertions.assertEquals(XYZBuffer.y, yAttribute.name());
+        Assertions.assertEquals(Y, yAttribute.name());
         Assertions.assertEquals(Integer.class, yAttribute.type());
         Assertions.assertEquals(4, yAttribute.sizeBytes());
         Assertions.assertEquals(4, yAttribute.offsetBytes());
 
-        Assertions.assertEquals(XYZBuffer.z, zAttribute.name());
+        Assertions.assertEquals(Z, zAttribute.name());
         Assertions.assertEquals(Integer.class, zAttribute.type());
         Assertions.assertEquals(4, zAttribute.sizeBytes());
         Assertions.assertEquals(8, zAttribute.offsetBytes());

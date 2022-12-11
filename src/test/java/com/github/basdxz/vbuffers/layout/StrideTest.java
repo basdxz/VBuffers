@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.github.basdxz.vbuffers.sample.TestConstants.*;
+
 @DisplayName("Stride")
 class StrideTest {
     @Test
@@ -25,25 +27,25 @@ class StrideTest {
 
         Assertions.assertEquals(3, attributes.size());
 
-        val xAttribute = attributes.get(XYZBuffer.x);
-        val yAttribute = attributes.get(XYZBuffer.y);
-        val zAttribute = attributes.get(XYZBuffer.z);
+        val xAttribute = attributes.get(X);
+        val yAttribute = attributes.get(Y);
+        val zAttribute = attributes.get(Z);
 
         Assertions.assertNotNull(xAttribute);
         Assertions.assertNotNull(yAttribute);
         Assertions.assertNotNull(zAttribute);
 
-        Assertions.assertEquals(XYZBuffer.x, xAttribute.name());
+        Assertions.assertEquals(X, xAttribute.name());
         Assertions.assertEquals(Integer.class, xAttribute.type());
         Assertions.assertEquals(4, xAttribute.sizeBytes());
         Assertions.assertEquals(0, xAttribute.offsetBytes());
 
-        Assertions.assertEquals(XYZBuffer.y, yAttribute.name());
+        Assertions.assertEquals(Y, yAttribute.name());
         Assertions.assertEquals(Integer.class, yAttribute.type());
         Assertions.assertEquals(4, yAttribute.sizeBytes());
         Assertions.assertEquals(4, yAttribute.offsetBytes());
 
-        Assertions.assertEquals(XYZBuffer.z, zAttribute.name());
+        Assertions.assertEquals(Z, zAttribute.name());
         Assertions.assertEquals(Integer.class, zAttribute.type());
         Assertions.assertEquals(4, zAttribute.sizeBytes());
         Assertions.assertEquals(8, zAttribute.offsetBytes());
