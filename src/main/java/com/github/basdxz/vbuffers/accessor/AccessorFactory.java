@@ -14,7 +14,7 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AccessorFactory {
-    public static Map<Method, Accessor> accessFronts(LayoutInfo layoutInfo) {
+    public static Map<Method, Accessor> accessFronts(LayoutInfo<?> layoutInfo) {
         val accessFronts = new HashMap<Method, Accessor>();
         for (val method : layoutInfo.methods()) {// Currently does not account properly for hierarchy
             val accessFront = create(layoutInfo.stride(), method);

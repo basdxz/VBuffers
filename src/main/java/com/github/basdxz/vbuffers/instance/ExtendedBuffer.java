@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Contract;
 import java.nio.ByteBuffer;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends Viewable<LAYOUT>,
+public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends Buffer<LAYOUT>,
+                                                                               Viewable<LAYOUT>,
                                                                                Iterable<LAYOUT>,
                                                                                Streamable<LAYOUT> {
     @Contract(pure = true)

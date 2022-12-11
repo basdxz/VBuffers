@@ -421,7 +421,7 @@ public final class BufferTest {
     }
 
     @Test
-    @DisplayName("ByteBuffer-like API for read only views")
+    @DisplayName("External stride copying")
     public void bufferToBufferCopy() {
         val bufferA = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);
         val bufferB = BufferInstance.newBuffer(LayoutA.class, ByteBuffer::allocateDirect, SIZE_A);

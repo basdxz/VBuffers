@@ -33,7 +33,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
     private final Class<LAYOUT> layout;
     private final int capacity;
     private final LAYOUT proxy;
-    private final LayoutInfo layoutInfo;
+    private final LayoutInfo<LAYOUT> layoutInfo;
     private final ByteBuffer backingBuffer;
     private final Map<Method, Accessor> methodAccessors;
 
@@ -47,7 +47,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
         this.layout = layout;
         this.capacity = capacity;
         this.proxy = initProxy();
-        this.layoutInfo = new LayoutInfo(layout);
+        this.layoutInfo = new LayoutInfo<>(layout);
         this.backingBuffer = allocator.apply(this.layoutInfo.stride().sizeBytes() * capacity);
         this.methodAccessors = Collections.unmodifiableMap(AccessorFactory.accessFronts(this.layoutInfo));
 
@@ -124,6 +124,11 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
     @Override
     public Iterator<LAYOUT> iterator() {
         return v$iterator();
+    }
+
+    @Override
+    public LayoutInfo v$layoutInfo() {
+        return layoutInfo;
     }
 
     @Override

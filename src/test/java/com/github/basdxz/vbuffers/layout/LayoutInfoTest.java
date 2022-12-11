@@ -14,7 +14,7 @@ class LayoutInfoTest {
     @DisplayName("XYZ Buffer")
     void xyzBuffer() {
         // Create the layout info
-        val layoutInfo = new LayoutInfo(XYZBuffer.class);
+        val layoutInfo = new LayoutInfo<>(XYZBuffer.class);
 
         // Validate the layout info
         Assertions.assertEquals(XYZBuffer.class, layoutInfo.type());
