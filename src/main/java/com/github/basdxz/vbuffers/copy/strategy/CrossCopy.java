@@ -1,10 +1,13 @@
 package com.github.basdxz.vbuffers.copy.strategy;
 
+import com.github.basdxz.vbuffers.copy.CopyMask;
 import com.github.basdxz.vbuffers.instance.ExtendedBuffer;
 import com.github.basdxz.vbuffers.layout.Attribute;
 import lombok.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class CrossCopy implements CopyStrategy {
@@ -13,6 +16,10 @@ public final class CrossCopy implements CopyStrategy {
     private final List<AttributeMapping> attributeMappings;
 
     public CrossCopy(ExtendedBuffer<?> source, ExtendedBuffer<?> target) {
+        this(source, target, null);
+    }
+
+    public CrossCopy(ExtendedBuffer<?> source, ExtendedBuffer<?> target, @Nullable CopyMask mask) {
         if (source.v$layoutInfo().equals(target.v$layoutInfo()))
             throw new IllegalArgumentException("Source and target must have different layouts");
 
@@ -23,12 +30,14 @@ public final class CrossCopy implements CopyStrategy {
         val sourceStride = source.v$layoutInfo().stride();
         val targetStride = target.v$layoutInfo().stride();
         for (val sourceAttribute : sourceStride.attributes().values()) {
+            if (mask != null && !mask.attributeNames().contains(sourceAttribute.name()))
+                continue;
             val targetAttribute = targetStride.attributes().get(sourceAttribute.name());
             if (targetAttribute != null)
                 attributeMappings.add(new AttributeMapping(sourceAttribute, targetAttribute));
         }
 
-        this.attributeMappings = attributeMappings;
+        this.attributeMappings = Collections.unmodifiableList(attributeMappings);
     }
 
     @Override
