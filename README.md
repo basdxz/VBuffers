@@ -108,8 +108,8 @@ ASM will take longer to implement but will be much faster and more efficient.
 |----------------------|-----------|------|------|------|-------|
 | Internally 1:1       | Essential | ✴️   | ✴️   | ❌    | ❌     |
 | Externally 1:1       | Essential | ✴️   | ❌    | ❌    | ❌     |
-| Internally Swizzling | Essential | ❌    | ❌    | ❌    | ❌     |
-| Externally Swizzling | Essential | ❌    | ❌    | ❌    | ❌     |
+| Internally Swizzling | Essential | ✴️   | ❌    | ❌    | ❌     |
+| Externally Swizzling | Essential | ✴️   | ❌    | ❌    | ❌     |
 | Different Backings   | High      | ❌    | ❌    | ❌    | ❌     |
 | SSE/AVX acceleration | Neat      | ❌    | ❌    | ❌    | ❌     |
 
