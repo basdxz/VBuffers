@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class PrimitiveBindingsTest {
+public class PrimitiveTypeBindingsTest {
     protected static final int BUFFER_SIZE_BYTES = 1024;
     protected static final int OFFSET_BYTES = 456;
 

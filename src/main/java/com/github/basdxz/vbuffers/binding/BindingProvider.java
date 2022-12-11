@@ -1,5 +1,8 @@
 package com.github.basdxz.vbuffers.binding;
 
+import com.github.basdxz.vbuffers.binding.type.JOMLTypeBindings;
+import com.github.basdxz.vbuffers.binding.type.PrimitiveTypeBindings;
+import com.github.basdxz.vbuffers.binding.type.TypeBindings;
 import lombok.*;
 
 import java.lang.reflect.Method;
@@ -8,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.basdxz.vbuffers.binding.Bindings.*;
+import static com.github.basdxz.vbuffers.binding.type.TypeBindings.*;
 import static com.github.basdxz.vbuffers.helper.LambdaHelper.newLambdaMetaFactory;
 
 // TODO: Convert from singleton
@@ -18,8 +21,8 @@ public final class BindingProvider {
     private static final Map<Class<?>, GetterBinding<?>> getters = new HashMap<>();
 
     static {
-        load(PrimitiveBindings.class);
-        load(JOMLBindings.class);
+        load(PrimitiveTypeBindings.class);
+        load(JOMLTypeBindings.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -32,7 +35,7 @@ public final class BindingProvider {
         return (GetterBinding<T>) getters.get(type);
     }
 
-    public static void load(Class<? extends Bindings> accessors) {
+    public static void load(Class<? extends TypeBindings> accessors) {
         Arrays.stream(accessors.getDeclaredMethods())
               .filter(method -> Modifier.isStatic(method.getModifiers()))
               .forEach(BindingProvider::addAccessors);

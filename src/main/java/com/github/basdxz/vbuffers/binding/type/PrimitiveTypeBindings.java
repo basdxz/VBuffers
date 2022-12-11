@@ -1,4 +1,4 @@
-package com.github.basdxz.vbuffers.binding;
+package com.github.basdxz.vbuffers.binding.type;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import static com.github.basdxz.vbuffers.helper.ByteHelper.*;
 
 @SuppressWarnings("unused")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PrimitiveBindings implements Bindings {
+public final class PrimitiveTypeBindings implements TypeBindings {
     @Put({byte.class, Byte.class})
     public static void putByte(ByteBuffer buffer, int offsetBytes, Byte value) {
         buffer.put(offsetBytes, value);
