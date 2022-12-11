@@ -1,6 +1,7 @@
 package com.github.basdxz.vbuffers.copy;
 
 import com.github.basdxz.vbuffers.copy.strategy.CopyStrategy;
+import com.github.basdxz.vbuffers.copy.strategy.MaskedCopy;
 import com.github.basdxz.vbuffers.copy.strategy.NoCopy;
 import com.github.basdxz.vbuffers.copy.strategy.StraightCopy;
 import com.github.basdxz.vbuffers.instance.ExtendedBuffer;
@@ -12,10 +13,14 @@ public final class CopyStrategyFactory {
         val sourceLayoutInfo = source.v$layoutInfo();
         val targetLayoutInfo = target.v$layoutInfo();
 
-        // Handle unmasked copies
         if (mask == null) {
+            // Handle unmasked copies
             if (sourceLayoutInfo.equals(targetLayoutInfo))
                 return new StraightCopy(source, target);
+        } else {
+            // Handle masked copies
+            if (sourceLayoutInfo.equals(targetLayoutInfo))
+                return new MaskedCopy(source, target, mask);
         }
 
         // No operation

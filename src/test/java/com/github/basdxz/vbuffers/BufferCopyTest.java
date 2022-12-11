@@ -1,6 +1,8 @@
 package com.github.basdxz.vbuffers;
 
+import com.github.basdxz.vbuffers.copy.CopyMask;
 import com.github.basdxz.vbuffers.instance.BufferInstance;
+import com.github.basdxz.vbuffers.sample.TestConstants;
 import com.github.basdxz.vbuffers.sample.ZYXBuffer;
 import lombok.*;
 import org.junit.jupiter.api.DisplayName;
@@ -57,15 +59,15 @@ class BufferCopyTest {
         bufferA.v$flip();
 
         // Copy buffer A to buffer B
-        bufferB.v$put(bufferA, null);
+        bufferB.v$put(bufferA, new CopyMask(TestConstants.X));
         bufferA.v$flip();
         bufferB.v$flip();
 
         // Read buffer B
         for (var i = 0; i < 1000; i++) {
             assertEquals(i + 1, bufferB.x());
-            assertEquals(i + 2, bufferB.y());
-            assertEquals(i + 3, bufferB.z());
+            assertEquals(0, bufferB.y());
+            assertEquals(0, bufferB.z());
             bufferB.v$next();
         }
         bufferB.v$flip();

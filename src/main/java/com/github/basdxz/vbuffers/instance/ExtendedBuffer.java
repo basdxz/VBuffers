@@ -50,17 +50,17 @@ public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends B
     @Contract("-> this")
     LAYOUT v$compact();
 
-    @Contract("_, _, _-> this")
-    LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length);
-
     @Contract("_, _-> this")
     LAYOUT v$copyStride(int targetIndex, int sourceIndex);
 
-    @Contract("_, _ -> this")
-    LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask);
+    @Contract("_, _, _-> this")
+    LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length);
 
     @Contract("_ -> this")
     LAYOUT v$put(LAYOUT source);
+
+    @Contract("_, _ -> this")
+    LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask);
 
     @Contract(pure = true)
     boolean v$hasRemaining();

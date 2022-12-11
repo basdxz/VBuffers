@@ -249,6 +249,7 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
 
     @Override
     public LAYOUT v$put(LAYOUT source) {
+        ensureWritable();
         return v$put(source, null);
     }
 
