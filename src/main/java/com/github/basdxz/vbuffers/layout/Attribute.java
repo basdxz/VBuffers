@@ -16,4 +16,16 @@ public class Attribute {
         this.sizeBytes = ByteHelper.sizeBytes(this.type);
         this.offsetBytes = offsetBytes;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Attribute other))
+            return false;
+        return name.equals(other.name) &&
+               type.equals(other.type) &&
+               sizeBytes == other.sizeBytes
+               && offsetBytes == other.offsetBytes;
+    }
 }

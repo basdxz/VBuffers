@@ -29,4 +29,13 @@ public class Stride {
         // Made unmodifiable as it is exposed via getter
         this.attributes = Collections.unmodifiableMap(attributes);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Stride other))
+            return false;
+        return sizeBytes == other.sizeBytes && attributes.equals(other.attributes);
+    }
 }
