@@ -57,10 +57,10 @@ public interface ExtendedBuffer<LAYOUT extends ExtendedBuffer<LAYOUT>> extends B
     LAYOUT v$copyStrides(int targetIndex, int sourceIndex, int length);
 
     @Contract("_ -> this")
-    LAYOUT v$put(LAYOUT source);
+    LAYOUT v$put(ExtendedBuffer<?> source);
 
     @Contract("_, _ -> this")
-    LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask);
+    LAYOUT v$put(ExtendedBuffer<?> source, @Nullable CopyMask mask);
 
     @Contract(pure = true)
     boolean v$hasRemaining();

@@ -248,13 +248,13 @@ public final class BufferInstance<LAYOUT extends Layout<LAYOUT>> implements Exte
     }
 
     @Override
-    public LAYOUT v$put(LAYOUT source) {
+    public LAYOUT v$put(ExtendedBuffer<?> source) {
         ensureWritable();
         return v$put(source, null);
     }
 
     @Override
-    public LAYOUT v$put(LAYOUT source, @Nullable CopyMask mask) {
+    public LAYOUT v$put(ExtendedBuffer<?> source, @Nullable CopyMask mask) {
         ensureWritable();
         if (!source.v$hasRemaining())
             return proxy;

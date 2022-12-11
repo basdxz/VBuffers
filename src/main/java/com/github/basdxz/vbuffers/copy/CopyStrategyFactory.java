@@ -1,9 +1,6 @@
 package com.github.basdxz.vbuffers.copy;
 
-import com.github.basdxz.vbuffers.copy.strategy.CopyStrategy;
-import com.github.basdxz.vbuffers.copy.strategy.MaskedCopy;
-import com.github.basdxz.vbuffers.copy.strategy.NoCopy;
-import com.github.basdxz.vbuffers.copy.strategy.StraightCopy;
+import com.github.basdxz.vbuffers.copy.strategy.*;
 import com.github.basdxz.vbuffers.instance.ExtendedBuffer;
 import lombok.*;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +14,7 @@ public final class CopyStrategyFactory {
             // Handle unmasked copies
             if (sourceLayoutInfo.equals(targetLayoutInfo))
                 return new StraightCopy(source, target);
+            return new CrossCopy(source, target);
         } else {
             // Handle masked copies
             if (sourceLayoutInfo.equals(targetLayoutInfo))

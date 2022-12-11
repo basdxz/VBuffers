@@ -3,13 +3,15 @@ package com.github.basdxz.vbuffers.copy.strategy;
 import com.github.basdxz.vbuffers.instance.ExtendedBuffer;
 import lombok.*;
 
-@AllArgsConstructor
 public final class StraightCopy implements CopyStrategy {
     private final ExtendedBuffer<?> source;
     private final ExtendedBuffer<?> target;
     private final int strideBytes;
 
     public StraightCopy(ExtendedBuffer<?> source, ExtendedBuffer<?> target) {
+        if (!source.v$layoutInfo().equals(target.v$layoutInfo()))
+            throw new IllegalArgumentException("Source and target must have the same layout");
+
         this.source = source;
         this.target = target;
         this.strideBytes = source.v$layoutInfo().stride().sizeBytes();
