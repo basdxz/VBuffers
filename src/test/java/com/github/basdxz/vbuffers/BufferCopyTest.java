@@ -3,7 +3,7 @@ package com.github.basdxz.vbuffers;
 import com.github.basdxz.vbuffers.copy.CopyMask;
 import com.github.basdxz.vbuffers.instance.BufferInstance;
 import com.github.basdxz.vbuffers.sample.TestConstants;
-import com.github.basdxz.vbuffers.sample.ZYXBuffer;
+import com.github.basdxz.vbuffers.sample.XYZBuffer;
 import lombok.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BufferCopyTest {
     @Test
-    @DisplayName("Buffer to Buffer")
+    @DisplayName("XYZBuffer to XYZBuffer")
     void bufferToBuffer() {
-        val bufferA = BufferInstance.newBuffer(ZYXBuffer.class, ByteBuffer::allocateDirect, 1000);
-        val bufferB = BufferInstance.newBuffer(ZYXBuffer.class, ByteBuffer::allocateDirect, 1000);
+        val bufferA = BufferInstance.newBuffer(XYZBuffer.class, ByteBuffer::allocateDirect, 1000);
+        val bufferB = BufferInstance.newBuffer(XYZBuffer.class, ByteBuffer::allocateDirect, 1000);
 
         // Fill buffer A
         for (var i = 0; i < 1000; i++) {
@@ -44,10 +44,10 @@ class BufferCopyTest {
     }
 
     @Test
-    @DisplayName("Masked Buffer to Buffer")
+    @DisplayName("Only X Attribute from XYZBuffer to another XYZBuffer")
     void maskedBufferToBuffer() {
-        val bufferA = BufferInstance.newBuffer(ZYXBuffer.class, ByteBuffer::allocateDirect, 1000);
-        val bufferB = BufferInstance.newBuffer(ZYXBuffer.class, ByteBuffer::allocateDirect, 1000);
+        val bufferA = BufferInstance.newBuffer(XYZBuffer.class, ByteBuffer::allocateDirect, 1000);
+        val bufferB = BufferInstance.newBuffer(XYZBuffer.class, ByteBuffer::allocateDirect, 1000);
 
         // Fill buffer A
         for (var i = 0; i < 1000; i++) {
