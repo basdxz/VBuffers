@@ -2,10 +2,7 @@ package com.github.basdxz.vbuffers.layout;
 
 import com.github.basdxz.vbuffers.instance.ExtendedBuffer;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 public interface Layout<LAYOUT extends ExtendedBuffer<LAYOUT>> extends ExtendedBuffer<LAYOUT> {
     @Target(ElementType.TYPE)
@@ -14,7 +11,9 @@ public interface Layout<LAYOUT extends ExtendedBuffer<LAYOUT>> extends ExtendedB
         Attr[] value();
     }
 
-    @Target({})
+    //NOTE: Repeatable only kicks in if the total number of Attrs is greater than 1
+    @Repeatable(Stride.class)
+    @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     @interface Attr {
         String name();

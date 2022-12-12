@@ -4,11 +4,10 @@ import com.github.basdxz.vbuffers.layout.Layout;
 
 import static com.github.basdxz.vbuffers.sample.TestConstants.*;
 import static com.github.basdxz.vbuffers.sample.XYZBuffer.Attr;
-import static com.github.basdxz.vbuffers.sample.XYZBuffer.Stride;
 
-@Stride({@Attr(name = X, type = Integer.class),
-         @Attr(name = Y, type = Integer.class),
-         @Attr(name = Z, type = Integer.class)})
+@Attr(name = X, type = Integer.class)
+@Attr(name = Y, type = Integer.class)
+@Attr(name = Z, type = Integer.class)
 public interface XYZBuffer extends Layout<XYZBuffer> {
     @This XYZBuffer x(@In(X) int value);
 
